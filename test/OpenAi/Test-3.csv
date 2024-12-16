@@ -1,0 +1,15 @@
+user_query
+Which stocks on NSE showed the highest price increase in the last trading session?
+Can you list stocks with prices trading near their 52-week high on NSE?
+Which stocks had the highest volume traded/volume buzzer compared to yesterday on NSE?
+Which stocks had the highest volume traded/volume buzzer on NSE?
+Find stocks where the price dropped by more than 5% with unusually high volume.
+Which NSE stocks closed above ?1000 with a 10% increase in trading volume compared to their average?
+Can you identify stocks trading below ?50 with high trading volumes?
+What are the top 5 most actively traded stocks on NSE today?
+Which stocks saw a price gap-up at the open but closed lower than the opening price?
+Give me the list of Gap Up stocks.
+Can you list stocks with low price volatility and consistent trading volume over the past month?
+"What?s the return of the sugar sector in the last 10 days, and give me the list of top 5 best performing stocks and top 5 worst performing stocks?"
+"Give me the 5 best-performing stocks of Nifty500 from 15th September 2023 to 26th October 2023 and filter out 2 among 5 which have the least performance in the next 10 days. Also, show the next 10-day performance."
+Give me the performance of all Nifty500 stocks from 15th September 2023 to 26th October 2023.

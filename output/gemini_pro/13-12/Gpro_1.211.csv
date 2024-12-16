@@ -1,0 +1,2325 @@
+user_query,SQL_query_generated,result,1st output,2nd output raw,2nd output processed,result.1
+Which stocks on NSE showed the highest price increase in the last trading session?,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Can you list stocks with prices trading near their 52-week high on NSE?,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Which stocks had the highest volume traded/volume buzzer compared to yesterday on NSE?,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 405 (end of query) (line 10, col 29): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: Find stocks traded on  with the highest volume compared to the previous day (2024-11-18).
+- Required Tables: `equity_prices_1d`
+- Columns: `security_code`, `volume`, `date_time`
+- Conditions: `date_time = '2024-11-19'` for current day volume and `date_time = '2024-11-18'` for previous day volume.
+- Joins: None (self-join for comparison with previous day's data)
+- Aggregations: None (volume is directly retrieved)
+- Sorting/Grouping: Order by volume difference in descending order.
+
+
+```sql
+SELECT t1.security_code
+FROM equity_prices_1d AS t1
+INNER JOIN equity_prices_1d AS t2 ON t1.security_code = t2.security_code
+WHERE t1.date_time = '2024-11-19' AND t2.date_time = '2024-11-18'
+ORDER BY (t1.volume - t2.volume) DESC;
+
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS t1
+INNER JOIN (
+    SELECT t2.security_code, (t2.volume - t3.volume) AS volume_diff
+    FROM ""equity_prices_1d"" AS t2
+    INNER JOIN ""equity_prices_1d"" AS t3 ON t2.security_code = t3.security_code
+    WHERE t2.""date_time"" = '2024-11-19' AND t3.""date_time"" = '2024-11-18'
+) AS t4 ON t1.security_code = t4.security_code
+ORDER BY t4.volume_diff DESC;
+```
+","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS t1
+INNER JOIN (
+    SELECT t2.security_code, (t2.volume - t3.volume) AS volume_diff
+    FROM ""equity_prices_1d"" AS t2
+    INNER JOIN ""equity_prices_1d"" AS t3 ON t2.security_code = t3.security_code
+    WHERE t2.""date_time"" = '2024-11-19' AND t3.""date_time"" = '2024-11-18'
+) AS t4 ON t1.security_code = t4.security_code
+ORDER BY t4.volume_diff DESC;
+
+",
+Which stocks had the highest volume traded/volume buzzer on NSE?,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Find stocks where the price dropped by more than 5% with unusually high volume.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Which NSE stocks closed above ?1000 with a 10% increase in trading volume compared to their average?,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 631 (end of query) (line 21, col 97): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: Find  stocks that closed above â¹1000 with a 10% increase in trading volume compared to their 20-day average volume.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`,`close`, `volume`, `date_time`,`security_code` ,`index_name`
+- Conditions: `close > 1000`, `index_name LIKE '%%'`, `date_time = '2024-11-19'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `AVG(volume)`
+- Sorting/Grouping: None
+
+
+```sql
+SELECT DISTINCT T1.company_name
+FROM master_prime_1d AS T1
+INNER JOIN equity_prices_1d AS T2
+  ON T1.security_code = T2.security_code
+WHERE
+  T2.close > 1000 AND T1.index_name LIKE '%%' AND T2.date_time = '2024-11-19' AND T2.volume > (
+    SELECT
+      AVG(volume) * 1.1
+    FROM equity_prices_1d AS T3
+    WHERE
+      T3.security_code = T2.security_code AND T3.date_time BETWEEN DATE('2024-11-19', '-19 days') AND '2024-11-19'
+  );
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS T1
+INNER JOIN (
+    SELECT
+        ""security_code"",
+        ""close"",
+        ""volume"",
+        ""date_time""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-11-19'
+) AS T2 ON T1.""security_code"" = T2.""security_code""
+INNER JOIN (
+    SELECT
+        ""security_code"",
+        avg(""volume"") AS avg_volume
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+    GROUP BY ""security_code""
+) AS T3 ON T2.""security_code"" = T3.""security_code""
+WHERE T2.""close"" > 1000 AND T1.""index_name"" LIKE '%NSE%' AND T2.""volume"" > (T3.avg_volume * 1.1);
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS T1
+INNER JOIN (
+    SELECT
+        ""security_code"",
+        ""close"",
+        ""volume"",
+        ""date_time""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-11-19'
+) AS T2 ON T1.""security_code"" = T2.""security_code""
+INNER JOIN (
+    SELECT
+        ""security_code"",
+        avg(""volume"") AS avg_volume
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+    GROUP BY ""security_code""
+) AS T3 ON T2.""security_code"" = T3.""security_code""
+WHERE T2.""close"" > 1000 AND T1.""index_name"" LIKE '%NSE%' AND T2.""volume"" > (T3.avg_volume * 1.1);
+",
+Can you identify stocks trading below ?50 with high trading volumes?,,success,"```json
+{
+  ""Intent"": ""Retrieve stocks trading below 50 with high trading volumes."",
+  ""Required Tables"": [""master_prime_1d"", ""equity_prices_1d""],
+  ""Columns"": [""company_name"", ""close"", ""volume""],
+  ""Conditions"": [""close < 50""],
+  ""Joins"": [""master_prime_1d.security_code = equity_prices_1d.security_code""],
+  ""Aggregations"": [],
+  ""Sorting/Grouping"": ""ORDER BY volume DESC"" 
+}
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""close"" < 50
+ORDER BY ""volume"" DESC
+
+```
+","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""close"" < 50
+ORDER BY ""volume"" DESC
+
+
+",
+What are the top 5 most actively traded stocks on NSE today?,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Which stocks saw a price gap-up at the open but closed lower than the opening price?,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Give me the list of Gap Up stocks.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Can you list stocks with low price volatility and consistent trading volume over the past month?,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+"WhatÂs the return of the sugar sector in the last 10 days, and give me the list of top 5 best performing stocks and top 5 worst performing stocks?",,success,"```json
+{
+  ""Intent"": ""Calculate the return of the sugar sector over the last 10 days and list the top 5 best and worst-performing stocks within that sector."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""company_name"",
+    ""industry_name"",
+    ""close"",
+    ""date_time""
+  ],
+  ""Conditions"": [
+    ""industry_name = 'Sugar'"",
+    ""date_time BETWEEN '2024-11-09' AND '2024-11-19'""
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+  ""Aggregations"": [],
+  ""Sorting/Grouping"": [
+    ""ORDER BY return DESC LIMIT 5"",  
+    ""ORDER BY return ASC LIMIT 5""
+  ]
+}
+```","```sql
+SELECT ""company_name"", (CASE WHEN close_latest = 0 THEN 0 ELSE ((close_latest - close_oldest) / close_latest) * 100 END) AS return
+FROM (
+    SELECT ""company_name"", argMax(close, ""date_time"") AS close_latest, argMin(close, ""date_time"") AS close_oldest
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""industry_name"" = 'Sugar' AND ""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+    GROUP BY ""company_name""
+)
+ORDER BY return DESC LIMIT 5
+UNION ALL
+SELECT ""company_name"", (CASE WHEN close_latest = 0 THEN 0 ELSE ((close_latest - close_oldest) / close_latest) * 100 END) AS return
+FROM (
+    SELECT ""company_name"", argMax(close, ""date_time"") AS close_latest, argMin(close, ""date_time"") AS close_oldest
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""industry_name"" = 'Sugar' AND ""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+    GROUP BY ""company_name""
+)
+ORDER BY return ASC LIMIT 5
+
+```","
+SELECT ""company_name"", (CASE WHEN close_latest = 0 THEN 0 ELSE ((close_latest - close_oldest) / close_latest) * 100 END) AS return
+FROM (
+    SELECT ""company_name"", argMax(close, ""date_time"") AS close_latest, argMin(close, ""date_time"") AS close_oldest
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""industry_name"" = 'Sugar' AND ""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+    GROUP BY ""company_name""
+)
+ORDER BY return DESC LIMIT 5
+UNION ALL
+SELECT ""company_name"", (CASE WHEN close_latest = 0 THEN 0 ELSE ((close_latest - close_oldest) / close_latest) * 100 END) AS return
+FROM (
+    SELECT ""company_name"", argMax(close, ""date_time"") AS close_latest, argMin(close, ""date_time"") AS close_oldest
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""industry_name"" = 'Sugar' AND ""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+    GROUP BY ""company_name""
+)
+ORDER BY return ASC LIMIT 5
+
+",
+"Give me the 5 best-performing stocks of Nifty500 from 15th September 2023 to 26th October 2023 and filter out 2 among 5 which have the least performance in the next 10 days. Also, show the next 10-day performance.",,success,"- Intent: Find the 5 best-performing Nifty 500 stocks between 2023-09-15 and 2023-10-26, then filter out the 2 with the lowest performance over the next 10 days (2023-10-27 to 2023-11-05).
+
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+
+- Columns: `company_name`, `date_time`, `close`, `index_name`
+
+- Conditions:
+    - `index_name LIKE '%Nifty 500%'`
+    - `date_time BETWEEN '2023-09-15' AND '2023-10-26'` (Period 1)
+    - `date_time BETWEEN '2023-10-27' AND '2023-11-05'` (Period 2)
+
+
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+
+- Aggregations: None (Performance will be calculated using closing prices)
+
+- Sorting/Grouping:
+    - Sort by performance in Period 1 (descending) to get the top 5.
+    - Sort by performance in Period 2 (ascending) to remove the bottom 2.
+
+
+
+Following are steps to achieve this:
+
+1. **Calculate Performance (Period 1):**  Determine the price change percentage for each stock between 2023-09-15 and 2023-10-26.
+
+2. **Get Top 5:** Select the top 5 stocks based on the performance calculated in step 1.
+
+3. **Calculate Performance (Period 2):** For the selected 5 stocks, calculate the performance over the next 10 days (2023-10-27 to 2023-11-05).
+
+4. **Filter Bottom 2:** Remove the 2 stocks with the lowest performance from step 3.
+
+5. **Output:** Display the final 3 stocks and their performance in both periods. 
+
+Note : The exact SQL query will involve subqueries or common table expressions (CTEs) to handle the staged calculations and sorting required by this complex query.  It also requires calculating percentage changes between start and end dates of the specified periods for each stock which requires careful handling of edge cases (like zero starting prices).
+","```sql
+SELECT DISTINCT ""company_name""
+FROM (
+    SELECT ""master_prime_1d"".""company_name"", (CASE WHEN p1.""close"" = 0 THEN 0 ELSE ((p2.""close"" - p1.""close"") / p1.""close"") * 100 END) AS period1_performance, (CASE WHEN p2.""close"" = 0 THEN 0 ELSE ((p3.""close"" - p2.""close"") / p2.""close"") * 100 END) AS period2_performance
+    FROM ""master_prime_1d""
+    INNER JOIN (
+        SELECT ""security_code"", ""close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2023-09-15'
+    ) AS p1 ON ""master_prime_1d"".""security_code"" = p1.""security_code""
+    INNER JOIN (
+        SELECT ""security_code"", ""close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2023-10-26'
+    ) AS p2 ON ""master_prime_1d"".""security_code"" = p2.""security_code""
+    INNER JOIN (
+        SELECT ""security_code"", ""close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2023-11-05'
+    ) AS p3 ON ""master_prime_1d"".""security_code"" = p3.""security_code""
+    WHERE ""index_name"" LIKE '%Nifty 500%'
+    ORDER BY period1_performance DESC
+    LIMIT 5
+) AS top5
+ORDER BY period2_performance DESC
+LIMIT 3
+
+```","
+SELECT DISTINCT ""company_name""
+FROM (
+    SELECT ""master_prime_1d"".""company_name"", (CASE WHEN p1.""close"" = 0 THEN 0 ELSE ((p2.""close"" - p1.""close"") / p1.""close"") * 100 END) AS period1_performance, (CASE WHEN p2.""close"" = 0 THEN 0 ELSE ((p3.""close"" - p2.""close"") / p2.""close"") * 100 END) AS period2_performance
+    FROM ""master_prime_1d""
+    INNER JOIN (
+        SELECT ""security_code"", ""close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2023-09-15'
+    ) AS p1 ON ""master_prime_1d"".""security_code"" = p1.""security_code""
+    INNER JOIN (
+        SELECT ""security_code"", ""close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2023-10-26'
+    ) AS p2 ON ""master_prime_1d"".""security_code"" = p2.""security_code""
+    INNER JOIN (
+        SELECT ""security_code"", ""close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2023-11-05'
+    ) AS p3 ON ""master_prime_1d"".""security_code"" = p3.""security_code""
+    WHERE ""index_name"" LIKE '%Nifty 500%'
+    ORDER BY period1_performance DESC
+    LIMIT 5
+) AS top5
+ORDER BY period2_performance DESC
+LIMIT 3
+
+",
+Give me the performance of all Nifty500 stocks from 15th September 2023 to 26th October 2023.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 299 (end of query) (line 6, col 56): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""Retrieve the performance (open, high, low, close, volume) of all Nifty 500 stocks from 15th September 2023 to 26th October 2023."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""date_time"",
+    ""open"",
+    ""high"",
+    ""low"",
+    ""close"",
+    ""volume"",
+    ""company_name""
+  ],
+  ""Conditions"": [
+    ""index_name LIKE '%Nifty 500%'"",
+    ""date_time BETWEEN '2023-09-15' AND '2023-10-26'""
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+  ""Aggregations"": [],
+  ""Sorting/Grouping"": []
+}
+```
+","```sql
+SELECT ""date_time"", ""open"", ""high"", ""low"", ""close"", ""volume"", ""company_name""
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""index_name"" LIKE '%Nifty 500%'
+  AND ""date_time"" BETWEEN '2023-09-15' AND '2023-10-26';
+```","
+SELECT ""date_time"", ""open"", ""high"", ""low"", ""close"", ""volume"", ""company_name""
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""index_name"" LIKE '%Nifty 500%'
+  AND ""date_time"" BETWEEN '2023-09-15' AND '2023-10-26';
+",
+Give me the top 10 best and worst performers of all Nifty500 stocks from 9th September 2024 to 27th September 2024.,,success,"- Intent: Retrieve the top 10 and bottom 10 performing Nifty 500 stocks based on percentage change in closing prices between 2024-09-09 and 2024-09-27.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `close`, `date_time`
+- Conditions: `index_name LIKE '%Nifty 500%'`, `date_time BETWEEN '2024-09-09' AND '2024-09-27'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None (Percentage change will be calculated)
+- Sorting/Grouping: Order by percentage change (ascending and descending for bottom and top performers respectively), limit to 10 for each.
+
+
+```sql
+SELECT DISTINCT company_name
+FROM (
+    SELECT DISTINCT company_name, 
+           (
+               (SELECT close 
+                FROM equity_prices_1d ep1 
+                WHERE ep1.security_code = ep.security_code 
+                  AND ep1.date_time = '2024-09-27') - 
+               (SELECT close 
+                FROM equity_prices_1d ep2 
+                WHERE ep2.security_code = ep.security_code 
+                  AND ep2.date_time = '2024-09-09')
+           ) * 100.0 /
+           (CASE 
+                WHEN (SELECT close FROM equity_prices_1d ep3 WHERE ep3.security_code = ep.security_code AND ep3.date_time = '2024-09-09') = 0
+                THEN 1
+                ELSE (SELECT close FROM equity_prices_1d ep3 WHERE ep3.security_code = ep.security_code AND ep3.date_time = '2024-09-09')
+            END) AS percentage_change
+    FROM equity_prices_1d ep
+    JOIN master_prime_1d mp ON ep.security_code = mp.security_code
+    WHERE mp.index_name LIKE '%Nifty 500%'
+      AND ep.date_time BETWEEN '2024-09-09' AND '2024-09-27'
+    ORDER BY percentage_change DESC
+    LIMIT 10
+) AS top_performers
+UNION ALL  -- Or UNION DISTINCT if you want to remove duplicates in case a company is in both top and bottom
+SELECT DISTINCT company_name
+FROM (
+    SELECT DISTINCT company_name, 
+           (
+               (SELECT close 
+                FROM equity_prices_1d ep1 
+                WHERE ep1.security_code = ep.security_code 
+                  AND ep1.date_time = '2024-09-27') - 
+               (SELECT close 
+                FROM equity_prices_1d ep2 
+                WHERE ep2.security_code = ep.security_code 
+                  AND ep2.date_time = '2024-09-09')
+           ) * 100.0 /
+           (CASE 
+                WHEN (SELECT close FROM equity_prices_1d ep3 WHERE ep3.security_code = ep.security_code AND ep3.date_time = '2024-09-09') = 0
+                THEN 1
+                ELSE (SELECT close FROM equity_prices_1d ep3 WHERE ep3.security_code = ep.security_code AND ep3.date_time = '2024-09-09')
+            END) AS percentage_change
+    FROM equity_prices_1d ep
+    JOIN master_prime_1d mp ON ep.security_code = mp.security_code
+    WHERE mp.index_name LIKE '%Nifty 500%'
+      AND ep.date_time BETWEEN '2024-09-09' AND '2024-09-27'
+    ORDER BY percentage_change ASC
+    LIMIT 10
+) AS bottom_performers;
+```
+
+
+","```sql
+SELECT DISTINCT ""company_name""
+FROM (
+    SELECT ""company_name"", (arrayElement(groupArray(""close""), -1) - arrayElement(groupArray(""close""), 1)) * 100 / CASE WHEN arrayElement(groupArray(""close""), 1) = 0 THEN 1 ELSE arrayElement(groupArray(""close""), 1) END AS ""percentage_change""
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""index_name"" LIKE '%Nifty 500%' AND ""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+    GROUP BY ""company_name"", ""security_code""
+    ORDER BY ""percentage_change"" DESC
+    LIMIT 10
+)
+UNION ALL
+SELECT DISTINCT ""company_name""
+FROM (
+    SELECT ""company_name"", (arrayElement(groupArray(""close""), -1) - arrayElement(groupArray(""close""), 1)) * 100 / CASE WHEN arrayElement(groupArray(""close""), 1) = 0 THEN 1 ELSE arrayElement(groupArray(""close""), 1) END AS ""percentage_change""
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""index_name"" LIKE '%Nifty 500%' AND ""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+    GROUP BY ""company_name"", ""security_code""
+    ORDER BY ""percentage_change"" ASC
+    LIMIT 10
+)
+
+```
+","
+SELECT DISTINCT ""company_name""
+FROM (
+    SELECT ""company_name"", (arrayElement(groupArray(""close""), -1) - arrayElement(groupArray(""close""), 1)) * 100 / CASE WHEN arrayElement(groupArray(""close""), 1) = 0 THEN 1 ELSE arrayElement(groupArray(""close""), 1) END AS ""percentage_change""
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""index_name"" LIKE '%Nifty 500%' AND ""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+    GROUP BY ""company_name"", ""security_code""
+    ORDER BY ""percentage_change"" DESC
+    LIMIT 10
+)
+UNION ALL
+SELECT DISTINCT ""company_name""
+FROM (
+    SELECT ""company_name"", (arrayElement(groupArray(""close""), -1) - arrayElement(groupArray(""close""), 1)) * 100 / CASE WHEN arrayElement(groupArray(""close""), 1) = 0 THEN 1 ELSE arrayElement(groupArray(""close""), 1) END AS ""percentage_change""
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""index_name"" LIKE '%Nifty 500%' AND ""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+    GROUP BY ""company_name"", ""security_code""
+    ORDER BY ""percentage_change"" ASC
+    LIMIT 10
+)
+
+
+",
+When was the last time ICICI Bank went up consecutively for 2 days?,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 125
+ Code: 125. DB::Exception: Scalar subquery returned more than one row. (INCORRECT_RESULT_OF_SCALAR_SUBQUERY) (version 24.12.1.1425 (official build))
+","- Intent: Find the last date when ICICI Bank's stock price increased cocutively for two days.
+- Required Tables: `equity_prices_1d`
+- Columns: `date_time`, `close`
+- Conditions: security_code obtained using (SELECT security_code FROM master_prime_1d WHERE short_company_name = 'ICICIBANKEQ')
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: Order by `date_time` descending
+
+```sql
+SELECT t1.date_time
+FROM equity_prices_1d AS t1
+INNER JOIN master_prime_1d AS t2 ON t1.security_code = t2.security_code
+WHERE t2.short_company_name = 'ICICIBANKEQ' AND t1.close > (
+    SELECT close
+    FROM equity_prices_1d AS t3
+    INNER JOIN master_prime_1d AS t4 ON t3.security_code = t4.security_code
+    WHERE t4.short_company_name = 'ICICIBANKEQ' AND t3.date_time = DATE(t1.date_time, '-1 day')
+)
+ORDER BY t1.date_time DESC
+LIMIT 1;
+
+```
+","```sql
+SELECT ""date_time""
+FROM ""equity_prices_1d""
+WHERE ""security_code"" = (SELECT ""security_code"" FROM ""master_prime_1d"" WHERE ""short_company_name"" = 'ICICIBANKEQ')
+AND ""close"" > (SELECT ""close"" FROM ""equity_prices_1d"" AS t2 WHERE t2.""security_code"" = ""security_code"" AND t2.""date_time"" = date(""date_time"", '-1 day'))
+ORDER BY ""date_time"" DESC
+LIMIT 1
+
+```","
+SELECT ""date_time""
+FROM ""equity_prices_1d""
+WHERE ""security_code"" = (SELECT ""security_code"" FROM ""master_prime_1d"" WHERE ""short_company_name"" = 'ICICIBANKEQ')
+AND ""close"" > (SELECT ""close"" FROM ""equity_prices_1d"" AS t2 WHERE t2.""security_code"" = ""security_code"" AND t2.""date_time"" = date(""date_time"", '-1 day'))
+ORDER BY ""date_time"" DESC
+LIMIT 1
+
+",
+"When was the last time the Nifty50 index went up for 3 weeks consecutively, and what was the performance in the next 3 months?",,success,"- Intent: Find the last date when Nifty50 went up for 3 cocutive weeks, and calculate the Nifty50 performance over the subsequent 3 months.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `date_time`, `index_name`, `close`
+- Conditions: `index_name` LIKE '%Nifty50%',  
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: None (Further logic required to identify cocutive weeks and calculate 3-month performance, but this goes beyond the scope of preprocessing for basic SQL component extraction). 
+","```sql
+SELECT ""date_time"", ""close""
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""index_name"" LIKE '%Nifty50%'
+
+```","
+SELECT ""date_time"", ""close""
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""index_name"" LIKE '%Nifty50%'
+
+",
+List stocks where today's low > yesterday's high and today's volume is 3x of the previous day's volume on 16th July 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 354 (end of query) (line 9, col 125): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: List stocks where today's low is greater than yesterday's high and today's volume is 3 times the previous day's volume on 16th July 2024.
+- Required Tables: `equity_prices_1d`, `master_prime_1d`
+- Columns: `equity_prices_1d.low`, `equity_prices_1d.high`, `equity_prices_1d.volume`, `equity_prices_1d.date_time`, `equity_prices_1d.security_code`, `master_prime_1d.company_name`
+- Conditions: `equity_prices_1d.date_time = '2024-07-16'`
+- Joins: `equity_prices_1d.security_code = equity_prices_1d.security_code` (Self-join)
+- Aggregations: None
+- Sorting/Grouping: None
+
+```sql
+SELECT DISTINCT T1.company_name
+FROM master_prime_1d AS T1
+INNER JOIN equity_prices_1d AS T2
+  ON T1.security_code = T2.security_code
+INNER JOIN equity_prices_1d AS T3
+  ON T1.security_code = T3.security_code
+WHERE
+  T2.date_time = '2024-07-16' AND T3.date_time = '2024-07-15' AND T2.low > T3.high AND T2.volume = 3 * T3.volume;
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS T1
+INNER JOIN ""equity_prices_1d"" AS T2
+  ON T1.""security_code"" = T2.""security_code""
+INNER JOIN ""equity_prices_1d"" AS T3
+  ON T1.""security_code"" = T3.""security_code""
+WHERE
+  T2.""date_time"" = '2024-07-16' AND T3.""date_time"" = '2024-07-15' AND T2.""low"" > T3.""high"" AND T2.""volume"" = 3 * T3.""volume"";
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS T1
+INNER JOIN ""equity_prices_1d"" AS T2
+  ON T1.""security_code"" = T2.""security_code""
+INNER JOIN ""equity_prices_1d"" AS T3
+  ON T1.""security_code"" = T3.""security_code""
+WHERE
+  T2.""date_time"" = '2024-07-16' AND T3.""date_time"" = '2024-07-15' AND T2.""low"" > T3.""high"" AND T2.""volume"" = 3 * T3.""volume"";
+",
+List stocks where today's low > yesterday's high and today's volume is 3x of its average volume on 16th July 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 607 (end of query) (line 13, col 73): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""List stocks where today's low is greater than yesterday's high and today's volume is 3 times its average volume on 16th July 2024."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""company_name"",
+    ""low"",
+    ""high"",
+    ""volume"",
+    ""date_time""
+  ],
+  ""Conditions"": [
+    ""date_time = '2024-11-19'"",
+    ""date_time = '2024-11-18'"",
+    ""date_time = '2024-07-16'""
+
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+  ""Aggregations"": [
+    ""avg(volume)""
+  ],
+  ""Sorting/Grouping"": ""None""
+}
+```","```sql
+SELECT DISTINCT ""t1"".""company_name""
+FROM ""master_prime_1d"" AS ""t1""
+INNER JOIN ""equity_prices_1d"" AS ""t2"" ON ""t1"".""security_code"" = ""t2"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", avg(""volume"") AS ""avg_volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-07-16'
+    GROUP BY ""security_code""
+) AS ""t3"" ON ""t1"".""security_code"" = ""t3"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS ""t4"" ON ""t1"".""security_code"" = ""t4"".""security_code""
+WHERE ""t2"".""date_time"" = '2024-11-19' AND ""t4"".""date_time"" = '2024-11-18'
+  AND ""t2"".""low"" > ""t4"".""high"" AND ""t2"".""volume"" = 3 * ""t3"".""avg_volume"";
+```","
+SELECT DISTINCT ""t1"".""company_name""
+FROM ""master_prime_1d"" AS ""t1""
+INNER JOIN ""equity_prices_1d"" AS ""t2"" ON ""t1"".""security_code"" = ""t2"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", avg(""volume"") AS ""avg_volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-07-16'
+    GROUP BY ""security_code""
+) AS ""t3"" ON ""t1"".""security_code"" = ""t3"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS ""t4"" ON ""t1"".""security_code"" = ""t4"".""security_code""
+WHERE ""t2"".""date_time"" = '2024-11-19' AND ""t4"".""date_time"" = '2024-11-18'
+  AND ""t2"".""low"" > ""t4"".""high"" AND ""t2"".""volume"" = 3 * ""t3"".""avg_volume"";
+",
+"List stocks where today's volume > yesterday's volume, and one day ago volume > 2-day ago volume, and 2-day ago volume > 3-day ago volume on 19th July 2024.",,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 678 (end of query) (line 14, col 36): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: List stocks where today's volume is greater than yesterday's, yesterday's is greater than 2 days ago, and 2 days ago is greater than 3 days ago on 19th July 2024.
+- Required Tables: `equity_prices_1d`, `master_prime_1d`
+- Columns: `equity_prices_1d.volume`, `equity_prices_1d.date_time`, `equity_prices_1d.security_code`, `master_prime_1d.company_name`
+- Conditions: 
+    - `equity_prices_1d.date_time = '2024-07-19'` (today)
+    - `equity_prices_1d.date_time = '2024-07-18'` (yesterday)
+    - `equity_prices_1d.date_time = '2024-07-17'` (2 days ago)
+    - `equity_prices_1d.date_time = '2024-07-16'` (3 days ago)
+- Joins: `equity_prices_1d.security_code = master_prime_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: None
+","```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d"" AS t1
+INNER JOIN ""master_prime_1d"" ON ""t1"".""security_code"" = ""master_prime_1d"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS t2 ON ""t1"".""security_code"" = ""t2"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS t3 ON ""t1"".""security_code"" = ""t3"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS t4 ON ""t1"".""security_code"" = ""t4"".""security_code""
+WHERE ""t1"".""date_time"" = '2024-07-19'
+  AND ""t2"".""date_time"" = '2024-07-18'
+  AND ""t3"".""date_time"" = '2024-07-17'
+  AND ""t4"".""date_time"" = '2024-07-16'
+  AND ""t1"".""volume"" > ""t2"".""volume""
+  AND ""t2"".""volume"" > ""t3"".""volume""
+  AND ""t3"".""volume"" > ""t4"".""volume"";
+```","
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d"" AS t1
+INNER JOIN ""master_prime_1d"" ON ""t1"".""security_code"" = ""master_prime_1d"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS t2 ON ""t1"".""security_code"" = ""t2"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS t3 ON ""t1"".""security_code"" = ""t3"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS t4 ON ""t1"".""security_code"" = ""t4"".""security_code""
+WHERE ""t1"".""date_time"" = '2024-07-19'
+  AND ""t2"".""date_time"" = '2024-07-18'
+  AND ""t3"".""date_time"" = '2024-07-17'
+  AND ""t4"".""date_time"" = '2024-07-16'
+  AND ""t1"".""volume"" > ""t2"".""volume""
+  AND ""t2"".""volume"" > ""t3"".""volume""
+  AND ""t3"".""volume"" > ""t4"".""volume"";
+",
+"List stocks where today's price > yesterday's close, and one-day ago price > 2-day ago price, and 2-day ago price > 3-day ago price on 16th July 2024, and next day closing is lesser than the previous day close, and 17th July 2024 volume < previous day volume.",Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+List stocks that closed above the previous month's high and above the previous week's high on 16th July 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+List stocks whose volume is -20% than 2 days before volume on 27th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 234 (end of query) (line 5, col 153): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: List stocks whose volume is 20% less than the volume 2 days prior, specifically on 27th September 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `security_code`, `date_time`, `volume`
+- Conditions: `date_time = '2024-09-27'` and `volume < 0.8 * (volume on 2024-09-25)`
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None
+","```sql
+SELECT ""security_code""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-27'
+AND ""volume"" < 0.8 * (SELECT ""volume"" FROM ""equity_prices_1d"" WHERE ""date_time"" = '2024-09-25' AND ""security_code"" = ""equity_prices_1d"".""security_code"");
+```","
+SELECT ""security_code""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-27'
+AND ""volume"" < 0.8 * (SELECT ""volume"" FROM ""equity_prices_1d"" WHERE ""date_time"" = '2024-09-25' AND ""security_code"" = ""equity_prices_1d"".""security_code"");
+",
+List stocks whose volume is minus 20% than 2 days before volume on 27th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 366 (end of query) (line 6, col 114): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: List stocks whose volume is 20% less than the volume 2 days prior, specifically on 2024-09-27.
+- Required Tables: `equity_prices_1d`, `master_prime_1d`
+- Columns: `equity_prices_1d.volume`, `equity_prices_1d.date_time`, `equity_prices_1d.security_code`, `master_prime_1d.company_name`
+- Conditions: `equity_prices_1d.date_time = '2024-09-27'`,  `equity_prices_1d.volume` is 20% less than the volume on `2024-09-25`
+- Joins: `equity_prices_1d.security_code = master_prime_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: None
+","```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d"" AS t1
+INNER JOIN ""master_prime_1d"" ON ""t1"".""security_code"" = ""master_prime_1d"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS t2 ON ""t1"".""security_code"" = ""t2"".""security_code""
+WHERE ""t1"".""date_time"" = '2024-09-27' AND ""t2"".""date_time"" = '2024-09-25' AND ""t1"".""volume"" = ""t2"".""volume"" * 0.8;
+```","
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d"" AS t1
+INNER JOIN ""master_prime_1d"" ON ""t1"".""security_code"" = ""master_prime_1d"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS t2 ON ""t1"".""security_code"" = ""t2"".""security_code""
+WHERE ""t1"".""date_time"" = '2024-09-27' AND ""t2"".""date_time"" = '2024-09-25' AND ""t1"".""volume"" = ""t2"".""volume"" * 0.8;
+",
+List stocks whose volume is +20% than 2 days before volume on 27th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 248 (end of query) (line 9, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: List stocks whose volume on 2024-09-27 is greater than 120% of their volume on 2024-09-25.
+- Required Tables: `equity_prices_1d`
+- Columns: `security_code`, `date_time`, `volume`
+- Conditions: `date_time = '2024-09-27'` and  volume on '2024-09-27' > 1.2 * volume on '2024-09-25'
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None
+","```sql
+SELECT ""security_code""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-27'
+AND ""volume"" > 1.2 * (
+    SELECT ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-25' AND ""security_code"" = ""equity_prices_1d"".""security_code""
+);
+```","
+SELECT ""security_code""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-27'
+AND ""volume"" > 1.2 * (
+    SELECT ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-25' AND ""security_code"" = ""equity_prices_1d"".""security_code""
+);
+",
+List stocks whose volume is 20% higher than 2 days before volume on 27th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 369 (end of query) (line 10, col 72): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""List stocks whose volume is 20% higher than the volume 2 days before on 27th September 2024."",
+  ""Required Tables"": [""equity_prices_1d""],
+  ""Columns"": [""security_code"", ""volume"", ""date_time"", ""company_name""],
+  ""Conditions"": [""date_time = '2024-09-27'"", ""volume > 1.2 * (SELECT volume FROM equity_prices_1d WHERE date_time = '2024-09-25' AND equity_prices_1d.security_code = t1.security_code)""],
+  ""Joins"": ""JOIN master_prime_1d AS t2 ON t2.security_code = t1.security_code"",
+  ""Aggregations"": [],
+  ""Sorting/Grouping"": []
+}
+
+```
+","```sql
+SELECT DISTINCT t2.""company_name""
+FROM ""equity_prices_1d"" AS t1
+JOIN ""master_prime_1d"" AS t2 ON t1.""security_code"" = t2.""security_code""
+JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-25'
+) AS t3 ON t1.""security_code"" = t3.""security_code""
+WHERE t1.""date_time"" = '2024-09-27' AND t1.""volume"" > 1.2 * t3.""volume"";
+```","
+SELECT DISTINCT t2.""company_name""
+FROM ""equity_prices_1d"" AS t1
+JOIN ""master_prime_1d"" AS t2 ON t1.""security_code"" = t2.""security_code""
+JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-25'
+) AS t3 ON t1.""security_code"" = t3.""security_code""
+WHERE t1.""date_time"" = '2024-09-27' AND t1.""volume"" > 1.2 * t3.""volume"";
+",
+"List stocks whose volume is between 20000 and 30000 on 27th September 2024. I need symbol, price, 10-day average volume in the columns.",,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 505 (end of query) (line 9, col 51): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""List stocks with volume between 20000 and 30000 on 27th September 2024, displaying symbol, price, and 10-day average volume."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""short_company_name"",
+    ""close"",
+    ""volume""
+  ],
+  ""Conditions"": [
+    ""volume BETWEEN 20000 AND 30000"",
+    ""date_time = '2024-09-27'""
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+  ""Aggregations"": [
+    ""AVG(volume) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY date_time ASC ROWS BETWEEN 9 PRECEDING AND CURRENT ROW)""
+  ],
+  ""Sorting/Grouping"": ""None""
+}
+```","```sql
+SELECT ""short_company_name"", ""close"", ""ten_day_avg_volume""
+FROM (
+    SELECT ""short_company_name"", ""close"", AVG(""volume"") OVER (PARTITION BY ""equity_prices_1d"".""security_code"" ORDER BY ""date_time"" ASC ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) AS ""ten_day_avg_volume""
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""date_time"" = '2024-09-27'
+) AS subquery
+WHERE ""ten_day_avg_volume"" BETWEEN 20000 AND 30000;
+```","
+SELECT ""short_company_name"", ""close"", ""ten_day_avg_volume""
+FROM (
+    SELECT ""short_company_name"", ""close"", AVG(""volume"") OVER (PARTITION BY ""equity_prices_1d"".""security_code"" ORDER BY ""date_time"" ASC ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) AS ""ten_day_avg_volume""
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""date_time"" = '2024-09-27'
+) AS subquery
+WHERE ""ten_day_avg_volume"" BETWEEN 20000 AND 30000;
+",
+"Give me symbol, price, 10-day average volume where stocks are in between 5% and 10% below their 52-week high.",,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 945 (end of query) (line 12, col 83): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""Retrieve the symbol, price, and 10-day average volume for stocks whose current price is between 5% and 10% below their 52-week high."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""short_company_name"",
+    ""close"",
+    ""volume"",
+    ""high""
+  ],
+  ""Conditions"": [
+    ""date_time BETWEEN '2023-11-19' AND '2024-11-19'"",
+    ""close BETWEEN 0.9 * MAX(high) OVER (PARTITION BY security_code ORDER BY date_time ASC ROWS BETWEEN 365 PRECEDING AND CURRENT ROW) AND 0.95 * MAX(high) OVER (PARTITION BY security_code ORDER BY date_time ASC ROWS BETWEEN 365 PRECEDING AND CURRENT ROW)""
+
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+  ""Aggregations"": [
+    ""AVG(volume) OVER (PARTITION BY security_code ORDER BY date_time ASC ROWS BETWEEN 9 PRECEDING AND CURRENT ROW)""
+  ],
+  ""Sorting/Grouping"": ""None""
+}
+```
+","```sql
+SELECT ""short_company_name"", ""close"", ""ten_day_avg_volume""
+FROM (
+    SELECT ""short_company_name"", ""close"", AVG(""volume"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) AS ""ten_day_avg_volume"", ""high"", ""fifty_two_week_high""
+    FROM (
+        SELECT ""master_prime_1d"".""short_company_name"", ""equity_prices_1d"".""close"", ""equity_prices_1d"".""volume"", ""equity_prices_1d"".""high"", MAX(""equity_prices_1d"".""high"") OVER (PARTITION BY ""equity_prices_1d"".""security_code"" ORDER BY ""equity_prices_1d"".""date_time"" ASC ROWS BETWEEN 365 PRECEDING AND CURRENT ROW) AS ""fifty_two_week_high""
+        FROM ""master_prime_1d""
+        INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+        WHERE ""equity_prices_1d"".""date_time"" BETWEEN '2023-11-19' AND '2024-11-19'
+    )
+)
+WHERE ""close"" BETWEEN 0.9 * ""fifty_two_week_high"" AND 0.95 * ""fifty_two_week_high"";
+```","
+SELECT ""short_company_name"", ""close"", ""ten_day_avg_volume""
+FROM (
+    SELECT ""short_company_name"", ""close"", AVG(""volume"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) AS ""ten_day_avg_volume"", ""high"", ""fifty_two_week_high""
+    FROM (
+        SELECT ""master_prime_1d"".""short_company_name"", ""equity_prices_1d"".""close"", ""equity_prices_1d"".""volume"", ""equity_prices_1d"".""high"", MAX(""equity_prices_1d"".""high"") OVER (PARTITION BY ""equity_prices_1d"".""security_code"" ORDER BY ""equity_prices_1d"".""date_time"" ASC ROWS BETWEEN 365 PRECEDING AND CURRENT ROW) AS ""fifty_two_week_high""
+        FROM ""master_prime_1d""
+        INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+        WHERE ""equity_prices_1d"".""date_time"" BETWEEN '2023-11-19' AND '2024-11-19'
+    )
+)
+WHERE ""close"" BETWEEN 0.9 * ""fifty_two_week_high"" AND 0.95 * ""fifty_two_week_high"";
+",
+Give me a 5-day average price for Nifty50 stocks on 16th July 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Give me price and volume data for ICICI Bank for the last 5 days on 16th July 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Give me a list of stocks whose daily volume is greater than the sum of last week's volume on 16th July 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 516 (end of query) (line 9, col 135): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""Retrieve a list of companies whose daily trading volume on July 16, 2024, exceeded the sum of their trading volumes for the week prior (July 9, 2024 to July 15, 2024)."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""company_name"",
+    ""volume"",
+    ""date_time""
+  ],
+  ""Conditions"": [
+    ""date_time = '2024-07-16'"",
+    ""date_time BETWEEN '2024-07-09' AND '2024-07-15'""
+  ],
+  ""Joins"": ""master_prime_1d.security_code = equity_prices_1d.security_code"",
+  ""Aggregations"": [
+    ""SUM(volume)""
+  ],
+  ""Sorting/Grouping"": ""None""
+}
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""date_time"" = '2024-07-16'
+AND ""volume"" > (SELECT SUM(""volume"")
+                FROM ""equity_prices_1d"" AS ""epd""
+                INNER JOIN ""master_prime_1d"" AS ""mpd"" ON ""epd"".""security_code"" = ""mpd"".""security_code""
+                WHERE ""date_time"" BETWEEN '2024-07-09' AND '2024-07-15' AND ""master_prime_1d"".""security_code"" = ""mpd"".""security_code"");
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""date_time"" = '2024-07-16'
+AND ""volume"" > (SELECT SUM(""volume"")
+                FROM ""equity_prices_1d"" AS ""epd""
+                INNER JOIN ""master_prime_1d"" AS ""mpd"" ON ""epd"".""security_code"" = ""mpd"".""security_code""
+                WHERE ""date_time"" BETWEEN '2024-07-09' AND '2024-07-15' AND ""master_prime_1d"".""security_code"" = ""mpd"".""security_code"");
+",
+Give me a list of stocks whose daily volume was at least three times higher than the average volume for the previous ten days on 16th July 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 380 (end of query) (line 11, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""Retrieve a list of stocks whose daily volume on 2024-07-16 was at least three times greater than their average volume over the preceding ten days."",
+  ""Required Tables"": [
+    ""equity_prices_1d"",
+    ""master_prime_1d""
+  ],
+  ""Columns"": [
+    ""equity_prices_1d.date_time"",
+    ""equity_prices_1d.volume"",
+    ""master_prime_1d.company_name""
+  ],
+  ""Conditions"": [
+    ""equity_prices_1d.date_time = '2024-07-16'""
+  ],
+  ""Joins"": [
+    ""equity_prices_1d.security_code = master_prime_1d.security_code""
+  ],
+  ""Aggregations"": [
+    ""AVG(equity_prices_1d.volume)""
+  ],
+  ""Sorting/Grouping"": []
+}
+```","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" AS ""ep"" ON ""master_prime_1d"".""security_code"" = ""ep"".""security_code""
+WHERE ""ep"".""date_time"" = '2024-07-16'
+AND ""ep"".""volume"" >= 3 * (
+    SELECT avg(""volume"")
+    FROM ""equity_prices_1d""
+    WHERE ""security_code"" = ""ep"".""security_code""
+    AND ""date_time"" BETWEEN '2024-07-06' AND '2024-07-15'
+);
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" AS ""ep"" ON ""master_prime_1d"".""security_code"" = ""ep"".""security_code""
+WHERE ""ep"".""date_time"" = '2024-07-16'
+AND ""ep"".""volume"" >= 3 * (
+    SELECT avg(""volume"")
+    FROM ""equity_prices_1d""
+    WHERE ""security_code"" = ""ep"".""security_code""
+    AND ""date_time"" BETWEEN '2024-07-06' AND '2024-07-15'
+);
+",
+List stocks where volume has increased for 2 consecutive days on 16th July 2024.,,success,"- Intent: Find stocks whose volume has increased for two cocutive days on 16th July 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `security_code`, `volume`, `date_time`
+- Conditions:  `date_time` in ('2024-07-15', '2024-07-16')
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None
+
+
+```sql
+SELECT T1.security_code
+FROM equity_prices_1d AS T1
+INNER JOIN equity_prices_1d AS T2
+  ON T1.security_code = T2.security_code
+WHERE
+  T1.date_time = '2024-07-16' AND T2.date_time = '2024-07-15' AND T1.volume > T2.volume;
+```
+","```sql
+SELECT ""security_code""
+FROM ""equity_prices_1d"" AS T1
+INNER JOIN ""equity_prices_1d"" AS T2 ON T1.""security_code"" = T2.""security_code""
+WHERE T1.""date_time"" = '2024-07-16' AND T2.""date_time"" = '2024-07-15' AND T1.""volume"" > T2.""volume""
+
+```
+","
+SELECT ""security_code""
+FROM ""equity_prices_1d"" AS T1
+INNER JOIN ""equity_prices_1d"" AS T2 ON T1.""security_code"" = T2.""security_code""
+WHERE T1.""date_time"" = '2024-07-16' AND T2.""date_time"" = '2024-07-15' AND T1.""volume"" > T2.""volume""
+
+
+",
+"Give me 10-day, 20-day performance whenever weekly volumes have increased for two consecutive weeks as of 16th July 2024.",,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 1810 (end of query) (line 44, col 21): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: Retrieve the 10-day and 20-day performance of stocks where weekly volumes have increased for two cocutive weeks as of July 16, 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `date_time`, `security_code`, `close`, `volume`
+- Conditions:  `date_time` <= '2024-07-16'
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None
+
+
+Here's a breakdown of how to approach this complex query with SQL and how the preprocessing helps:
+
+1. **Weekly Volume Increase Calculation:**
+
+This part is the most challenging. We need to calculate weekly volumes and then check for a two-week cocutive increase.  This will involve subqueries and date manipulation within SQL.  A simplified example of the core logic (the actual implementation would be more elaborate to handle edge cases and specific date requirements):
+
+```sql
+WITH WeeklyVolumes AS (
+    SELECT
+        security_code,
+        DATE_TRUNC('week', date_time) AS week_start,  -- Group by week
+        SUM(volume) AS weekly_volume
+    FROM
+        equity_prices_1d
+    WHERE date_time <= '2024-07-16'
+    GROUP BY
+        security_code, week_start
+),
+LaggedVolumes AS (
+    SELECT
+        security_code,
+        week_start,
+        weekly_volume,
+        LAG(weekly_volume, 1) OVER (PARTITION BY security_code ORDER BY week_start) AS previous_week_volume,
+        LAG(weekly_volume, 2) OVER (PARTITION BY security_code ORDER BY week_start) AS two_weeks_ago_volume
+    FROM
+        WeeklyVolumes
+)
+SELECT
+    security_code
+FROM
+    LaggedVolumes
+WHERE
+    weekly_volume > previous_week_volume AND previous_week_volume > two_weeks_ago_volume;
+
+```
+
+2. **10-Day and 20-Day Performance:**
+   This requires calculating percentage changes in closing prices. We'll likely need another subquery or common table expression (CTE) to achieve this efficiently. Again, here is simplified SQL illustrating how this can be combined:
+   ```sql
+
+WITH WeeklyVolumes AS (
+    -- Same as before--
+),
+LaggedVolumes AS (
+    -- Same as before --
+),
+QualifyingStocks AS(
+SELECT
+    security_code
+FROM
+    LaggedVolumes
+WHERE
+    weekly_volume > previous_week_volume AND previous_week_volume > two_weeks_ago_volume
+),
+Prices AS (
+  SELECT
+        ep.security_code,
+        ep.date_time,
+        ep.close
+    FROM
+        equity_prices_1d ep
+        JOIN QualifyingStocks qs ON ep.security_code = qs.security_code
+    WHERE ep.date_time <= '2024-07-16'
+)
+SELECT
+    p.security_code,
+    p.date_time,
+    (p.close - LAG(p.close, 10) OVER (PARTITION BY p.security_code ORDER BY p.date_time)) * 100.0 / LAG(p.close, 10) OVER (PARTITION BY p.security_code ORDER BY p.date_time) as ten_day_performance,
+    (p.close - LAG(p.close, 20) OVER (PARTITION BY p.security_code ORDER BY p.date_time)) * 100.0 / LAG(p.close, 20) OVER (PARTITION BY p.security_code ORDER BY p.date_time)  as twenty_day_performance
+FROM Prices p;
+
+```
+
+The structured preprocessing provides the key elements that are then used to build these more complex SQL queries.  It breaks down the user's request into the fundamental parts the database needs to execute it.","```sql
+WITH ""WeeklyVolumes"" AS (
+  SELECT
+    ""security_code"",
+    DATE_TRUNC('week', ""date_time"") AS ""week_start"",
+    SUM(""volume"") AS ""weekly_volume""
+  FROM ""equity_prices_1d""
+  WHERE ""date_time"" <= '2024-07-16'
+  GROUP BY
+    ""security_code"",
+    ""week_start""
+), ""LaggedVolumes"" AS (
+  SELECT
+    ""security_code"",
+    ""week_start"",
+    ""weekly_volume"",
+    LAG(""weekly_volume"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""week_start"") AS ""previous_week_volume"",
+    LAG(""weekly_volume"", 2) OVER (PARTITION BY ""security_code"" ORDER BY ""week_start"") AS ""two_weeks_ago_volume""
+  FROM ""WeeklyVolumes""
+), ""QualifyingStocks"" AS (
+  SELECT
+    ""security_code""
+  FROM ""LaggedVolumes""
+  WHERE
+    ""weekly_volume"" > ""previous_week_volume"" AND ""previous_week_volume"" > ""two_weeks_ago_volume""
+), ""Prices"" AS (
+  SELECT
+    ""ep"".""security_code"",
+    ""ep"".""date_time"",
+    ""ep"".""close""
+  FROM ""equity_prices_1d"" AS ""ep""
+  INNER JOIN ""QualifyingStocks"" AS ""qs"" ON ""ep"".""security_code"" = ""qs"".""security_code""
+  WHERE ""ep"".""date_time"" <= '2024-07-16'
+)
+SELECT
+  ""p"".""security_code"",
+  ""p"".""date_time"",
+  (
+    ""p"".""close"" - LAG(""p"".""close"", 10) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"")
+  ) * 100.0 / CASE WHEN LAG(""p"".""close"", 10) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"") = 0 THEN 1 ELSE LAG(""p"".""close"", 10) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"") END AS ""ten_day_performance"",
+  (
+    ""p"".""close"" - LAG(""p"".""close"", 20) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"")
+  ) * 100.0 / CASE WHEN LAG(""p"".""close"", 20) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"") = 0 THEN 1 ELSE LAG(""p"".""close"", 20) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"") END AS ""twenty_day_performance""
+FROM ""Prices"" AS ""p"";
+```","
+WITH ""WeeklyVolumes"" AS (
+  SELECT
+    ""security_code"",
+    DATE_TRUNC('week', ""date_time"") AS ""week_start"",
+    SUM(""volume"") AS ""weekly_volume""
+  FROM ""equity_prices_1d""
+  WHERE ""date_time"" <= '2024-07-16'
+  GROUP BY
+    ""security_code"",
+    ""week_start""
+), ""LaggedVolumes"" AS (
+  SELECT
+    ""security_code"",
+    ""week_start"",
+    ""weekly_volume"",
+    LAG(""weekly_volume"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""week_start"") AS ""previous_week_volume"",
+    LAG(""weekly_volume"", 2) OVER (PARTITION BY ""security_code"" ORDER BY ""week_start"") AS ""two_weeks_ago_volume""
+  FROM ""WeeklyVolumes""
+), ""QualifyingStocks"" AS (
+  SELECT
+    ""security_code""
+  FROM ""LaggedVolumes""
+  WHERE
+    ""weekly_volume"" > ""previous_week_volume"" AND ""previous_week_volume"" > ""two_weeks_ago_volume""
+), ""Prices"" AS (
+  SELECT
+    ""ep"".""security_code"",
+    ""ep"".""date_time"",
+    ""ep"".""close""
+  FROM ""equity_prices_1d"" AS ""ep""
+  INNER JOIN ""QualifyingStocks"" AS ""qs"" ON ""ep"".""security_code"" = ""qs"".""security_code""
+  WHERE ""ep"".""date_time"" <= '2024-07-16'
+)
+SELECT
+  ""p"".""security_code"",
+  ""p"".""date_time"",
+  (
+    ""p"".""close"" - LAG(""p"".""close"", 10) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"")
+  ) * 100.0 / CASE WHEN LAG(""p"".""close"", 10) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"") = 0 THEN 1 ELSE LAG(""p"".""close"", 10) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"") END AS ""ten_day_performance"",
+  (
+    ""p"".""close"" - LAG(""p"".""close"", 20) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"")
+  ) * 100.0 / CASE WHEN LAG(""p"".""close"", 20) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"") = 0 THEN 1 ELSE LAG(""p"".""close"", 20) OVER (PARTITION BY ""p"".""security_code"" ORDER BY ""p"".""date_time"") END AS ""twenty_day_performance""
+FROM ""Prices"" AS ""p"";
+",
+List stocks going below the previous week's low on 20th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 444 (end of query) (line 12, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: Find stocks whose price went below the previous week's low on 20th September 2024.
+
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+
+- Columns: `company_name`, `date_time`, `low`
+
+- Conditions: 
+    - `date_time = '2024-09-20'` (for current day's low)
+    - `date_time BETWEEN '2024-09-13' AND '2024-09-19'` (for previous week's data)
+
+
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+
+- Aggregations: `MIN(low)` (to find the previous week's low)
+
+- Sorting/Grouping: None
+
+
+```sql
+SELECT DISTINCT t1.company_name
+FROM master_prime_1d AS t1
+INNER JOIN equity_prices_1d AS t2 ON t1.security_code = t2.security_code
+WHERE t2.date_time = '2024-09-20'
+AND t2.low < (
+    SELECT MIN(low)
+    FROM equity_prices_1d AS t3
+    INNER JOIN master_prime_1d AS t4 ON t3.security_code = t4.security_code
+    WHERE t3.date_time BETWEEN '2024-09-13' AND '2024-09-19'
+    AND t1.security_code=t4.security_code
+);
+
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS t1
+INNER JOIN ""equity_prices_1d"" AS t2 ON t1.""security_code"" = t2.""security_code""
+WHERE t2.""date_time"" = '2024-09-20'
+AND t2.""low"" < (
+    SELECT MIN(""low"")
+    FROM ""equity_prices_1d"" AS t3
+    INNER JOIN ""master_prime_1d"" AS t4 ON t3.""security_code"" = t4.""security_code""
+    WHERE t3.""date_time"" BETWEEN '2024-09-13' AND '2024-09-19'
+    AND t1.""security_code"" = t4.""security_code""
+);
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS t1
+INNER JOIN ""equity_prices_1d"" AS t2 ON t1.""security_code"" = t2.""security_code""
+WHERE t2.""date_time"" = '2024-09-20'
+AND t2.""low"" < (
+    SELECT MIN(""low"")
+    FROM ""equity_prices_1d"" AS t3
+    INNER JOIN ""master_prime_1d"" AS t4 ON t3.""security_code"" = t4.""security_code""
+    WHERE t3.""date_time"" BETWEEN '2024-09-13' AND '2024-09-19'
+    AND t1.""security_code"" = t4.""security_code""
+);
+",
+List stocks crossing below the previous week's low on 20th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 433 (end of query) (line 6, col 248): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""List stocks whose closing price on 20th September 2024 crossed below the previous week's low."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""company_name"",
+    ""date_time"",
+    ""close"",
+    ""low""
+  ],
+  ""Conditions"": [
+    ""date_time = '2024-09-20'"",
+    ""date_time BETWEEN '2024-09-13' AND '2024-09-19'""
+  ],
+  ""Joins"": ""master_prime_1d.security_code = equity_prices_1d.security_code"",
+  ""Aggregations"": [
+    ""MIN(low)""
+  ],
+  ""Sorting/Grouping"": ""None""
+}
+
+```","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" AS t1 ON ""master_prime_1d"".""security_code"" = t1.""security_code""
+WHERE t1.""date_time"" = '2024-09-20'
+AND t1.""close"" < (SELECT MIN(""low"") FROM ""equity_prices_1d"" AS t2 INNER JOIN ""master_prime_1d"" AS t3 ON t2.""security_code"" = t3.""security_code"" WHERE t2.""date_time"" BETWEEN '2024-09-13' AND '2024-09-19' AND t1.""security_code"" = t2.""security_code"");
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" AS t1 ON ""master_prime_1d"".""security_code"" = t1.""security_code""
+WHERE t1.""date_time"" = '2024-09-20'
+AND t1.""close"" < (SELECT MIN(""low"") FROM ""equity_prices_1d"" AS t2 INNER JOIN ""master_prime_1d"" AS t3 ON t2.""security_code"" = t3.""security_code"" WHERE t2.""date_time"" BETWEEN '2024-09-13' AND '2024-09-19' AND t1.""security_code"" = t2.""security_code"");
+",
+List stocks closing below yesterday's high on 20th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 402 (end of query) (line 10, col 71): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""List stocks whose closing price is below yesterday's high on 20th September 2024."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""company_name"",
+    ""close"",
+    ""high""
+  ],
+  ""Conditions"": [
+    ""equity_prices_1d.date_time = '2024-09-20'"",
+    ""equity_prices_1d.close < yesterday_high"" 
+  ],
+  ""Joins"": ""master_prime_1d.security_code = equity_prices_1d.security_code"",
+  ""Aggregations"": [],
+  ""Sorting/Grouping"": []
+}
+```","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" AS t1 ON ""master_prime_1d"".""security_code"" = t1.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""high"" AS yesterday_high
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-19'
+) AS t2 ON t1.""security_code"" = t2.""security_code""
+WHERE t1.""date_time"" = '2024-09-20' AND t1.""close"" < t2.yesterday_high;
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" AS t1 ON ""master_prime_1d"".""security_code"" = t1.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""high"" AS yesterday_high
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-19'
+) AS t2 ON t1.""security_code"" = t2.""security_code""
+WHERE t1.""date_time"" = '2024-09-20' AND t1.""close"" < t2.yesterday_high;
+",
+"Give me the 10-day, 20-day, 30-day, and 6-month performance of all Nifty50 stocks whenever it has given 3 consecutive weeks of positive gains.",,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 3047 (end of query) (line 35, col 111): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: Retrieve the 10-day, 20-day, 30-day, and 6-month performance of all Nifty 50 stocks that have shown positive gains for three cocutive weeks.
+
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+
+- Columns: `date_time`, `close`, `index_name`, `company_name`
+
+- Conditions: 
+    - `index_name LIKE '%Nifty 50%'`
+    - Three cocutive weeks of positive gains (This requires a complex subquery or CTE to determine)
+
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+
+- Aggregations: None (Performance calculation will involve comparing closing prices, not aggregation)
+
+- Sorting/Grouping: None
+
+
+Here's how the complex condition for ""three cocutive weeks of positive gains"" can be translated into a SQL fragment (using a CTE for clarity):
+
+```sql
+WITH WeeklyClosingPrices AS (
+    SELECT
+        mp.company_name,
+        ep.date_time,
+        ep.close,
+        DATE_TRUNC('week', ep.date_time) AS week_start
+    FROM
+        equity_prices_1d ep
+    JOIN
+        master_prime_1d mp ON ep.security_code = mp.security_code
+    WHERE mp.index_name LIKE '%Nifty 50%' 
+),
+LaggedWeeklyReturns AS (
+  SELECT
+        company_name,
+        week_start,
+        close,
+        LAG(close, 1, 0) OVER (PARTITION BY company_name ORDER BY week_start) AS prev_close,  -- Previous week's closing price
+        LAG(close, 2, 0) OVER (PARTITION BY company_name ORDER BY week_start) AS prev_prev_close -- Closing price two weeks ago
+    FROM WeeklyClosingPrices
+),
+ThreeWeekGains AS (
+    SELECT
+        company_name
+    FROM LaggedWeeklyReturns
+    WHERE (close > prev_close) AND (prev_close > prev_prev_close)
+    GROUP BY company_name  -- To avoid duplicates if a company has multiple 3-week gain streaks
+)
+-- Now you can use the ThreeWeekGains CTE to filter the main query
+SELECT ... -- The rest of your query to calculate performance
+FROM ...
+WHERE company_name IN (SELECT company_name FROM ThreeWeekGains)
+
+
+-- Calculate 10-day, 20-day, 30-day, and 6-month performance
+-- (Illustrative - the exact date calculations need to be adjusted based on your business logic)
+SELECT 
+  ep.date_time,
+  mp.company_name,
+  -- ... (Other calculations for 10-day, 20-day, 30-day, 6-month performance)
+FROM equity_prices_1d ep
+JOIN master_prime_1d mp ON ep.security_code = mp.security_code
+WHERE mp.company_name IN (SELECT company_name FROM ThreeWeekGains); -- Filter by companies with 3 cocutive weeks of gain
+
+
+```
+
+
+
+
+This outlines the SQL structure necessary to handle the complex three-week gain condition, which involves lagged comparisons and grouping.  Remember to adapt the date calculations and performance calculations based on your specific requirements.","```sql
+WITH ""WeeklyClosingPrices"" AS (
+  SELECT
+    ""mp"".""company_name"",
+    ""ep"".""date_time"",
+    ""ep"".""close"",
+    DATE_TRUNC('week', ""ep"".""date_time"") AS ""week_start""
+  FROM ""equity_prices_1d"" AS ""ep""
+  INNER JOIN ""master_prime_1d"" AS ""mp"" ON ""ep"".""security_code"" = ""mp"".""security_code""
+  WHERE ""mp"".""index_name"" LIKE '%Nifty 50%'
+), ""LaggedWeeklyReturns"" AS (
+  SELECT
+    ""company_name"",
+    ""week_start"",
+    ""close"",
+    LAG(""close"", 1, 0) OVER (PARTITION BY ""company_name"" ORDER BY ""week_start"") AS ""prev_close"",
+    LAG(""close"", 2, 0) OVER (PARTITION BY ""company_name"" ORDER BY ""week_start"") AS ""prev_prev_close""
+  FROM ""WeeklyClosingPrices""
+), ""ThreeWeekGains"" AS (
+  SELECT
+    ""company_name""
+  FROM ""LaggedWeeklyReturns""
+  WHERE ""close"" > ""prev_close"" AND ""prev_close"" > ""prev_prev_close""
+  GROUP BY ""company_name""
+)
+SELECT
+  ""ep"".""date_time"",
+  ""mp"".""company_name"",
+  CASE WHEN (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-10 day') AND ""security_code"" = ""ep"".""security_code"") = 0 THEN 0 ELSE ((""ep"".""close"" - (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-10 day') AND ""security_code"" = ""ep"".""security_code"")) / (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-10 day') AND ""security_code"" = ""ep"".""security_code"")) * 100 END AS ""10_day_performance"",
+  CASE WHEN (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-20 day') AND ""security_code"" = ""ep"".""security_code"") = 0 THEN 0 ELSE ((""ep"".""close"" - (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-20 day') AND ""security_code"" = ""ep"".""security_code"")) / (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-20 day') AND ""security_code"" = ""ep"".""security_code"")) * 100 END AS ""20_day_performance"",
+  CASE WHEN (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-30 day') AND ""security_code"" = ""ep"".""security_code"") = 0 THEN 0 ELSE ((""ep"".""close"" - (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-30 day') AND ""security_code"" = ""ep"".""security_code"")) / (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-30 day') AND ""security_code"" = ""ep"".""security_code"")) * 100 END AS ""30_day_performance"",
+  CASE WHEN (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-180 day') AND ""security_code"" = ""ep"".""security_code"") = 0 THEN 0 ELSE ((""ep"".""close"" - (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-180 day') AND ""security_code"" = ""ep"".""security_code"")) / (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-180 day') AND ""security_code"" = ""ep"".""security_code"")) * 100 END AS ""6_month_performance""
+FROM ""equity_prices_1d"" AS ""ep""
+INNER JOIN ""master_prime_1d"" AS ""mp"" ON ""ep"".""security_code"" = ""mp"".""security_code""
+WHERE ""mp"".""company_name"" IN (SELECT ""company_name"" FROM ""ThreeWeekGains"") AND ""ep"".""date_time"" = '2024-11-19';
+```","
+WITH ""WeeklyClosingPrices"" AS (
+  SELECT
+    ""mp"".""company_name"",
+    ""ep"".""date_time"",
+    ""ep"".""close"",
+    DATE_TRUNC('week', ""ep"".""date_time"") AS ""week_start""
+  FROM ""equity_prices_1d"" AS ""ep""
+  INNER JOIN ""master_prime_1d"" AS ""mp"" ON ""ep"".""security_code"" = ""mp"".""security_code""
+  WHERE ""mp"".""index_name"" LIKE '%Nifty 50%'
+), ""LaggedWeeklyReturns"" AS (
+  SELECT
+    ""company_name"",
+    ""week_start"",
+    ""close"",
+    LAG(""close"", 1, 0) OVER (PARTITION BY ""company_name"" ORDER BY ""week_start"") AS ""prev_close"",
+    LAG(""close"", 2, 0) OVER (PARTITION BY ""company_name"" ORDER BY ""week_start"") AS ""prev_prev_close""
+  FROM ""WeeklyClosingPrices""
+), ""ThreeWeekGains"" AS (
+  SELECT
+    ""company_name""
+  FROM ""LaggedWeeklyReturns""
+  WHERE ""close"" > ""prev_close"" AND ""prev_close"" > ""prev_prev_close""
+  GROUP BY ""company_name""
+)
+SELECT
+  ""ep"".""date_time"",
+  ""mp"".""company_name"",
+  CASE WHEN (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-10 day') AND ""security_code"" = ""ep"".""security_code"") = 0 THEN 0 ELSE ((""ep"".""close"" - (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-10 day') AND ""security_code"" = ""ep"".""security_code"")) / (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-10 day') AND ""security_code"" = ""ep"".""security_code"")) * 100 END AS ""10_day_performance"",
+  CASE WHEN (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-20 day') AND ""security_code"" = ""ep"".""security_code"") = 0 THEN 0 ELSE ((""ep"".""close"" - (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-20 day') AND ""security_code"" = ""ep"".""security_code"")) / (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-20 day') AND ""security_code"" = ""ep"".""security_code"")) * 100 END AS ""20_day_performance"",
+  CASE WHEN (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-30 day') AND ""security_code"" = ""ep"".""security_code"") = 0 THEN 0 ELSE ((""ep"".""close"" - (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-30 day') AND ""security_code"" = ""ep"".""security_code"")) / (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-30 day') AND ""security_code"" = ""ep"".""security_code"")) * 100 END AS ""30_day_performance"",
+  CASE WHEN (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-180 day') AND ""security_code"" = ""ep"".""security_code"") = 0 THEN 0 ELSE ((""ep"".""close"" - (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-180 day') AND ""security_code"" = ""ep"".""security_code"")) / (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = DATE('2024-11-19', '-180 day') AND ""security_code"" = ""ep"".""security_code"")) * 100 END AS ""6_month_performance""
+FROM ""equity_prices_1d"" AS ""ep""
+INNER JOIN ""master_prime_1d"" AS ""mp"" ON ""ep"".""security_code"" = ""mp"".""security_code""
+WHERE ""mp"".""company_name"" IN (SELECT ""company_name"" FROM ""ThreeWeekGains"") AND ""ep"".""date_time"" = '2024-11-19';
+",
+List stocks opening above yesterday's high on 20th September 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+List stocks closing above the previous weekly candle closing price on 20th September 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+List stocks closing above the previous week's closing price on 20th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 344 (end of query) (line 6, col 106): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""List stocks whose closing price on 2024-09-20 is greater than their closing price on 2024-09-13 (the previous week)."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""master_prime_1d.company_name"",
+    ""equity_prices_1d.close""
+  ],
+  ""Conditions"": [
+    ""equity_prices_1d.date_time = '2024-09-20'"",
+    ""equity_prices_1d.date_time = '2024-09-13'""
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+  ""Aggregations"": [],
+  ""Sorting/Grouping"": []
+}
+```","```sql
+SELECT DISTINCT ""t1"".""company_name""
+FROM ""master_prime_1d"" AS ""t1""
+INNER JOIN ""equity_prices_1d"" AS ""t2"" ON ""t1"".""security_code"" = ""t2"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS ""t3"" ON ""t1"".""security_code"" = ""t3"".""security_code""
+WHERE ""t2"".""date_time"" = '2024-09-20' AND ""t3"".""date_time"" = '2024-09-13' AND ""t2"".""close"" > ""t3"".""close"";
+```","
+SELECT DISTINCT ""t1"".""company_name""
+FROM ""master_prime_1d"" AS ""t1""
+INNER JOIN ""equity_prices_1d"" AS ""t2"" ON ""t1"".""security_code"" = ""t2"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS ""t3"" ON ""t1"".""security_code"" = ""t3"".""security_code""
+WHERE ""t2"".""date_time"" = '2024-09-20' AND ""t3"".""date_time"" = '2024-09-13' AND ""t2"".""close"" > ""t3"".""close"";
+",
+List stocks closing above the previous Friday's closing price on 20th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 348 (end of query) (line 8, col 34): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""List stocks whose closing price on 20th September 2024 was higher than the closing price on the previous Friday."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""company_name"",
+    ""close"",
+    ""date_time""
+  ],
+  ""Conditions"": [
+    ""date_time = '2024-09-20'"",
+    ""date_time = '2024-09-13'"" 
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+  ""Aggregations"": [],
+  ""Sorting/Grouping"": []
+}
+```","```sql
+SELECT DISTINCT ""t1"".""company_name""
+FROM ""master_prime_1d"" AS ""t1""
+INNER JOIN ""equity_prices_1d"" AS ""t2"" ON ""t1"".""security_code"" = ""t2"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS ""t3"" ON ""t1"".""security_code"" = ""t3"".""security_code""
+WHERE ""t2"".""date_time"" = '2024-09-20'
+  AND ""t3"".""date_time"" = '2024-09-13'
+  AND ""t2"".""close"" > ""t3"".""close"";
+```","
+SELECT DISTINCT ""t1"".""company_name""
+FROM ""master_prime_1d"" AS ""t1""
+INNER JOIN ""equity_prices_1d"" AS ""t2"" ON ""t1"".""security_code"" = ""t2"".""security_code""
+INNER JOIN ""equity_prices_1d"" AS ""t3"" ON ""t1"".""security_code"" = ""t3"".""security_code""
+WHERE ""t2"".""date_time"" = '2024-09-20'
+  AND ""t3"".""date_time"" = '2024-09-13'
+  AND ""t2"".""close"" > ""t3"".""close"";
+",
+List stocks with daily candle closing above the previous weekly open price on 20th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 307 (end of query) (line 6, col 131): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""List stocks whose daily close price is greater than the previous week's open price on 2024-09-20."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""company_name"",
+    ""close"",
+    ""open""
+  ],
+  ""Conditions"": [
+    ""equity_prices_1d.date_time = '2024-09-20'"",
+    ""equity_prices_1d.close > weekly_open"" 
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+ ""Aggregations"": [],
+  ""Sorting/Grouping"": [],
+    ""Subqueries"": [
+    {
+        ""Intent"": ""Get weekly open price for previous week (2024-09-13)"",
+      ""Required Tables"": [ ""equity_prices_1d"" ],
+      ""Columns"": [ ""open"" ],
+      ""Conditions"": [ ""date_time = '2024-09-13'"" ],
+       ""Alias"": ""weekly_open""
+    }
+  ]
+}
+```","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN ""equity_prices_1d"" AS ep ON mp.""security_code"" = ep.""security_code""
+WHERE ep.""date_time"" = '2024-09-20'
+AND ep.""close"" > (SELECT ""open"" FROM ""equity_prices_1d"" WHERE ""date_time"" = '2024-09-13' AND ""security_code"" = ep.""security_code"");
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN ""equity_prices_1d"" AS ep ON mp.""security_code"" = ep.""security_code""
+WHERE ep.""date_time"" = '2024-09-20'
+AND ep.""close"" > (SELECT ""open"" FROM ""equity_prices_1d"" WHERE ""date_time"" = '2024-09-13' AND ""security_code"" = ep.""security_code"");
+",
+List NIFTY500 stocks with their closing price 1% lower from the day's high on 20th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 260 (end of query) (line 7, col 30): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""Retrieve NIFTY500 stocks whose closing price on 20th September 2024 was 1% lower than the day's high."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""company_name"",
+    ""close"",
+    ""high""
+  ],
+  ""Conditions"": [
+    ""index_name LIKE '%Nifty 500%'"",
+    ""date_time = '2024-09-20'"" ,
+    ""close = high * 0.99""
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+  ""Aggregations"": [],
+  ""Sorting/Grouping"": []
+}
+```","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""index_name"" LIKE '%Nifty 500%'
+  AND ""date_time"" = '2024-09-20'
+  AND ""close"" = ""high"" * 0.99;
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""index_name"" LIKE '%Nifty 500%'
+  AND ""date_time"" = '2024-09-20'
+  AND ""close"" = ""high"" * 0.99;
+",
+List stocks with their closing price 5% lower from the day's high on 20th September 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+List stocks with their closing price 2% higher from the day's low on 20th September 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+"On 16th September 2024, which stocks have closed below their previous week's low?",,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 625 (end of query) (line 15, col 72): ;
+
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: Find stocks that closed below their previous week's low on 16th September 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `date_time`, `security_code`, `close`, `low`
+- Conditions: `date_time = '2024-09-16'`
+- Joins: None
+- Aggregations: `min(low)`
+- Sorting/Grouping: None
+
+Here's a more detailed breakdown for SQL query generation:
+
+1. **Previous Week's Low Calculation**:
+   - Need to determine the date range for the previous week (2024-09-09 to 2024-09-15).
+   - Calculate the minimum `low` value for each `security_code` within this date range. This represents the previous week's low.
+
+2. **Current Day's Close**:
+   - Filter for records where `date_time = '2024-09-16'`.
+   - Retrieve the `close` value for each `security_code` on this date.
+
+3. **Comparison**:
+   - Compare the `close` value on 2024-09-16 with the calculated previous week's low for each `security_code`.
+   - Select only those `security_code`s where the `close` is less than the previous week's low.
+
+4. **Final Output**:
+   - Retrieve the `company_name` corresponding to the selected `security_code`s from the `master_prime_1d` table.
+
+
+This structured information allows for the generation of a SQL query to answer the given natural language query accurately.  It requires a subquery or common table expression (CTE) to effectively calculate the previous week's low and then compare it to the closing price on the specified date.
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", ""close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-16'
+) AS current_day_close ON ""master_prime_1d"".""security_code"" = current_day_close.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", min(""low"") AS ""previous_week_low""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-09-09' AND '2024-09-15'
+    GROUP BY ""security_code""
+) AS previous_week_low ON ""master_prime_1d"".""security_code"" = previous_week_low.""security_code""
+WHERE current_day_close.""close"" < previous_week_low.""previous_week_low"";
+
+```
+","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", ""close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-16'
+) AS current_day_close ON ""master_prime_1d"".""security_code"" = current_day_close.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", min(""low"") AS ""previous_week_low""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-09-09' AND '2024-09-15'
+    GROUP BY ""security_code""
+) AS previous_week_low ON ""master_prime_1d"".""security_code"" = previous_week_low.""security_code""
+WHERE current_day_close.""close"" < previous_week_low.""previous_week_low"";
+
+
+",
+"On 16th September 2024, which stocks have closed below their previous weekly candle low?",,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 224 (end of query) (line 5, col 143): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""Find stocks that closed below their previous week's low on 16th September 2024."",
+  ""Required Tables"": [
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""security_code"",
+    ""date_time"",
+    ""low"",
+    ""close""
+  ],
+  ""Conditions"": [
+    ""date_time = '2024-09-16'"",
+    ""close < (SELECT low FROM equity_prices_1d WHERE date_time = '2024-09-09' AND security_code = equity_prices_1d.security_code)""
+  ],
+  ""Joins"": [],
+  ""Aggregations"": [],
+  ""Sorting/Grouping"": []
+}
+```","```sql
+SELECT ""security_code""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-16'
+AND ""close"" < (SELECT ""low"" FROM ""equity_prices_1d"" WHERE ""date_time"" = '2024-09-09' AND ""security_code"" = ""equity_prices_1d"".""security_code"");
+
+```","
+SELECT ""security_code""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-16'
+AND ""close"" < (SELECT ""low"" FROM ""equity_prices_1d"" WHERE ""date_time"" = '2024-09-09' AND ""security_code"" = ""equity_prices_1d"".""security_code"");
+
+",
+"List stocks that have closed above their August 2024 high in September 2024, along with the dates and symbols.",,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 373 (end of query) (line 6, col 167): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: Find stocks that closed above their August 2024 high in September 2024, displaying their symbols and dates.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `master_prime_1d.short_company_name`, `equity_prices_1d.date_time`, `equity_prices_1d.close`
+- Conditions: 
+    - `equity_prices_1d.date_time` between '2024-09-01' and '2024-09-30' (September 2024)
+    - `equity_prices_1d.close` > Maximum `equity_prices_1d.high` for each stock in August 2024
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `MAX(equity_prices_1d.high)` for August 2024 data
+- Sorting/Grouping: None
+
+
+
+```sql
+SELECT DISTINCT mp.short_company_name, ep.date_time
+FROM master_prime_1d AS mp
+JOIN equity_prices_1d AS ep ON mp.security_code = ep.security_code
+WHERE ep.date_time BETWEEN '2024-09-01' AND '2024-09-30'
+AND ep.close > (
+    SELECT MAX(high)
+    FROM equity_prices_1d AS ep2
+    WHERE ep2.security_code = ep.security_code
+    AND ep2.date_time BETWEEN '2024-08-01' AND '2024-08-31'
+);
+
+```
+","```sql
+SELECT ""short_company_name"", ""date_time""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN ""equity_prices_1d"" AS ep ON mp.""security_code"" = ep.""security_code""
+WHERE ""date_time"" BETWEEN '2024-09-01' AND '2024-09-30'
+AND ""close"" > (SELECT MAX(""high"") FROM ""equity_prices_1d"" AS ep2 WHERE ep2.""security_code"" = ep.""security_code"" AND ""date_time"" BETWEEN '2024-08-01' AND '2024-08-31');
+```
+","
+SELECT ""short_company_name"", ""date_time""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN ""equity_prices_1d"" AS ep ON mp.""security_code"" = ep.""security_code""
+WHERE ""date_time"" BETWEEN '2024-09-01' AND '2024-09-30'
+AND ""close"" > (SELECT MAX(""high"") FROM ""equity_prices_1d"" AS ep2 WHERE ep2.""security_code"" = ep.""security_code"" AND ""date_time"" BETWEEN '2024-08-01' AND '2024-08-31');
+
+",
+"List stocks that have closed above their August 2024 highest price in September 2024, along with the dates and symbols.",,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 391 (end of query) (line 6, col 172): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: List stocks that closed above their August 2024 highest price in September 2024, along with the dates and symbols.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `master_prime_1d.short_company_name`, `equity_prices_1d.date_time`, `equity_prices_1d.close`
+- Conditions: `equity_prices_1d.date_time` between '2024-09-01' and '2024-09-30', `equity_prices_1d.close` > max(`equity_prices_1d.close`) for August 2024
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: max(`equity_prices_1d.close`)
+- Sorting/Grouping: None
+
+
+```sql
+SELECT mp.short_company_name, ep.date_time, ep.close
+FROM equity_prices_1d AS ep
+JOIN master_prime_1d AS mp ON ep.security_code = mp.security_code
+WHERE ep.date_time BETWEEN '2024-09-01' AND '2024-09-30'
+AND ep.close > (
+    SELECT MAX(close)
+    FROM equity_prices_1d AS ep2
+    WHERE ep2.security_code = ep.security_code
+    AND ep2.date_time BETWEEN '2024-08-01' AND '2024-08-31'
+);
+
+```
+","```sql
+SELECT ""short_company_name"", ""date_time"", ""close""
+FROM ""equity_prices_1d"" AS ep
+INNER JOIN ""master_prime_1d"" AS mp ON ""ep"".""security_code"" = ""mp"".""security_code""
+WHERE ""date_time"" BETWEEN '2024-09-01' AND '2024-09-30'
+AND ""close"" > (SELECT max(""close"") FROM ""equity_prices_1d"" AS ep2 WHERE ""ep2"".""security_code"" = ""ep"".""security_code"" AND ""date_time"" BETWEEN '2024-08-01' AND '2024-08-31');
+```","
+SELECT ""short_company_name"", ""date_time"", ""close""
+FROM ""equity_prices_1d"" AS ep
+INNER JOIN ""master_prime_1d"" AS mp ON ""ep"".""security_code"" = ""mp"".""security_code""
+WHERE ""date_time"" BETWEEN '2024-09-01' AND '2024-09-30'
+AND ""close"" > (SELECT max(""close"") FROM ""equity_prices_1d"" AS ep2 WHERE ""ep2"".""security_code"" = ""ep"".""security_code"" AND ""date_time"" BETWEEN '2024-08-01' AND '2024-08-31');
+",
+List stocks that have closed higher for 3 consecutive days as of 16th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 449 (end of query) (line 10, col 21): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""List stocks that have closed higher for 3 cocutive days as of 2024-09-16."",
+  ""Required Tables"": [""equity_prices_1d""],
+  ""Columns"": [""date_time"", ""security_code"", ""close""],
+  ""Conditions"": [""date_time <= '2024-09-16'""],
+  ""Joins"": [],
+  ""Aggregations"": [],
+  ""Sorting/Grouping"": []
+}
+```","```sql
+SELECT ""security_code""
+FROM (
+    SELECT ""date_time"", ""security_code"", ""close"", lagInFrame(""close"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"") AS prev_close, lagInFrame(""close"", 2) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"") AS prev_prev_close
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" <= '2024-09-16'
+)
+WHERE ""close"" > prev_close AND prev_close > prev_prev_close
+GROUP BY ""security_code""
+HAVING count(*) >= 1;
+```","
+SELECT ""security_code""
+FROM (
+    SELECT ""date_time"", ""security_code"", ""close"", lagInFrame(""close"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"") AS prev_close, lagInFrame(""close"", 2) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"") AS prev_prev_close
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" <= '2024-09-16'
+)
+WHERE ""close"" > prev_close AND prev_close > prev_prev_close
+GROUP BY ""security_code""
+HAVING count(*) >= 1;
+",
+Give me the 5-week weekly average volume for ICICI Bank as of 20th September 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Give me the 5-week average volume for ICICI Bank using weekly data as of 16th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 239 (end of query) (line 5, col 90): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""Retrieve the 5-week average volume for ICICI Bank using weekly data as of 16th September 2024."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""company_name"",
+    ""volume"",
+    ""date_time""
+  ],
+  ""Conditions"": [
+    ""company_name = 'ICICI Bank'"",
+    ""date_time BETWEEN '2024-08-12' AND '2024-09-16'""
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+  ""Aggregations"": [
+    ""AVG(volume)""
+  ],
+  ""Sorting/Grouping"": null
+}
+
+```","```sql
+SELECT avg(""volume"")
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""company_name"" = 'ICICI Bank' AND ""date_time"" BETWEEN '2024-08-12' AND '2024-09-16';
+```","
+SELECT avg(""volume"")
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""company_name"" = 'ICICI Bank' AND ""date_time"" BETWEEN '2024-08-12' AND '2024-09-16';
+",
+Give me the 5-week average volume weekly for ICICI Bank as of 16th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 358 (end of query) (line 7, col 55): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: Calculate the 5-week average weekly volume for ICICI Bank as of 16th September 2024.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `volume`, `date_time`
+- Conditions: `company_name` = 'ICICI Bank', `date_time` between '2024-08-12' and '2024-09-16'
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `avg(volume)`
+- Sorting/Grouping: Group by week
+
+
+","```sql
+SELECT avg(""volume"") AS average_weekly_volume
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""master_prime_1d"".""company_name"" = 'ICICI Bank'
+  AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-08-12' AND '2024-09-16'
+GROUP BY toStartOfWeek(""equity_prices_1d"".""date_time"");
+```","
+SELECT avg(""volume"") AS average_weekly_volume
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""master_prime_1d"".""company_name"" = 'ICICI Bank'
+  AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-08-12' AND '2024-09-16'
+GROUP BY toStartOfWeek(""equity_prices_1d"".""date_time"");
+",
+List stocks that are within 5% of their 3-month low on 20th September 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+List stocks that are trading within 3% of their 3-year high on 20th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 629 (end of query) (line 20, col 90): ;
+
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: List stocks trading within 3% of their 3-year high on 2024-09-20.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `high`, `date_time`
+- Conditions: `date_time` between 2021-09-20 and 2024-09-20, `date_time` = 2024-09-20,  `high` within 3% of 3-year high.
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `MAX(high)`
+- Sorting/Grouping: None
+
+
+```sql
+SELECT DISTINCT T1.company_name
+FROM master_prime_1d AS T1
+INNER JOIN equity_prices_1d AS T2
+  ON T1.security_code = T2.security_code
+WHERE T2.date_time = '2024-09-20'
+  AND T2.high >= (
+    SELECT
+      MAX(high) * 0.97
+    FROM equity_prices_1d AS T3
+    WHERE
+      T3.security_code = T2.security_code AND T3.date_time BETWEEN '2021-09-20' AND '2024-09-20'
+  )
+  AND T2.high <= (
+    SELECT
+      MAX(high) * 1.03
+    FROM equity_prices_1d AS T3
+    WHERE
+      T3.security_code = T2.security_code AND T3.date_time BETWEEN '2021-09-20' AND '2024-09-20'
+  );
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT
+        ""security_code"",
+        ""high"",
+        ""date_time""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+) AS ""T2"" ON ""master_prime_1d"".""security_code"" = ""T2"".""security_code""
+INNER JOIN (
+    SELECT
+        ""security_code"",
+        max(""high"") AS ""three_year_high""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2021-09-20' AND '2024-09-20'
+    GROUP BY ""security_code""
+) AS ""T3"" ON ""T2"".""security_code"" = ""T3"".""security_code""
+WHERE ""T2"".""high"" BETWEEN ""T3"".""three_year_high"" * 0.97 AND ""T3"".""three_year_high"" * 1.03;
+
+```
+","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT
+        ""security_code"",
+        ""high"",
+        ""date_time""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+) AS ""T2"" ON ""master_prime_1d"".""security_code"" = ""T2"".""security_code""
+INNER JOIN (
+    SELECT
+        ""security_code"",
+        max(""high"") AS ""three_year_high""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2021-09-20' AND '2024-09-20'
+    GROUP BY ""security_code""
+) AS ""T3"" ON ""T2"".""security_code"" = ""T3"".""security_code""
+WHERE ""T2"".""high"" BETWEEN ""T3"".""three_year_high"" * 0.97 AND ""T3"".""three_year_high"" * 1.03;
+
+
+",
+List stocks that are within 5% of their 52-week low on 20th September 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+List stocks that have crossed above their August 2024 high on 20th September 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+List stocks that have broken their August 2024 high on 20th September 2024.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 544 (end of query) (line 6, col 333): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","```json
+{
+  ""Intent"": ""List stocks that reached a new high on September 20, 2024, surpassing their previous highs for August 2024."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""company_name"",
+    ""high"",
+    ""date_time""
+  ],
+  ""Conditions"": [
+    ""date_time = '2024-09-20'"",
+    ""date_time BETWEEN '2024-08-01' AND '2024-08-31'""
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+  ""Aggregations"": [
+    ""MAX(high)""
+  ],
+  ""Sorting/Grouping"": []
+}
+```","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""high"" > (SELECT MAX(""high"") FROM ""equity_prices_1d"" AS ""epd_inner"" INNER JOIN ""master_prime_1d"" AS ""mpd_inner"" ON ""epd_inner"".""security_code"" = ""mpd_inner"".""security_code"" WHERE ""epd_inner"".""date_time"" BETWEEN '2024-08-01' AND '2024-08-31' AND ""mpd_inner"".""security_code"" = ""master_prime_1d"".""security_code"");
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""high"" > (SELECT MAX(""high"") FROM ""equity_prices_1d"" AS ""epd_inner"" INNER JOIN ""master_prime_1d"" AS ""mpd_inner"" ON ""epd_inner"".""security_code"" = ""mpd_inner"".""security_code"" WHERE ""epd_inner"".""date_time"" BETWEEN '2024-08-01' AND '2024-08-31' AND ""mpd_inner"".""security_code"" = ""master_prime_1d"".""security_code"");
+",
+Give me the 5-day average volume for ICICI Bank as of 23rd September 2024.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Give me the latest 5-day average volume for ICICI Bank.,Error generating SQL: 429 Resource has been exhausted (e.g. check quota).,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Give me the list of top 3 best-performing macroeconomic sectors in the last 20 days.,,success,"```json
+{
+  ""Intent"": ""Retrieve the top 3 best-performing macroeconomic sectors based on their performance over the last 20 days."",
+  ""Required Tables"": [
+    ""master_prime_1d"",
+    ""equity_prices_1d""
+  ],
+  ""Columns"": [
+    ""major_sector_name"",
+    ""close""
+  ],
+  ""Conditions"": [
+    ""date_time BETWEEN '2024-10-20' AND '2024-11-19'""
+  ],
+  ""Joins"": [
+    ""master_prime_1d.security_code = equity_prices_1d.security_code""
+  ],
+  ""Aggregations"": [
+    
+  ],
+  ""Sorting/Grouping"": {
+    ""Group By"": ""major_sector_name"",
+    ""Order By"": ""performance DESC"",
+    ""Limit"": 3
+  },
+    ""Derived Columns"": ""(((SUM(CASE WHEN date_time = '2024-11-19' THEN close ELSE 0 END)/SUM(CASE WHEN date_time = '2024-10-20' THEN close ELSE 1 END)) - 1) * 100) as performance""
+
+}
+```","```sql
+SELECT ""major_sector_name"", (((SUM(CASE WHEN ""date_time"" = '2024-11-19' THEN ""close"" ELSE 0 END)/SUM(CASE WHEN ""date_time"" = '2024-10-20' THEN ""close"" ELSE 1 END)) - 1) * 100) AS performance
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+GROUP BY ""major_sector_name""
+ORDER BY performance DESC
+LIMIT 3
+
+```
+","
+SELECT ""major_sector_name"", (((SUM(CASE WHEN ""date_time"" = '2024-11-19' THEN ""close"" ELSE 0 END)/SUM(CASE WHEN ""date_time"" = '2024-10-20' THEN ""close"" ELSE 1 END)) - 1) * 100) AS performance
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+GROUP BY ""major_sector_name""
+ORDER BY performance DESC
+LIMIT 3
+
+
+",
+Give me the list of top 10 worst-performing basic industry sectors in the previous month.,,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 628 (end of query) (line 14, col 9): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","- Intent: Find the top 10 worst-performing basic industry sectors in the previous month (2024-10-20 to 2024-11-19).
+
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+
+- Columns: `master_prime_1d.major_sector_name`, `equity_prices_1d.close`, `equity_prices_1d.date_time`
+
+- Conditions:  `master_prime_1d.major_sector_name` IS NOT NULL , `equity_prices_1d.date_time` BETWEEN '2024-10-20' AND '2024-11-19'
+
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+
+- Aggregations: None (Calculating performance will involve comparing closing prices across the date range, but the initial aggregation only needs closing prices per sector per day.)
+
+- Sorting/Grouping: Group by `master_prime_1d.major_sector_name`, then sort by performance (which will be calculated based on the closing prices for each sector over the date range) in ascending order (worst performers first) and Limit to 10.
+
+
+Calculating sector performance will likely require a subquery or CTE (Common Table Expression) to first obtain the first and last closing prices within the date range for each sector, and then calculate the percentage change between them. The outer query would then select the top 10 worst performers based on this calculated percentage change.
+","```sql
+SELECT ""major_sector_name""
+FROM (
+    SELECT ""major_sector_name"", (last_close - first_close) * 100 / CASE WHEN first_close = 0 THEN 1 ELSE first_close END AS performance
+    FROM (
+        SELECT ""major_sector_name"", argMin(""close"", ""date_time"") AS first_close, argMax(""close"", ""date_time"") AS last_close
+        FROM ""equity_prices_1d""
+        INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+        WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19' AND ""major_sector_name"" IS NOT NULL
+        GROUP BY ""major_sector_name""
+    )
+)
+ORDER BY performance ASC
+LIMIT 10;
+```","
+SELECT ""major_sector_name""
+FROM (
+    SELECT ""major_sector_name"", (last_close - first_close) * 100 / CASE WHEN first_close = 0 THEN 1 ELSE first_close END AS performance
+    FROM (
+        SELECT ""major_sector_name"", argMin(""close"", ""date_time"") AS first_close, argMax(""close"", ""date_time"") AS last_close
+        FROM ""equity_prices_1d""
+        INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+        WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19' AND ""major_sector_name"" IS NOT NULL
+        GROUP BY ""major_sector_name""
+    )
+)
+ORDER BY performance ASC
+LIMIT 10;
+",
+Give me the list of top 5 best-performing sectors in the last 1 month.,Error generating SQL: 429 Resource has been exhausted (e.g. check quota).,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+"Give me the list of top 2 best and worst-performing stocks within the fertilizer sector between 27th September 2024 to 21st November 2024, and what was the % change of the fertilizer sector within this timeframe?",Error generating SQL: 429 Resource has been exhausted (e.g. check quota).,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Give me the list of basic industry sectors which have not broken the low of 4th November.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,
+Give me the list of macroeconomic sectors that are trading below the low of 4th June and whose trading volumes are above their 5-day average in the past 3 days.,Error generating SQL: cannot access local variable 'final_output' where it is not associated with a value,"failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('nan') (line 1, col 1): nan
+ FORMAT Native. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",,,,

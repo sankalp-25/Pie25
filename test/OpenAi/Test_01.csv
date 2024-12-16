@@ -1,0 +1,18 @@
+user_query
+Find stocks where the price dropped by more than 5% with unusually high volume.
+Can you list stocks with low price volatility and consistent trading volume over the past month?
+"WhatåÕs the return of the sugar sector in the last 10 days, and give me the list of top 5 best performing stocks and top 5 worst performing stocks?"
+When was the last time ICICI Bank went up consecutively for 2 days?
+"When was the last time the Nifty50 index went up for 3 weeks consecutively, and what was the performance in the next 3 months?"
+"Give me 10-day, 20-day performance whenever weekly volumes have increased for two consecutive weeks as of 16th July 2024."
+List stocks going below the previous week's low on 20th September 2024.
+"Give me the 10-day, 20-day, 30-day, and 6-month performance of all Nifty50 stocks whenever it has given 3 consecutive weeks of positive gains."
+List stocks closing above the previous week's closing price on 20th September 2024.
+List stocks closing above the previous Friday's closing price on 20th September 2024.
+List stocks with daily candle closing above the previous weekly open price on 20th September 2024.
+"Give me the 5 best-performing stocks of Nifty500 from 15th September 2023 to 26th October 2023 and filter out 2 among 5 which have the least performance in the next 10 days. Also, show the next 10-day performance."
+Give me the top 10 best and worst performers of all Nifty500 stocks from 9th September 2024 to 27th September 2024.
+List stocks closing above the previous weekly candle closing price on 20th September 2024.
+List stocks whose volume is minus 20% than 2 days before volume on 27th September 2024.
+List stocks where volume has increased for 2 consecutive days on 16th July 2024.
+List stocks crossing below the previous week's low on 20th September 2024.

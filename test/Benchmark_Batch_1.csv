@@ -1,0 +1,46 @@
+user_query
+Which stocks on NSE showed the highest price increase in the last trading session?
+Can you list stocks with prices trading near their 52-week high on NSE?
+Which stocks had the highest volume traded/volume buzzer compared to yesterday on NSE?
+Which stocks had the highest volume traded/volume buzzer on NSE?
+Find stocks where the price dropped by more than 5% with unusually high volume.
+Which NSE stocks closed above ?1000 with a 10% increase in trading volume compared to their average?
+Can you identify stocks trading below ?50 with high trading volumes?
+What are the top 5 most actively traded stocks on NSE today?
+Which stocks saw a price gap-up at the open but closed lower than the opening price?
+Give me the list of Gap Up stocks.
+Can you list stocks with low price volatility and consistent trading volume over the past month?
+"What’s the return of the sugar sector in the last 10 days, and give me the list of top 5 best performing stocks and top 5 worst performing stocks?"
+"Give me the 5 best-performing stocks of Nifty500 from 15th September 2023 to 26th October 2023 and filter out 2 among 5 which have the least performance in the next 10 days. Also, show the next 10-day performance."
+Give me the performance of all Nifty500 stocks from 15th September 2023 to 26th October 2023.
+Give me the top 10 best and worst performers of all Nifty500 stocks from 9th September 2024 to 27th September 2024.
+When was the last time ICICI Bank went up consecutively for 2 days?
+"When was the last time the Nifty50 index went up for 3 weeks consecutively, and what was the performance in the next 3 months?"
+List stocks where today's low > yesterday's high and today's volume is 3x of the previous day's volume on 16th July 2024.
+List stocks where today's low > yesterday's high and today's volume is 3x of its average volume on 16th July 2024.
+"List stocks where today's volume > yesterday's volume, and one day ago volume > 2-day ago volume, and 2-day ago volume > 3-day ago volume on 19th July 2024."
+"List stocks where today's price > yesterday's close, and one-day ago price > 2-day ago price, and 2-day ago price > 3-day ago price on 16th July 2024, and next day closing is lesser than the previous day close, and 17th July 2024 volume < previous day volume."
+List stocks that closed above the previous month's high and above the previous week's high on 16th July 2024.
+List stocks whose volume is -20% than 2 days before volume on 27th September 2024.
+List stocks whose volume is minus 20% than 2 days before volume on 27th September 2024.
+List stocks whose volume is +20% than 2 days before volume on 27th September 2024.
+List stocks whose volume is 20% higher than 2 days before volume on 27th September 2024.
+"List stocks whose volume is between 20000 and 30000 on 27th September 2024. I need symbol, price, 10-day average volume in the columns."
+"Give me symbol, price, 10-day average volume where stocks are in between 5% and 10% below their 52-week high."
+Give me a 5-day average price for Nifty50 stocks on 16th July 2024.
+Give me price and volume data for ICICI Bank for the last 5 days on 16th July 2024.
+Give me a list of stocks whose daily volume is greater than the sum of last week's volume on 16th July 2024.
+Give me a list of stocks whose daily volume was at least three times higher than the average volume for the previous ten days on 16th July 2024.
+List stocks where volume has increased for 2 consecutive days on 16th July 2024.
+"Give me 10-day, 20-day performance whenever weekly volumes have increased for two consecutive weeks as of 16th July 2024."
+List stocks going below the previous week's low on 20th September 2024.
+List stocks crossing below the previous week's low on 20th September 2024.
+List stocks closing below yesterday's high on 20th September 2024.
+"Give me the 10-day, 20-day, 30-day, and 6-month performance of all Nifty50 stocks whenever it has given 3 consecutive weeks of positive gains."
+List stocks opening above yesterday's high on 20th September 2024.
+List stocks closing above the previous weekly candle closing price on 20th September 2024.
+List stocks closing above the previous week's closing price on 20th September 2024.
+List stocks closing above the previous Friday's closing price on 20th September 2024.
+List stocks with daily candle closing above the previous weekly open price on 20th September 2024.
+List NIFTY500 stocks with their closing price 1% lower from the day's high on 20th September 2024.
+List stocks with their closing price 5% lower from the day's high on 20th September 2024.

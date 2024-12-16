@@ -1,0 +1,745 @@
+SQL Query,Result,Error
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-11-18'
+  AND ep1.date_time = '2024-11-19'
+ORDER BY (ep1.close - ep2.close) DESC
+LIMIT 1;","MRF Ltd.
+MRF Ltd.",
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep
+  ON mp.security_code = ep.security_code
+WHERE ep.""high"" >= (SELECT max(""high"") FROM ""equity_prices_1d"" WHERE ""date_time"" >= '2023-11-19' AND ""date_time"" <= '2024-11-19')
+AND mp.""index_name"" LIKE '%NSE%';","Empty DataFrame
+Columns: []
+Index: []",
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.volume / ep2.volume = (SELECT max(ep1.volume / ep2.volume) 
+                                  FROM ""equity_prices_1d"" AS ep1
+                                  JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+                                  WHERE ep1.date_time = '2024-11-18' AND ep2.date_time = '2024-11-17')
+AND mp.index_name LIKE '%NSE%';",,Query execution exceeded time limit
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep
+ON mp.security_code = ep.security_code
+WHERE ep.""volume"" = (SELECT MAX(volume) FROM ""equity_prices_1d"" WHERE date_time = '2024-11-19' AND ""security_code"" = ""security_code"")
+AND mp.""index_name"" LIKE '%NSE%';",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.close < ep2.close * 0.95
+AND ep1.volume > (SELECT 1.5 * avg(volume) FROM ""equity_prices_1d"")
+ORDER BY mp.""company_name"";",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.close > 1000
+AND ep1.volume > (SELECT avg(volume) * 1.1 FROM ""equity_prices_1d"" WHERE security_code = ep1.security_code)
+AND ep1.index_name LIKE '%NSE%'",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep
+ON mp.security_code = ep.security_code
+WHERE ep.""close"" < 50
+AND ep.""volume"" > (SELECT avg(""volume"") AS avg_volume FROM ""equity_prices_1d"" WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19')
+ORDER BY ep.""volume"" DESC;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep 
+ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-11-19'
+ORDER BY ep.volume DESC
+LIMIT 5;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep_open
+    ON mp.security_code = ep_open.security_code
+JOIN ""equity_prices_1d"" AS ep_close
+    ON mp.security_code = ep_close.security_code
+WHERE ep_open.open < ep_open.close
+    AND ep_close.close < ep_close.open;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"
+SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep2.""date_time"" = '2024-11-19'
+  AND ep1.""open"" > ep2.""close"";",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.""volume"" > 1.2 * (
+    SELECT avg(""volume"")
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+)
+AND (ep1.""high"" - ep1.""low"") < 0.05 * ep1.""low""
+AND ep1.""date_time"" = '2024-11-19'
+AND ep2.""date_time"" = '2024-10-20';",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"
+SELECT 
+    mp.company_name,
+    (ep.close - ep.open) / ep.open AS return
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep 
+    ON mp.security_code = ep.security_code
+WHERE mp.broad_industry_name = 'Sugar'
+    AND ep.date_time BETWEEN toDate('2024-11-09') AND toDate('2024-11-19')
+ORDER BY return DESC
+LIMIT 5
+
+UNION ALL
+
+SELECT 
+    mp.company_name,
+    (ep.close - ep.open) / ep.open AS return
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep 
+    ON mp.security_code = ep.security_code
+WHERE mp.broad_industry_name = 'Sugar'
+    AND ep.date_time BETWEEN toDate('2024-11-09') AND toDate('2024-11-19')
+ORDER BY return ASC
+LIMIT 5",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep 
+ON mp.security_code = ep.security_code
+WHERE ep.date_time BETWEEN '2023-09-15' AND '2023-10-26'
+AND mp.index_name LIKE '%Nifty500%'
+ORDER BY ep.close DESC
+LIMIT 5
+
+UNION ALL
+
+SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep 
+ON mp.security_code = ep.security_code
+WHERE ep.date_time BETWEEN '2023-10-27' AND '2023-11-05'
+AND mp.index_name LIKE '%Nifty500%'
+ORDER BY ep.close
+LIMIT 2",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" mp
+WHERE mp.""index_name"" LIKE '%Nifty500%'
+AND mp.""security_code"" IN (
+    SELECT ep.""security_code""
+    FROM ""equity_prices_1d"" ep
+    WHERE ep.""date_time"" BETWEEN '2023-09-15' AND '2023-10-26'
+);",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 
+    ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 
+    ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-09-09'
+  AND ep1.date_time = '2024-09-27'
+ORDER BY (ep1.close - ep2.close) DESC
+LIMIT 10
+
+UNION ALL
+
+SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 
+    ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 
+    ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-09-09'
+  AND ep1.date_time = '2024-09-27'
+ORDER BY (ep1.close - ep2.close) ASC
+LIMIT 10",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+Error generating SQL: 'short_company_name',,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT 
+    date_time,
+    close
+FROM
+    ""equity_prices_1d"" AS ep
+JOIN
+    ""master_prime_1d"" AS mp
+ON
+    ep.security_code = mp.security_code
+WHERE
+    mp.index_name = 'Nifty50'
+    AND date_time = '2024-11-19'
+    AND close > (
+        SELECT
+            close
+        FROM
+            ""equity_prices_1d""
+        WHERE
+            date_time = '2024-11-19' - INTERVAL 3 WEEK
+            AND security_code = 'Nifty50'
+    )
+ORDER BY
+    date_time
+LIMIT 1;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-07-16'
+  AND ep2.date_time = '2024-07-15'
+  AND ep1.""low"" > ep2.""high""
+  AND ep1.""volume"" > 3 * ep2.""volume"";",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON mp.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-07-16'
+AND ep2.date_time = '2024-07-17'
+AND ep1.""low"" > ep2.""high""
+AND ep2.""volume"" > 3 * 
+    (SELECT avg(""volume"")
+     FROM ""equity_prices_1d""
+     WHERE ""date_time"" BETWEEN '2024-06-26' AND '2024-07-16');",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.""security_code"" = ep1.""security_code""
+JOIN ""equity_prices_1d"" AS ep2 ON mp.""security_code"" = ep2.""security_code""
+JOIN ""equity_prices_1d"" AS ep3 ON mp.""security_code"" = ep3.""security_code""
+WHERE ep1.""date_time"" = '2024-07-19'
+  AND ep2.""date_time"" = '2024-07-18'
+  AND ep3.""date_time"" = '2024-07-17'
+  AND ep1.""volume"" > ep2.""volume""
+  AND ep2.""volume"" > ep3.""volume"";",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.""security_code"" = ep1.""security_code""
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.""security_code"" = ep2.""security_code""
+JOIN ""equity_prices_1d"" AS ep3 ON ep2.""security_code"" = ep3.""security_code""
+JOIN ""equity_prices_1d"" AS ep4 ON ep3.""security_code"" = ep4.""security_code""
+JOIN ""equity_prices_1d"" AS ep5 ON ep4.""security_code"" = ep5.""security_code""
+WHERE ep1.""date_time"" = '2024-07-16' 
+    AND ep2.""date_time"" = '2024-07-15'
+    AND ep3.""date_time"" = '2024-07-14'
+    AND ep4.""date_time"" = '2024-07-13'
+    AND ep5.""date_time"" = '2024-07-17'
+    AND ep1.""close"" > ep2.""close""
+    AND ep2.""close"" > ep3.""close""
+    AND ep3.""close"" > ep4.""close""
+    AND ep5.""close"" < ep4.""close""
+    AND ep5.""volume"" < ep4.""volume"";",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep_now
+    ON mp.security_code = ep_now.security_code
+JOIN ""equity_prices_1d"" AS ep_prev_month
+    ON ep_now.security_code = ep_prev_month.security_code
+JOIN ""equity_prices_1d"" AS ep_prev_week
+    ON ep_now.security_code = ep_prev_week.security_code
+WHERE ep_now.date_time = '2024-07-16'
+    AND ep_now.close > ep_prev_month.high
+    AND ep_now.close > ep_prev_week.high;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.""volume"" < (ep2.""volume"" * 0.8)
+AND ep1.""date_time"" = '2024-09-27'
+AND ep2.""date_time"" = '2024-09-25';",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON mp.security_code = ep2.security_code
+WHERE ep1.volume < (ep2.volume * 0.80) 
+AND ep1.date_time = '2024-09-27' 
+AND ep2.date_time = '2024-09-25';",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.company_name
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-09-27'
+AND ep2.date_time = '2024-09-25'
+AND ep1.volume > ep2.volume * 1.2;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.company_name
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-09-27'
+AND ep2.date_time = '2024-09-25'
+AND ep1.volume > 1.2 * ep2.volume;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""short_company_name"", ep.""close"", sub.""avg_volume_10days""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep ON mp.""security_code"" = ep.""security_code""
+JOIN (
+    SELECT ""security_code"", avg(""volume"") AS ""avg_volume_10days""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" >= '2024-09-17' AND ""date_time"" <= '2024-09-27'
+    GROUP BY ""security_code""
+) AS sub ON ep.""security_code"" = sub.""security_code""
+WHERE ep.""volume"" BETWEEN 20000 AND 30000
+AND ep.""date_time"" = '2024-09-27'",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT ""short_company_name"", ""close"", avg(volume) as average_volume 
+FROM ""equity_prices_1d""
+WHERE ""security_code"" IN (
+    SELECT DISTINCT ""security_code""
+    FROM ""equity_prices_1d""
+    WHERE (""high"" - ""close"") / ""high"" BETWEEN 0.05 AND 0.10
+)
+AND ""date_time"" >= '2023-11-19'
+AND ""date_time"" <= '2024-11-19' - INTERVAL 1 YEAR + INTERVAL 10 DAY
+GROUP BY ""short_company_name"", ""close"";",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT ""index_name"", avg(""close"") AS average_price
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""index_name"" LIKE '%Nifty50%' 
+AND ""date_time"" >= '2024-07-11' 
+AND ""date_time"" <= '2024-07-16'
+GROUP BY ""index_name""",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+Error generating SQL: 'short_company_name',,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON mp.security_code = ep2.security_code
+WHERE ep1.""volume"" > (
+    SELECT SUM(ep3.""volume"") 
+    FROM ""equity_prices_1d"" AS ep3 
+    WHERE ep3.""date_time"" BETWEEN '2024-07-09' AND '2024-07-16' 
+    AND ep3.""security_code"" = ep2.""security_code""
+)
+AND ep2.""date_time"" = '2024-07-16';",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 
+    ON mp.security_code = ep1.security_code
+JOIN 
+    (SELECT ep2.security_code, avg(ep2.volume) AS avg_volume
+     FROM ""equity_prices_1d"" AS ep2
+     WHERE ep2.date_time >= '2024-07-06' AND ep2.date_time < '2024-07-16'
+     GROUP BY ep2.security_code
+    ) AS avg_vol
+ON ep1.security_code = avg_vol.security_code
+WHERE ep1.date_time = '2024-07-16'
+AND ep1.volume >= 3 * avg_vol.avg_volume;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-07-16'
+  AND ep2.date_time = '2024-07-15'
+  AND ep1.volume > ep2.volume;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name"",
+       ep1.close AS close_10_days,
+       ep2.close AS close_20_days
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 
+    ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2
+    ON ep1.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-07-06'
+  AND ep2.date_time = '2024-07-13'
+  AND ep1.volume > (SELECT avg(volume) FROM ""equity_prices_1d"" WHERE date_time BETWEEN '2024-06-22' AND '2024-07-06')
+  AND ep2.volume > (SELECT avg(volume) FROM ""equity_prices_1d"" WHERE date_time BETWEEN '2024-06-15' AND '2024-06-29');",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON mp.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-09-20' 
+AND ep1.low < (
+    SELECT ep3.low 
+    FROM ""equity_prices_1d"" AS ep3 
+    WHERE ep3.date_time = '2024-09-13' 
+    AND ep3.security_code = mp.security_code
+);",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-09-13'
+  AND ep1.date_time = '2024-09-20'
+  AND ep1.low < ep2.low;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-09-20'
+AND ep1.close < ep2.high
+AND ep2.date_time = '2024-09-19';",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name"",
+    avg(ep1.""close"") AS avg_10_day,
+    avg(ep2.""close"") AS avg_20_day,
+    avg(ep3.""close"") AS avg_30_day,
+    avg(ep6.""close"") AS avg_6_month
+FROM ""master_prime_1d"" mp
+JOIN ""equity_prices_1d"" ep1 
+    ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" ep2 
+    ON mp.security_code = ep2.security_code
+JOIN ""equity_prices_1d"" ep3 
+    ON mp.security_code = ep3.security_code
+JOIN ""equity_prices_1d"" ep6 
+    ON mp.security_code = ep6.security_code
+WHERE ep1.""date_time"" BETWEEN '2024-10-29' AND '2024-11-19'
+    AND ep2.""date_time"" BETWEEN '2024-10-19' AND '2024-11-19'
+    AND ep3.""date_time"" BETWEEN '2024-10-09' AND '2024-11-19'
+    AND ep6.""date_time"" BETWEEN '2024-05-19' AND '2024-11-19'
+    AND (
+        (ep1.""close"" > (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = '2024-10-20' AND ""security_code"" = ep1.""security_code""))
+        AND (ep2.""close"" > (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = '2024-10-13' AND ""security_code"" = ep2.""security_code""))
+        AND (ep3.""close"" > (SELECT ""close"" FROM ""equity_prices_1d"" WHERE ""date_time"" = '2024-10-06' AND ""security_code"" = ep3.""security_code""))
+    )
+GROUP BY mp.""company_name""
+HAVING count(DISTINCT ep1.""date_time"") = 10
+    AND count(DISTINCT ep2.""date_time"") = 20
+    AND count(DISTINCT ep3.""date_time"") = 30
+    AND count(DISTINCT ep6.""date_time"") >= 126;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-09-20'
+AND ep1.open > ep2.high
+AND ep2.date_time = '2024-09-19';",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-09-13'
+  AND ep1.date_time = '2024-09-20'
+  AND ep1.close > ep2.close;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.""close"" > ep2.""close""
+AND ep1.date_time = '2024-09-13'
+AND ep2.date_time = '2024-09-20';",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON mp.security_code = ep2.security_code
+WHERE ep1.""close"" > (
+    SELECT ""close"" 
+    FROM ""equity_prices_1d"" 
+    WHERE ""date_time"" = toDate('2024-09-17') 
+    AND ep1.security_code = ep2.security_code
+)
+AND ep1.""date_time"" = toDate('2024-09-20');",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON mp.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-09-20' 
+AND ep1.close > (SELECT ""open""
+                  FROM ""equity_prices_1d""
+                  WHERE date_time = '2024-09-13' 
+                  AND ep2.security_code = ""security_code"")
+AND ep2.date_time = '2024-09-13';",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-09-20' 
+AND ep1.close < (ep2.high * 0.99)
+AND ep1.date_time = '2024-09-20'
+AND mp.index_name LIKE '%NIFTY500%';",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.""date_time"" = '2024-09-20'
+AND ep1.""close"" < (ep2.""high"" * 0.95)
+AND ep2.""date_time"" = '2024-09-20';",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name"", ep_close.""close""
+FROM ""master_prime_1d"" AS mp
+JOIN (
+    SELECT ""security_code"", ""close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+) AS ep_low ON mp.""security_code"" = ep_low.""security_code""
+JOIN ""equity_prices_1d"" AS ep_close ON mp.""security_code"" = ep_close.""security_code""
+WHERE ep_close.""close"" > (ep_low.""low"" * 1.02);",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM master_prime_1d AS mp
+JOIN equity_prices_1d AS ep1 ON mp.security_code = ep1.security_code
+JOIN equity_prices_1d AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-09-09' AND
+      ep1.date_time = '2024-09-16' AND
+      ep1.close < ep2.low;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-09-09'
+AND ep1.date_time = '2024-09-16'
+AND ep1.close < ep2.low;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name"", ep1.""date_time"", ep1.""short_company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.""close"" > (SELECT ""high"" FROM ""equity_prices_1d"" WHERE ""date_time"" = '2024-08-31' AND ""security_code"" = ep1.""security_code"")
+AND ep1.""date_time"" >= '2024-09-01' 
+AND ep1.""date_time"" <= '2024-09-30'
+AND ep1.""close"" > ep2.""high"";",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name"", ep1.""short_company_name"", ep1.date_time
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN 
+    (SELECT security_code, MAX(high) AS max_high
+     FROM ""equity_prices_1d""
+     WHERE date_time >= '2024-08-01' AND date_time <= '2024-08-31'
+     GROUP BY security_code) AS ep2
+ON mp.security_code = ep2.security_code
+WHERE ep1.date_time >= '2024-09-01' AND ep1.date_time <= '2024-09-30'
+AND ep1.close > ep2.max_high;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+JOIN ""equity_prices_1d"" AS ep3 ON ep2.security_code = ep3.security_code
+WHERE ep1.date_time = '2024-09-14'
+    AND ep2.date_time = '2024-09-15'
+    AND ep3.date_time = '2024-09-16'
+    AND ep3.close > ep2.close
+    AND ep2.close > ep1.close;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+Error generating SQL: 'short_company_name',,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+Error generating SQL: 'short_company_name',,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+Error generating SQL: 'short_company_name',,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.company_name
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep_current 
+    ON mp.security_code = ep_current.security_code
+JOIN ""equity_prices_1d"" AS ep_low 
+    ON ep_current.security_code = ep_low.security_code
+WHERE ep_current.date_time = '2024-09-20'
+    AND ep_low.date_time = '2024-06-20'
+    AND ep_current.low >= (ep_low.low * 0.95);",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep
+ON mp.""security_code"" = ep.""security_code""
+WHERE ep.""close"" >= (SELECT MAX(""close"") * 0.97 
+                    FROM ""equity_prices_1d"" 
+                    WHERE ""date_time"" >= '2021-09-20' 
+                    AND ""date_time"" <= '2024-09-20')
+AND ep.""close"" <= (SELECT MAX(""close"") 
+                    FROM ""equity_prices_1d"" 
+                    WHERE ""date_time"" >= '2021-09-20' 
+                    AND ""date_time"" <= '2024-09-20');",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-09-13'
+AND ep1.date_time = '2024-09-20'
+AND ep1.low <= (ep2.low * 1.05);",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON mp.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-09-20'
+AND ep2.date_time >= '2024-08-01'
+AND ep2.high < ep1.high;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-09-20'
+AND ep1.high > (SELECT ""high"" FROM ""equity_prices_1d"" WHERE ""date_time"" >= '2024-08-01' AND ""date_time"" <= '2024-08-31' AND ""equity_prices_1d"".""security_code"" = ep1.""security_code"");",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+Error generating SQL: 'short_company_name',,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+Error generating SQL: 'short_company_name',,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT mp.""major_sector_name"", 
+       sum(ep.""close"" - ep.""open"") AS sector_performance
+FROM ""master_prime_1d"" mp
+JOIN ""equity_prices_1d"" ep ON mp.""security_code"" = ep.""security_code""
+WHERE ep.""date_time"" >= toDate('2024-10-30') AND ep.""date_time"" <= toDate('2024-11-19') 
+GROUP BY mp.""major_sector_name""
+ORDER BY sector_performance DESC
+LIMIT 3;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT major_sector_name,
+       avg(close) AS avg_closing_price
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE date_time >= '2024-10-20' AND date_time <= '2024-11-19'
+GROUP BY major_sector_name
+ORDER BY avg_closing_price ASC
+LIMIT 10;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT mp.""major_sector_name"", 
+       SUM((ep.""close"" - ep.""open"") / ep.""open"") AS sector_performance
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep 
+ON mp.""security_code"" = ep.""security_code""
+WHERE ep.""date_time"" >= '2024-10-20' 
+AND ep.""date_time"" <= '2024-11-19'
+GROUP BY mp.""major_sector_name""
+ORDER BY sector_performance DESC
+LIMIT 5;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-09-27'
+    AND ep1.date_time = '2024-11-21'
+    AND mp.""major_sector_name"" = 'Fertilizer'
+ORDER BY (ep1.close - ep2.close)/ep2.close DESC
+LIMIT 2
+UNION
+SELECT DISTINCT mp.""company_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-09-27'
+    AND ep1.date_time = '2024-11-21'
+    AND mp.""major_sector_name"" = 'Fertilizer'
+ORDER BY (ep1.close - ep2.close)/ep2.close
+LIMIT 2",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""major_sector_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+WHERE ep2.date_time = '2024-11-04'
+AND ep1.low >= ep2.low;",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"
+"SELECT DISTINCT mp.""major_sector_name""
+FROM ""master_prime_1d"" AS mp
+JOIN ""equity_prices_1d"" AS ep1 ON mp.security_code = ep1.security_code
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.security_code = ep2.security_code
+JOIN ""equity_prices_1d"" AS ep3 ON ep1.security_code = ep3.security_code
+JOIN ""equity_prices_1d"" AS ep4 ON ep1.security_code = ep4.security_code
+WHERE ep1.date_time = '2024-06-04' 
+    AND ep2.date_time = '2024-11-16' 
+    AND ep3.date_time = '2024-11-17' 
+    AND ep4.date_time = '2024-11-18' 
+    AND ep1.low > ep2.low 
+    AND ep1.volume > (SELECT avg(volume) FROM ""equity_prices_1d"" WHERE date_time BETWEEN '2024-11-13' AND '2024-11-16' AND security_code = ep1.security_code)
+    AND ep2.volume > (SELECT avg(volume) FROM ""equity_prices_1d"" WHERE date_time BETWEEN '2024-11-10' AND '2024-11-16' AND security_code = ep2.security_code)
+    AND ep3.volume > (SELECT avg(volume) FROM ""equity_prices_1d"" WHERE date_time BETWEEN '2024-11-11' AND '2024-11-16' AND security_code = ep3.security_code);",,"HTTPDriver for http://localhost:8123 received ClickHouse error code 373
+ Code: 373. DB::Exception: Session 299d8585-92d1-4b3c-94ed-e1a6077864c1 is locked by a concurrent client. (SESSION_IS_LOCKED) (version 24.12.1.850 (official build))
+"

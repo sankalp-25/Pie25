@@ -1,0 +1,841 @@
+user_query,1st output,2nd output raw,2nd output processed,result,Result_final
+Find stocks where the price dropped by more than 5% with unusually high volume.,"### Intent: Find stocks where the price dropped by more than 5% with unusually high volume.
+
+- **Required Tables**: `equity_prices_1d`
+- **Columns**: `security_code`, `date_time`, `close`, `volume`
+- **Conditions**: 
+   - Price drop more than 5%: Calculate price drop percentage as (`(close - open) / open`) * 100 > 5
+   - Unusually high volume: `volume` is significantly higher compared to average volume (specific threshold needed)
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**: None
+
+### Additional Information Needed:
+- Threshold for defining 'unusually high volume' (e.g., volume > 2 * average volume)","```sql
+SELECT DISTINCT ep.company_name
+FROM equity_prices_1d ep
+WHERE ((ep.close - ep.open) / ep.open) * 100 > 5
+AND ep.volume > 2 * (
+    SELECT avg(volume)
+    FROM (
+        SELECT volume
+        FROM equity_prices_1d
+        WHERE date_time BETWEEN toDate('2024-11-19') - 19 AND toDate('2024-11-19')
+    )
+)
+```","
+SELECT DISTINCT ep.company_name
+FROM equity_prices_1d ep
+WHERE ((ep.close - ep.open) / ep.open) * 100 > 5
+AND ep.volume > 2 * (
+    SELECT avg(volume)
+    FROM (
+        SELECT volume
+        FROM equity_prices_1d
+        WHERE date_time BETWEEN toDate('2024-11-19') - 19 AND toDate('2024-11-19')
+    )
+)
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 47
+ Code: 47. DB::Exception: Identifier 'ep.company_name' cannot be resolved from table with name ep. In scope SELECT DISTINCT ep.company_name FROM equity_prices_1d AS ep WHERE ((((ep.close - ep.open) / ep.open) * 100) > 5) AND (ep.volume > (2 * (SELECT avg(volume) FROM (SELECT volume FROM equity_prices_1d WHERE (date_time >= (toDate('2024-11-19') - 19)) AND (date_time <= toDate('2024-11-19')))))). (UNKNOWN_IDENTIFIER) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 47
+ Code: 47. DB::Exception: Identifier 'ep.company_name' cannot be resolved from table with name ep. In scope SELECT DISTINCT ep.company_name FROM equity_prices_1d AS ep WHERE ((((ep.close - ep.open) / ep.open) * 100) > 5) AND (ep.volume > (2 * (SELECT avg(volume) FROM (SELECT volume FROM equity_prices_1d WHERE (date_time >= (toDate('2024-11-19') - 19)) AND (date_time <= toDate('2024-11-19')))))). (UNKNOWN_IDENTIFIER) (version 24.12.1.1425 (official build))
+"
+Can you list stocks with low price volatility and consistent trading volume over the past month?,"- **Intent**: Retrieve stocks with low price volatility and consistent trading volume over the past month.
+- **Required Tables**: `equity_prices_1d`
+- **Columns**: `security_code`, `open`, `high`, `low`, `close`, `volume`
+- **Conditions**: 
+  - Price volatility criteria can be calculated using the formula (high - low) / close. Therefore, to identify low price volatility, we can set a threshold for this ratio.
+  - To ensure consistent trading volume, we can calculate the average trading volume over the past month and compare each day's volume with this average.
+  - Date range condition for the past month.
+- **Joins**: Not required
+- **Aggregations**: None
+- **Sorting/Grouping**: None","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+WHERE ""security_code"" IN (
+    SELECT ""security_code""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+    AND (CASE WHEN (""high"" - ""low"") / ""close"" < 0.05 THEN 1 ELSE 0 END) = 1
+    AND ""volume"" >= (
+        SELECT avg(""volume"")
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+    )
+);
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+WHERE ""security_code"" IN (
+    SELECT ""security_code""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+    AND (CASE WHEN (""high"" - ""low"") / ""close"" < 0.05 THEN 1 ELSE 0 END) = 1
+    AND ""volume"" >= (
+        SELECT avg(""volume"")
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+    )
+);
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 428 (end of query) (line 14, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 428 (end of query) (line 14, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+"
+"WhatÃ¥Ãs the return of the sugar sector in the last 10 days, and give me the list of top 5 best performing stocks and top 5 worst performing stocks?","
+- **Intent**: Calculate the return of the sugar sector in the last 10 days and provide the list of the top 5 best performing and worst performing stocks.
+- **Required Tables**: `master_prime_1d`, `equity_prices_1d`
+- **Columns**: 
+    - For calculating the return of the sugar sector: `security_code`, `company_name`, `close`
+    - For identifying best and worst performing stocks: `security_code`, `company_name`, `close`
+- **Conditions**: 
+    - For the sugar sector return: `industry_name = 'Sugar'`, `date_time BETWEEN [last 10 days]`
+    - No specific conditions for identifying top/bottom performing stocks
+- **Joins**: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- **Aggregations**: None
+- **Sorting/Grouping**: Sort by `close` to identify the top/bottom performing stocks, limit by 5 for each top/bottom.
+
+
+","```sql
+SELECT DISTINCT
+    master_prime_1d.company_name,
+    equity_prices_1d.close
+FROM master_prime_1d
+JOIN equity_prices_1d ON master_prime_1d.security_code = equity_prices_1d.security_code
+WHERE master_prime_1d.industry_name = 'Sugar'
+AND equity_prices_1d.date_time BETWEEN toDate('2024-11-09') AND toDate('2024-11-19')
+ORDER BY equity_prices_1d.close DESC
+LIMIT 5
+UNION ALL
+SELECT DISTINCT
+    master_prime_1d.company_name,
+    equity_prices_1d.close
+FROM master_prime_1d
+JOIN equity_prices_1d ON master_prime_1d.security_code = equity_prices_1d.security_code
+WHERE master_prime_1d.industry_name = 'Sugar'
+AND equity_prices_1d.date_time BETWEEN toDate('2024-11-09') AND toDate('2024-11-19')
+ORDER BY equity_prices_1d.close ASC
+LIMIT 5;
+```","
+SELECT DISTINCT
+    master_prime_1d.company_name,
+    equity_prices_1d.close
+FROM master_prime_1d
+JOIN equity_prices_1d ON master_prime_1d.security_code = equity_prices_1d.security_code
+WHERE master_prime_1d.industry_name = 'Sugar'
+AND equity_prices_1d.date_time BETWEEN toDate('2024-11-09') AND toDate('2024-11-19')
+ORDER BY equity_prices_1d.close DESC
+LIMIT 5
+UNION ALL
+SELECT DISTINCT
+    master_prime_1d.company_name,
+    equity_prices_1d.close
+FROM master_prime_1d
+JOIN equity_prices_1d ON master_prime_1d.security_code = equity_prices_1d.security_code
+WHERE master_prime_1d.industry_name = 'Sugar'
+AND equity_prices_1d.date_time BETWEEN toDate('2024-11-09') AND toDate('2024-11-19')
+ORDER BY equity_prices_1d.close ASC
+LIMIT 5;
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 734 (end of query) (line 20, col 8): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 734 (end of query) (line 20, col 8): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+"
+When was the last time ICICI Bank went up consecutively for 2 days?,"- **Intent**: Find the last date when ICICI Bank stock price has cocutively increased for 2 days.
+- **Required Tables**: `equity_prices_1d`
+- **Columns**: `date_time`, `security_code`, `close`
+- **Conditions**: `company_name = 'ICICI Bank'`, cocutive increase for 2 days
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**: Order by `date_time` in descending order.","```sql
+SELECT date_time
+FROM (
+    SELECT date_time,
+            close,
+            LAG(close) OVER (ORDER BY date_time) AS prev_close,
+            LAG(close, 2) OVER (ORDER BY date_time) AS prev_prev_close
+    FROM equity_prices_1d
+    WHERE company_name = 'ICICI Bank'
+)
+WHERE close > prev_close AND prev_close > prev_prev_close
+ORDER BY date_time DESC
+LIMIT 1
+```","
+SELECT date_time
+FROM (
+    SELECT date_time,
+            close,
+            LAG(close) OVER (ORDER BY date_time) AS prev_close,
+            LAG(close, 2) OVER (ORDER BY date_time) AS prev_prev_close
+    FROM equity_prices_1d
+    WHERE company_name = 'ICICI Bank'
+)
+WHERE close > prev_close AND prev_close > prev_prev_close
+ORDER BY date_time DESC
+LIMIT 1
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 63
+ Code: 63. DB::Exception: Aggregate function with name 'LAG' does not exist. In scope SELECT date_time, close, LAG(close) OVER (ORDER BY date_time ASC) AS prev_close, LAG(close, 2) OVER (ORDER BY date_time ASC) AS prev_prev_close FROM equity_prices_1d WHERE company_name = 'ICICI Bank'. (UNKNOWN_AGGREGATE_FUNCTION) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 63
+ Code: 63. DB::Exception: Aggregate function with name 'LAG' does not exist. In scope SELECT date_time, close, LAG(close) OVER (ORDER BY date_time ASC) AS prev_close, LAG(close, 2) OVER (ORDER BY date_time ASC) AS prev_prev_close FROM equity_prices_1d WHERE company_name = 'ICICI Bank'. (UNKNOWN_AGGREGATE_FUNCTION) (version 24.12.1.1425 (official build))
+"
+"When was the last time the Nifty50 index went up for 3 weeks consecutively, and what was the performance in the next 3 months?","- **Intent**: Identify the date when the Nifty50 index last went up for 3 cocutive weeks and determine its performance in the next 3 months.
+- **Required Tables**: `equity_prices_1d`
+- **Columns**: `date_time`, `close`, `index_name`
+- **Conditions**: 
+  - Identify the dates when the Nifty50 index went up for 3 cocutive weeks.
+  - Calculate the performance in the next 3 months from the identified date.
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**: Ascending order of `date_time` for finding cocutive weeks, and sorting for performance evaluation.","```sql
+SELECT ""date_time"", ""close""
+FROM ""equity_prices_1d""
+WHERE ""index_name"" LIKE '%Nifty50%'
+AND (
+    ""date_time"" IN (
+        SELECT DISTINCT ep1.""date_time""
+        FROM ""equity_prices_1d"" ep1
+        JOIN ""equity_prices_1d"" ep2 ON ep1.""date_time"" = dateadd('week', 1, ep2.""date_time"")
+        JOIN ""equity_prices_1d"" ep3 ON ep2.""date_time"" = dateadd('week', 1, ep3.""date_time"")
+        WHERE ep2.""close"" > ep1.""close""
+        AND ep3.""close"" > ep2.""close""
+    )
+)
+ORDER BY ""date_time"" DESC
+LIMIT 1
+```","
+SELECT ""date_time"", ""close""
+FROM ""equity_prices_1d""
+WHERE ""index_name"" LIKE '%Nifty50%'
+AND (
+    ""date_time"" IN (
+        SELECT DISTINCT ep1.""date_time""
+        FROM ""equity_prices_1d"" ep1
+        JOIN ""equity_prices_1d"" ep2 ON ep1.""date_time"" = dateadd('week', 1, ep2.""date_time"")
+        JOIN ""equity_prices_1d"" ep3 ON ep2.""date_time"" = dateadd('week', 1, ep3.""date_time"")
+        WHERE ep2.""close"" > ep1.""close""
+        AND ep3.""close"" > ep2.""close""
+    )
+)
+ORDER BY ""date_time"" DESC
+LIMIT 1
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 47
+ Code: 47. DB::Exception: Unknown expression or function identifier `index_name` in scope SELECT date_time, close FROM equity_prices_1d WHERE (index_name LIKE '%Nifty50%') AND (date_time IN (SELECT DISTINCT ep1.date_time FROM equity_prices_1d AS ep1 INNER JOIN equity_prices_1d AS ep2 ON ep1.date_time = plus('week', 1, ep2.date_time) INNER JOIN equity_prices_1d AS ep3 ON ep2.date_time = plus('week', 1, ep3.date_time) WHERE (ep2.close > ep1.close) AND (ep3.close > ep2.close))) ORDER BY date_time DESC LIMIT 1. (UNKNOWN_IDENTIFIER) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 47
+ Code: 47. DB::Exception: Unknown expression or function identifier `index_name` in scope SELECT date_time, close FROM equity_prices_1d WHERE (index_name LIKE '%Nifty50%') AND (date_time IN (SELECT DISTINCT ep1.date_time FROM equity_prices_1d AS ep1 INNER JOIN equity_prices_1d AS ep2 ON ep1.date_time = plus('week', 1, ep2.date_time) INNER JOIN equity_prices_1d AS ep3 ON ep2.date_time = plus('week', 1, ep3.date_time) WHERE (ep2.close > ep1.close) AND (ep3.close > ep2.close))) ORDER BY date_time DESC LIMIT 1. (UNKNOWN_IDENTIFIER) (version 24.12.1.1425 (official build))
+"
+"Give me 10-day, 20-day performance whenever weekly volumes have increased for two consecutive weeks as of 16th July 2024.","### Preprocessed Output:
+- **Intent**: Retrieve the performance of stocks for a 10-day and 20-day period whenever weekly volumes have increased for two cocutive weeks as of 16th July 2024.
+- **Required Tables**: `equity_prices_1d`
+- **Columns**: `security_code`, `date_time`, `volume`
+- **Conditions**: 
+  - Weekly volume increases for two cocutive weeks
+  - Date as of 16th July 2024
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**: None","```sql
+SELECT ""security_code"", date_time
+FROM ""equity_prices_1d""
+WHERE date_time BETWEEN '2024-07-06' AND '2024-07-16'
+AND ""volume"" > (
+    SELECT AVG(""volume"")
+    FROM (
+        SELECT date_time, SUM(volume) AS ""volume""
+        FROM ""equity_prices_1d""
+        WHERE date_time BETWEEN '2024-06-22' AND '2024-07-01'
+        GROUP BY toMonday(date_time)
+        HAVING COUNT(*) = 2
+    ) weekly_avg
+)
+AND ""volume"" > (
+    SELECT AVG(""volume"")
+    FROM (
+        SELECT date_time, SUM(volume) AS ""volume""
+        FROM ""equity_prices_1d""
+        WHERE date_time BETWEEN '2024-06-15' AND '2024-07-06'
+        GROUP BY toMonday(date_time)
+        HAVING COUNT(*) = 2
+    ) weekly_avg
+);
+```","
+SELECT ""security_code"", date_time
+FROM ""equity_prices_1d""
+WHERE date_time BETWEEN '2024-07-06' AND '2024-07-16'
+AND ""volume"" > (
+    SELECT AVG(""volume"")
+    FROM (
+        SELECT date_time, SUM(volume) AS ""volume""
+        FROM ""equity_prices_1d""
+        WHERE date_time BETWEEN '2024-06-22' AND '2024-07-01'
+        GROUP BY toMonday(date_time)
+        HAVING COUNT(*) = 2
+    ) weekly_avg
+)
+AND ""volume"" > (
+    SELECT AVG(""volume"")
+    FROM (
+        SELECT date_time, SUM(volume) AS ""volume""
+        FROM ""equity_prices_1d""
+        WHERE date_time BETWEEN '2024-06-15' AND '2024-07-06'
+        GROUP BY toMonday(date_time)
+        HAVING COUNT(*) = 2
+    ) weekly_avg
+);
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 675 (end of query) (line 24, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 675 (end of query) (line 24, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+"
+List stocks going below the previous week's low on 20th September 2024.,"### Preprocessed Output:
+
+- **Intent**: Identify stocks that went below the previous week's low on 20th September 2024.
+- **Required Tables**: `equity_prices_1d`
+- **Columns**: `security_code`, `date_time`, `low`
+- **Conditions**: `date_time = '2024-09-20'`, `low < (SELECT min(low) FROM equity_prices_1d WHERE date_time >= '2024-09-13' AND date_time < '2024-09-20' GROUP BY security_code)`
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**: None","```sql
+SELECT ""security_code"", ""date_time"", ""low""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-20' 
+AND ""low"" < (
+    SELECT min(""low"") 
+    FROM ""equity_prices_1d"" 
+    WHERE ""date_time"" BETWEEN '2024-09-13' AND '2024-09-19' 
+    GROUP BY ""security_code""
+);
+```","
+SELECT ""security_code"", ""date_time"", ""low""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-20' 
+AND ""low"" < (
+    SELECT min(""low"") 
+    FROM ""equity_prices_1d"" 
+    WHERE ""date_time"" BETWEEN '2024-09-13' AND '2024-09-19' 
+    GROUP BY ""security_code""
+);
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 260 (end of query) (line 10, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 260 (end of query) (line 10, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+"
+"Give me the 10-day, 20-day, 30-day, and 6-month performance of all Nifty50 stocks whenever it has given 3 consecutive weeks of positive gains.","
+- **Intent**: Retrieve the 10-day, 20-day, 30-day, and 6-month performance of all Nifty50 stocks when there are 3 cocutive weeks of positive gains.
+- **Required Tables**: `master_prime_1d`, `equity_prices_1d`
+- **Columns**: `date_time`, `security_code`, `close`
+- **Conditions**: 
+  - Check for 3 cocutive weeks of positive gains
+  - Filter for Nifty50 stocks
+- **Joins**: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- **Aggregations**: Compute performance metrics for the specified time periods (10-day, 20-day, 30-day, 6-month)
+- **Sorting/Grouping**: None","```sql
+SELECT ""equity_prices_1d"".""security_code"",
+    ""master_prime_1d"".""company_name"",
+    ""equity_prices_1d"".""date_time"",
+    (LAST(""close"", 10) - FIRST(""close"", 10)) / FIRST(""close"", 10) * 100 AS ""10-day_performance"",
+    (LAST(""close"", 20) - FIRST(""close"", 20)) / FIRST(""close"", 20) * 100 AS ""20-day_performance"",
+    (LAST(""close"", 30) - FIRST(""close"", 30)) / FIRST(""close"", 30) * 100 AS ""30-day_performance"",
+    (LAST(""close"", 6) - FIRST(""close"", 6)) / FIRST(""close"", 6) * 100 AS ""6-month_performance""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+    ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty50%'
+AND ""equity_prices_1d"".""close"" > LAG(""equity_prices_1d"".""close"", 1) OVER (PARTITION BY ""equity_prices_1d"".""security_code"" ORDER BY ""equity_prices_1d"".""date_time"")
+AND ""equity_prices_1d"".""close"" > LAG(""equity_prices_1d"".""close"", 1) OVER (PARTITION BY ""equity_prices_1d"".""security_code"" ORDER BY ""equity_prices_1d"".""date_time"", 'week')
+AND ""equity_prices_1d"".""close"" > LAG(""equity_prices_1d"".""close"", 1) OVER (PARTITION BY ""equity_prices_1d"".""security_code"" ORDER BY ""equity_prices_1d"".""date_time"", 'week', -1)
+AND ""equity_prices_1d"".""date_time"" >= '2024-05-19'
+GROUP BY ""equity_prices_1d"".""security_code"", ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""date_time""
+HAVING count(""equity_prices_1d"".""security_code"") >= 3
+```","
+SELECT ""equity_prices_1d"".""security_code"",
+    ""master_prime_1d"".""company_name"",
+    ""equity_prices_1d"".""date_time"",
+    (LAST(""close"", 10) - FIRST(""close"", 10)) / FIRST(""close"", 10) * 100 AS ""10-day_performance"",
+    (LAST(""close"", 20) - FIRST(""close"", 20)) / FIRST(""close"", 20) * 100 AS ""20-day_performance"",
+    (LAST(""close"", 30) - FIRST(""close"", 30)) / FIRST(""close"", 30) * 100 AS ""30-day_performance"",
+    (LAST(""close"", 6) - FIRST(""close"", 6)) / FIRST(""close"", 6) * 100 AS ""6-month_performance""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+    ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty50%'
+AND ""equity_prices_1d"".""close"" > LAG(""equity_prices_1d"".""close"", 1) OVER (PARTITION BY ""equity_prices_1d"".""security_code"" ORDER BY ""equity_prices_1d"".""date_time"")
+AND ""equity_prices_1d"".""close"" > LAG(""equity_prices_1d"".""close"", 1) OVER (PARTITION BY ""equity_prices_1d"".""security_code"" ORDER BY ""equity_prices_1d"".""date_time"", 'week')
+AND ""equity_prices_1d"".""close"" > LAG(""equity_prices_1d"".""close"", 1) OVER (PARTITION BY ""equity_prices_1d"".""security_code"" ORDER BY ""equity_prices_1d"".""date_time"", 'week', -1)
+AND ""equity_prices_1d"".""date_time"" >= '2024-05-19'
+GROUP BY ""equity_prices_1d"".""security_code"", ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""date_time""
+HAVING count(""equity_prices_1d"".""security_code"") >= 3
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 46
+ Code: 46. DB::Exception: Function with name `LAST` does not exist. In scope SELECT equity_prices_1d.security_code, master_prime_1d.company_name, equity_prices_1d.date_time, ((LAST(close, 10) - FIRST(close, 10)) / FIRST(close, 10)) * 100 AS `10-day_performance`, ((LAST(close, 20) - FIRST(close, 20)) / FIRST(close, 20)) * 100 AS `20-day_performance`, ((LAST(close, 30) - FIRST(close, 30)) / FIRST(close, 30)) * 100 AS `30-day_performance`, ((LAST(close, 6) - FIRST(close, 6)) / FIRST(close, 6)) * 100 AS `6-month_performance` FROM equity_prices_1d INNER JOIN master_prime_1d ON master_prime_1d.security_code = equity_prices_1d.security_code WHERE (master_prime_1d.index_name LIKE '%Nifty50%') AND (equity_prices_1d.close > LAG(equity_prices_1d.close, 1) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY equity_prices_1d.date_time ASC)) AND (equity_prices_1d.close > LAG(equity_prices_1d.close, 1) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY equity_prices_1d.date_time ASC, 'week' ASC)) AND (equity_prices_1d.close > LAG(equity_prices_1d.close, 1) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY equity_prices_1d.date_time ASC, 'week' ASC, -1 ASC)) AND (equity_prices_1d.date_time >= '2024-05-19') GROUP BY equity_prices_1d.security_code, master_prime_1d.company_name, equity_prices_1d.date_time HAVING count(equity_prices_1d.security_code) >= 3. Maybe you meant: ['CAST','least']. (UNKNOWN_FUNCTION) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 46
+ Code: 46. DB::Exception: Function with name `LAST` does not exist. In scope SELECT equity_prices_1d.security_code, master_prime_1d.company_name, equity_prices_1d.date_time, ((LAST(close, 10) - FIRST(close, 10)) / FIRST(close, 10)) * 100 AS `10-day_performance`, ((LAST(close, 20) - FIRST(close, 20)) / FIRST(close, 20)) * 100 AS `20-day_performance`, ((LAST(close, 30) - FIRST(close, 30)) / FIRST(close, 30)) * 100 AS `30-day_performance`, ((LAST(close, 6) - FIRST(close, 6)) / FIRST(close, 6)) * 100 AS `6-month_performance` FROM equity_prices_1d INNER JOIN master_prime_1d ON master_prime_1d.security_code = equity_prices_1d.security_code WHERE (master_prime_1d.index_name LIKE '%Nifty50%') AND (equity_prices_1d.close > LAG(equity_prices_1d.close, 1) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY equity_prices_1d.date_time ASC)) AND (equity_prices_1d.close > LAG(equity_prices_1d.close, 1) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY equity_prices_1d.date_time ASC, 'week' ASC)) AND (equity_prices_1d.close > LAG(equity_prices_1d.close, 1) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY equity_prices_1d.date_time ASC, 'week' ASC, -1 ASC)) AND (equity_prices_1d.date_time >= '2024-05-19') GROUP BY equity_prices_1d.security_code, master_prime_1d.company_name, equity_prices_1d.date_time HAVING count(equity_prices_1d.security_code) >= 3. Maybe you meant: ['CAST','least']. (UNKNOWN_FUNCTION) (version 24.12.1.1425 (official build))
+"
+List stocks closing above the previous week's closing price on 20th September 2024.,"### Intent: List of stocks closing above the previous week's closing price on 20th September 2024.
+
+- **Required Tables**: `equity_prices_1d`
+- **Columns**: `security_code`, `close`, `date_time`
+- **Conditions**: 
+   - Stocks closing above the previous week's closing price on 20th September 2024
+   - Calculate the closing price on 20th September and compare it with the closing price for the week after that
+- **Joins**: Not required
+- **Aggregations**: None
+- **Sorting/Grouping**: None","```sql
+SELECT security_code, close, date_time
+FROM equity_prices_1d
+WHERE date_time = '2024-09-20'
+AND close > (
+    SELECT close
+    FROM equity_prices_1d
+    WHERE date_time = '2024-09-27'
+);
+```","
+SELECT security_code, close, date_time
+FROM equity_prices_1d
+WHERE date_time = '2024-09-20'
+AND close > (
+    SELECT close
+    FROM equity_prices_1d
+    WHERE date_time = '2024-09-27'
+);
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 187 (end of query) (line 9, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 187 (end of query) (line 9, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+"
+List stocks closing above the previous Friday's closing price on 20th September 2024.,"### Intent: Retrieve the list of stocks closing above the previous Friday's closing price on 20th September 2024.
+
+- **Required Tables**: `equity_prices_1d`
+- **Columns**: `security_code`, `close`, `date_time`
+- **Conditions**: 
+  - Closing price on 20th September 2024 > Closing price on the previous Friday
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**: None","```sql
+SELECT DISTINCT ""security_code"", ""close"", ""date_time""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-20'
+AND ""close"" > (
+    SELECT ""close""
+    FROM ""equity_prices_1d""
+    WHERE toYear(toDateTime(""date_time"")) = 5
+    AND ""date_time"" < '2024-09-20'
+    ORDER BY ""date_time"" DESC
+    LIMIT 1
+)
+```","
+SELECT DISTINCT ""security_code"", ""close"", ""date_time""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-20'
+AND ""close"" > (
+    SELECT ""close""
+    FROM ""equity_prices_1d""
+    WHERE toYear(toDateTime(""date_time"")) = 5
+    AND ""date_time"" < '2024-09-20'
+    ORDER BY ""date_time"" DESC
+    LIMIT 1
+)
+",[],success
+List stocks with daily candle closing above the previous weekly open price on 20th September 2024.,"### Intent: Retrieve the list of stocks with daily candle closing above the previous weekly open price on 20th September 2024.
+
+### Required Tables: equity_prices_1d
+
+### Columns: security_code, date_time, open, close
+
+### Conditions: 
+- Calculate the previous weekly open price as the open price on 20th September 2024.
+- Filter for daily candle closing prices above the calculated previous weekly open price on 20th September 2024.
+
+### Joins: None
+
+### Aggregations: None
+
+### Sorting/Grouping: None","```sql
+SELECT ""security_code"", ""date_time"", ""open"", ""close""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-20'
+AND ""close"" > (
+    SELECT ""open""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+)
+```","
+SELECT ""security_code"", ""date_time"", ""open"", ""close""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-20'
+AND ""close"" > (
+    SELECT ""open""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+)
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 125
+ Code: 125. DB::Exception: Scalar subquery returned more than one row. (INCORRECT_RESULT_OF_SCALAR_SUBQUERY) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 125
+ Code: 125. DB::Exception: Scalar subquery returned more than one row. (INCORRECT_RESULT_OF_SCALAR_SUBQUERY) (version 24.12.1.1425 (official build))
+"
+"Give me the 5 best-performing stocks of Nifty500 from 15th September 2023 to 26th October 2023 and filter out 2 among 5 which have the least performance in the next 10 days. Also, show the next 10-day performance.","
+- **Intent**: Retrieve the 5 best-performing stocks of Nifty500 from 15th September 2023 to 26th October 2023, filter out 2 of the 5 least performing stocks in the next 10 days, and display the next 10-day performance.
+- **Required Tables**: `master_prime_1d`, `equity_prices_1d`
+- **Columns**: `
+    - For best-performing stocks: `security_code`, `company_name`, `date_time`, `close`
+    - For subsequent performance evaluation: `security_code`, `company_name`, `date_time`, `close`
+- **Conditions**: 
+    - Date range for best-performing stocks: `date_time BETWEEN '2023-09-15' AND '2023-10-26'`, `index_name = 'Nifty 500'`
+    - Date range for performance evaluation: `date_time BETWEEN '2023-10-27' AND '2023-11-05'`
+- **Joins**: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- **Aggregations**: None
+- **Sorting/Grouping**: Sort by performance to identify the top 5 best performers and filter out the 2 least performers.","```sql
+SELECT 
+    a.*
+FROM
+(
+    SELECT 
+        mp.company_name,
+        ep.date_time,
+        ep.close
+    FROM 
+        master_prime_1d AS mp
+    JOIN 
+        equity_prices_1d AS ep ON mp.security_code = ep.security_code
+    WHERE 
+        mp.index_name LIKE 'Nifty 500'
+        AND ep.date_time BETWEEN '2023-09-15' AND '2023-10-26'
+    ORDER BY 
+        ep.close DESC
+    LIMIT 5
+) AS a
+LEFT JOIN
+(
+    SELECT 
+        mp.company_name,
+        ep.date_time,
+        ep.close
+    FROM 
+        master_prime_1d AS mp
+    JOIN 
+        equity_prices_1d AS ep ON mp.security_code = ep.security_code
+    WHERE 
+        mp.index_name LIKE 'Nifty 500'
+        AND ep.date_time BETWEEN '2023-10-26' AND '2023-11-05'
+    ORDER BY 
+        ep.close ASC
+    LIMIT 2
+) AS b ON a.company_name = b.company_name
+```","
+SELECT 
+    a.*
+FROM
+(
+    SELECT 
+        mp.company_name,
+        ep.date_time,
+        ep.close
+    FROM 
+        master_prime_1d AS mp
+    JOIN 
+        equity_prices_1d AS ep ON mp.security_code = ep.security_code
+    WHERE 
+        mp.index_name LIKE 'Nifty 500'
+        AND ep.date_time BETWEEN '2023-09-15' AND '2023-10-26'
+    ORDER BY 
+        ep.close DESC
+    LIMIT 5
+) AS a
+LEFT JOIN
+(
+    SELECT 
+        mp.company_name,
+        ep.date_time,
+        ep.close
+    FROM 
+        master_prime_1d AS mp
+    JOIN 
+        equity_prices_1d AS ep ON mp.security_code = ep.security_code
+    WHERE 
+        mp.index_name LIKE 'Nifty 500'
+        AND ep.date_time BETWEEN '2023-10-26' AND '2023-11-05'
+    ORDER BY 
+        ep.close ASC
+    LIMIT 2
+) AS b ON a.company_name = b.company_name
+",[],success
+Give me the top 10 best and worst performers of all Nifty500 stocks from 9th September 2024 to 27th September 2024.,"- **Intent**: Retrieve the top 10 best and worst performers of all companies in the Nifty500 index between 9th September 2024 and 27th September 2024.
+- **Required Tables**: `master_prime_1d`, `equity_prices_1d`
+- **Columns**: `company_name`, `close`
+- **Conditions**: `index_name = 'Nifty 500'`, `date_time BETWEEN '2024-09-09' AND '2024-09-27'`
+- **Joins**: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- **Aggregations**: None
+- **Sorting/Grouping**: `ORDER BY close DESC LIMIT 10` for top performers, `ORDER BY close ASC LIMIT 10` for worst performers","```sql
+SELECT DISTINCT
+    ""company_name"",
+    ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty 500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+ORDER BY ""close"" DESC
+LIMIT 10
+
+UNION DISTINCT
+
+SELECT DISTINCT
+    ""company_name"",
+    ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty 500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+ORDER BY ""close"" ASC
+LIMIT 10;
+```","
+SELECT DISTINCT
+    ""company_name"",
+    ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty 500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+ORDER BY ""close"" DESC
+LIMIT 10
+
+UNION DISTINCT
+
+SELECT DISTINCT
+    ""company_name"",
+    ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty 500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+ORDER BY ""close"" ASC
+LIMIT 10;
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 675 (end of query) (line 24, col 9): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 675 (end of query) (line 24, col 9): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+"
+List stocks closing above the previous weekly candle closing price on 20th September 2024.,"### Intent: Retrieve stocks closing above the previous weekly candle closing price on 20th September 2024.
+
+- **Required Tables**: `equity_prices_1d`
+- **Columns**: `security_code`, `close`, `date_time`
+- **Conditions**: 
+    - Stocks closing above the previous weekly candle closing price on 20th September 2024
+    - `date_time = '2024-09-20'` (for the reference date)
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**: None","```sql
+SELECT ""security_code"", ""close"", ""date_time""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-20'
+AND ""close"" > (
+    SELECT ""close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" <= '2024-09-20'
+    ORDER BY ""date_time"" DESC
+    LIMIT 1 OFFSET 7
+);
+```","
+SELECT ""security_code"", ""close"", ""date_time""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-20'
+AND ""close"" > (
+    SELECT ""close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" <= '2024-09-20'
+    ORDER BY ""date_time"" DESC
+    LIMIT 1 OFFSET 7
+);
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 257 (end of query) (line 11, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 257 (end of query) (line 11, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+"
+List stocks whose volume is minus 20% than 2 days before volume on 27th September 2024.,"- **Intent**: Find stocks whose volume is 20% less than the volume 2 days prior to 27th September 2024.
+- **Required Tables**: `equity_prices_1d`
+- **Columns**: `date_time`, `security_code`, `volume`
+- **Conditions**: 
+  - `date_time = '2024-09-25'` for 2 days before 27th September 2024
+  - Calculate volume threshold: `volume = 0.8 * (SELECT volume FROM equity_prices_1d WHERE date_time = '2024-09-25')` 
+  - Filter stocks based on volume: `volume < threshold and date_time = '2024-09-27'`
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**: None","```sql
+SELECT ""security_code""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-27' 
+AND ""volume"" < 
+CASE WHEN ""volume"" < 0.8 * 
+(SELECT ""volume"" 
+ FROM ""equity_prices_1d"" 
+ WHERE ""date_time"" = '2024-09-25') 
+THEN 0.8 * 
+(SELECT ""volume"" 
+ FROM ""equity_prices_1d"" 
+ WHERE ""date_time"" = '2024-09-25') 
+ELSE ""volume"" 
+END;
+```","
+SELECT ""security_code""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-27' 
+AND ""volume"" < 
+CASE WHEN ""volume"" < 0.8 * 
+(SELECT ""volume"" 
+ FROM ""equity_prices_1d"" 
+ WHERE ""date_time"" = '2024-09-25') 
+THEN 0.8 * 
+(SELECT ""volume"" 
+ FROM ""equity_prices_1d"" 
+ WHERE ""date_time"" = '2024-09-25') 
+ELSE ""volume"" 
+END;
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 317 (end of query) (line 15, col 4): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 317 (end of query) (line 15, col 4): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+"
+List stocks where volume has increased for 2 consecutive days on 16th July 2024.,"### Intent: Retrieve stocks where volume has increased for 2 cocutive days on 16th July 2024.
+
+- **Required Tables**: `equity_prices_1d`
+- **Columns**: `security_code`, `volume`, `date_time`
+- **Conditions**: 
+  - Volume increased for 2 cocutive days
+  - Date is on 16th July 2024
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**: None","```sql
+SELECT DISTINCT security_code
+FROM equity_prices_1d
+WHERE date_time = '2024-07-16' 
+AND (
+    volume > (
+        SELECT volume
+        FROM equity_prices_1d
+        WHERE date_time = '2024-07-15' 
+        AND security_code = equity_prices_1d.security_code
+    )
+    AND volume > (
+        SELECT volume
+        FROM equity_prices_1d
+        WHERE date_time = '2024-07-14' 
+        AND security_code = equity_prices_1d.security_code
+    )
+);
+```","
+SELECT DISTINCT security_code
+FROM equity_prices_1d
+WHERE date_time = '2024-07-16' 
+AND (
+    volume > (
+        SELECT volume
+        FROM equity_prices_1d
+        WHERE date_time = '2024-07-15' 
+        AND security_code = equity_prices_1d.security_code
+    )
+    AND volume > (
+        SELECT volume
+        FROM equity_prices_1d
+        WHERE date_time = '2024-07-14' 
+        AND security_code = equity_prices_1d.security_code
+    )
+);
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 441 (end of query) (line 18, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 441 (end of query) (line 18, col 2): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+"
+List stocks crossing below the previous week's low on 20th September 2024.,"### Intent: Extract stocks that crossed below the previous week's low on 20th September 2024.
+
+### Required Tables: equity_prices_1d
+
+### Columns: 
+- `security_code`
+- `date_time`
+- `low`
+
+### Conditions: 
+- Stocks crossed below the previous week's low on 20th September 2024.
+
+### Joins: None
+
+### Aggregations: None
+
+### Sorting/Grouping: None","```sql
+SELECT DISTINCT ep.company_name
+FROM equity_prices_1d ep
+JOIN
+    (SELECT prev_week.security_code, prev_week.low
+     FROM equity_prices_1d prev_week
+     WHERE toDate(prev_week.date_time) >= '2024-09-13' AND toDate(prev_week.date_time) <= '2024-09-20') prev_week
+ON ep.security_code = prev_week.security_code
+WHERE toDate(ep.date_time) = '2024-09-20' AND ep.low < prev_week.low;
+```","
+SELECT DISTINCT ep.company_name
+FROM equity_prices_1d ep
+JOIN
+    (SELECT prev_week.security_code, prev_week.low
+     FROM equity_prices_1d prev_week
+     WHERE toDate(prev_week.date_time) >= '2024-09-13' AND toDate(prev_week.date_time) <= '2024-09-20') prev_week
+ON ep.security_code = prev_week.security_code
+WHERE toDate(ep.date_time) = '2024-09-20' AND ep.low < prev_week.low;
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 380 (end of query) (line 9, col 69): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 380 (end of query) (line 9, col 69): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+"

@@ -1,0 +1,7 @@
+user_query
+Find stocks where the price dropped by more than 5% with unusually high volume.+A2:A18
+Can you list stocks with low price volatility and consistent trading volume over the past month?
+"Give me 10-day, 20-day performance whenever weekly volumes have increased for two consecutive weeks as of 16th July 2024."
+"Give me the 5 best-performing stocks of Nifty500 from 15th September 2023 to 26th October 2023 and filter out 2 among 5 which have the least performance in the next 10 days. Also, show the next 10-day performance."
+List stocks closing above the previous weekly candle closing price on 20th September 2024.
+List stocks whose volume is minus 20% than 2 days before volume on 27th September 2024.

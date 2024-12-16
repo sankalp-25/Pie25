@@ -1,0 +1,1743 @@
+user_query,1st output,2nd output raw,2nd output processed,result,Reason
+Which stocks on NSE showed the highest price increase in the last trading session?,"- Intent: Identify the stocks on  that experienced the largest percentage price increase in the last trading session.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `close`, `date_time`
+- Conditions:  `index_name` LIKE '%%' , `date_time` = '2024-11-18' (yesterday's date assuming today is 2024-11-19)
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations:  MAX(close)
+- Sorting/Grouping: Order by percentage price change (calculated as (close - open) / open * 100) in descending order, limit to the top results (implicitly, likely top 1, or top few). 
+
+
+It's important to note that directly translating ""highest price increase"" requires calculating the percentage change within the SQL query itself, which will involve retrieving both `open` and `close` prices for the latest date.  A more complete example incorporating this calculation would be needed for actual query generation.
+","```sql
+SELECT DISTINCT ""company_name""
+FROM (
+    SELECT ""master_prime_1d"".""company_name"", 
+           ""equity_prices_1d"".""close"", 
+           (CASE WHEN ""equity_prices_1d"".""open"" = 0 THEN 0  -- Handling potential zero open price
+            ELSE ((""equity_prices_1d"".""close"" - ""equity_prices_1d"".""open"") * 100.0 / ""equity_prices_1d"".""open"") END) AS percentage_change
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""equity_prices_1d"".""date_time"" = '2024-11-18' AND ""master_prime_1d"".""index_name"" LIKE '%%'
+) AS subquery
+ORDER BY percentage_change DESC
+LIMIT 1; -- Limiting to the top result to get the largest increase
+
+
+```","
+SELECT DISTINCT ""company_name""
+FROM (
+    SELECT ""master_prime_1d"".""company_name"", 
+           ""equity_prices_1d"".""close"", 
+           (CASE WHEN ""equity_prices_1d"".""open"" = 0 THEN 0  -- Handling potential zero open price
+            ELSE ((""equity_prices_1d"".""close"" - ""equity_prices_1d"".""open"") * 100.0 / ""equity_prices_1d"".""open"") END) AS percentage_change
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""equity_prices_1d"".""date_time"" = '2024-11-18' AND ""master_prime_1d"".""index_name"" LIKE '%%'
+) AS subquery
+ORDER BY percentage_change DESC
+LIMIT 1 -- Limiting to the top result to get the largest increase
+
+",success,
+Which stocks had the highest volume traded/volume buzzer compared to yesterday on NSE?,"- Intent: Find the stocks with the highest traded volume compared to the previous day on the .
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `volume`, `date_time`
+- Conditions:  `index_name` LIKE '%%' , `date_time` = '2024-11-18' AND `date_time` = '2024-11-19'
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations:  MAX(`volume`)
+- Sorting/Grouping: Group By `company_name`, Order By `volume` DESC
+
+
+","```sql
+SELECT DISTINCT ""company_name""
+FROM (
+    SELECT ""master_prime_1d"".""company_name"", 
+           ""equity_prices_1d"".""volume"",
+           (CASE WHEN ""equity_prices_1d"".""volume"" = 0 THEN 0  ELSE ((""t2"".""volume"" - ""equity_prices_1d"".""volume"") / ""equity_prices_1d"".""volume"") * 100 END) AS ""percentage_change""
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    INNER JOIN (
+        SELECT ""volume"", ""security_code"", ""date_time""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2024-11-19'
+    ) AS ""t2"" ON ""equity_prices_1d"".""security_code"" = ""t2"".""security_code""
+    WHERE ""equity_prices_1d"".""date_time"" = '2024-11-18' AND ""master_prime_1d"".""index_name"" LIKE '%%'
+) AS ""subquery""
+ORDER BY ""percentage_change"" DESC
+LIMIT 10; -- Limiting to top 10 stocks for practicality
+
+
+```","
+SELECT DISTINCT ""company_name""
+FROM (
+    SELECT ""master_prime_1d"".""company_name"", 
+           ""equity_prices_1d"".""volume"",
+           (CASE WHEN ""equity_prices_1d"".""volume"" = 0 THEN 0  ELSE ((""t2"".""volume"" - ""equity_prices_1d"".""volume"") / ""equity_prices_1d"".""volume"") * 100 END) AS ""percentage_change""
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    INNER JOIN (
+        SELECT ""volume"", ""security_code"", ""date_time""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2024-11-19'
+    ) AS ""t2"" ON ""equity_prices_1d"".""security_code"" = ""t2"".""security_code""
+    WHERE ""equity_prices_1d"".""date_time"" = '2024-11-18' AND ""master_prime_1d"".""index_name"" LIKE '%%'
+) AS ""subquery""
+ORDER BY ""percentage_change"" DESC
+LIMIT 10 -- Limiting to top 10 stocks for practicality
+
+",success,
+Which stocks had the highest volume traded/volume buzzer on NSE?,"- Intent: Identify the stocks with the highest trading volume on the  (National Stock Exchange).
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `volume`,`index_name`
+- Conditions:  `index_name` LIKE '%%'
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `max(volume)`
+- Sorting/Grouping: Group by `company_name`, Order by `volume` DESC LIMIT 1 
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""index_name"" LIKE '%'
+ORDER BY ""volume"" DESC
+LIMIT 1;
+
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""index_name"" LIKE '%'
+ORDER BY ""volume"" DESC
+LIMIT 1
+",success,
+Can you identify stocks trading below ?50 with high trading volumes?,"- Intent: Identify stocks trading below ÃÃÃ¥ÃÃÃ¢Ã¥Â¢ÃÃÃ¥Ã¢ÃÃ¢Ã¥Ã¢ÃÃÃ¥Ã¢ÃÃ¢Ã¥?50 with high trading volumes.
+- Required Tables: `equity_prices_1d`, `master_prime_1d`
+- Columns: `close`, `volume`, `company_name`
+- Conditions: `close < 50`,  `date_time` between '2024-10-20' and '2024-11-19' (last 20 days for volume calculation - this can be made more sophisticated if access to current date is available within the SQL environment).
+- Joins: `equity_prices_1d.security_code = master_prime_1d.security_code`
+- Aggregations:  Average volume over the last 20 days could be calculated, but explicit instructions are missing about how ""high"" volume is defined.  
+- Sorting/Grouping: Potentially sort by volume in descending order to prioritize the highest volume stocks among those trading below ÃÃÃ¥ÃÃÃ¢Ã¥Â¢ÃÃÃ¥Ã¢ÃÃ¢Ã¥Ã¢ÃÃÃ¥Ã¢ÃÃ¢Ã¥?50.
+
+**Further Considerations:**
+
+* **""High Volume"" Definition:** The query needs clarification on how to define ""high trading volume.""  Possible options include:
+    * **Comparison to Average:** Calculate the average volume over the last 20 days and consider ""high volume"" as some multiple (e.g., 1.5x or 2x) of the average.  
+    * **Percentile:**  Define ""high volume"" as belonging to the top n-th percentile of trading volumes within the chosen timeframe.
+    * **Absolute Threshold:**  Use a fixed volume threshold (e.g., > 1,000,000 shares traded) to filter for high-volume stocks.
+* **Timeframe:** The query defaults to a daily timeframe.  Is this correct, or should volume be calculated intraday?  
+* **Sorting/Presentation:**  The output format isn't specified. Should the query return the `company_name`, `close` price, and the `volume`? 
+
+
+If we assume ""high volume"" means greater than the average volume over the last 20 days, a sample structured query fragment (not complete SQL) would look like this:
+
+```sql
+SELECT DISTINCT mp.company_name, ep.close, ep.volume
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.close < 50
+AND ep.date_time BETWEEN '2024-10-20' AND '2024-11-19'
+AND ep.volume > (SELECT AVG(volume) FROM equity_prices_1d WHERE date_time BETWEEN '2024-10-20' AND '2024-11-19')  -- Example high-volume definition
+ORDER BY ep.volume DESC; -- Optional sorting
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN (
+    SELECT ""security_code"", ""close"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+) AS ep ON mp.""security_code"" = ep.""security_code""
+WHERE ep.""close"" < 50 AND ep.""volume"" > (
+    SELECT avg(""volume"")
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+)
+ORDER BY ep.""volume"" DESC;
+
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN (
+    SELECT ""security_code"", ""close"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+) AS ep ON mp.""security_code"" = ep.""security_code""
+WHERE ep.""close"" < 50 AND ep.""volume"" > (
+    SELECT avg(""volume"")
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+)
+ORDER BY ep.""volume"" DESC
+",success,
+Can you list stocks with low price volatility and consistent trading volume over the past month?,"- Intent: Find stocks with low price volatility and consistent trading volume in the last month.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `high`, `low`, `volume`, `date_time`
+- Conditions: `date_time BETWEEN '2024-10-20' AND '2024-11-19'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `STDDEV(high - low)`, `AVG(volume)`
+- Sorting/Grouping: `GROUP BY company_name`, `ORDER BY STDDEV(high - low) ASC` 
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+GROUP BY ""company_name""
+ORDER BY stddevPop(""high"" - ""low"") ASC;
+
+```
+","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+GROUP BY ""company_name""
+ORDER BY stddevPop(""high"" - ""low"") ASC
+
+",success,
+"WhatÃÃÃ¥ÃÃÃ¢Ã¥Ã¢ÃÃÃ¥Ã¢ÃÃ¢Ã¥Ãs the return of the sugar sector in the last 10 days, and give me the list of top 5 best performing stocks and top 5 worst performing stocks?","- Intent: Calculate the return of the sugar sector over the last 10 days and identify the top 5 best and worst-performing stocks within that sector.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `industry_name`, `close`, `date_time`
+- Conditions: `industry_name LIKE '%Sugar%'`, `date_time BETWEEN '2024-11-09' AND '2024-11-19'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None (Calculations for return will be performed within the SQL query itself)
+- Sorting/Grouping: Order by percentage change in closing price (calculated as (current_close - initial_close) / initial_close)
+
+
+Here's a breakdown of why some parts are designed this way:
+
+* **Conditions**: The date condition dynamically calculates the ""last 10 days"" relative to the current date (2024-11-19).
+* **Aggregations**:  While we need to calculate returns, this isn't a standard SQL aggregation like `SUM` or `AVG`. The return calculation will be a part of the SQL query itself, usually involving subqueries or window functions to compare closing prices on different dates.
+* **Sorting/Grouping**: The query explicitly asks for ""top 5"" and ""bottom 5,"" implying sorting based on the calculated return.  This sorting will also be implemented within the SQL query using `ORDER BY` and `LIMIT`. 
+
+
+","```sql
+WITH
+    FirstClose AS (
+        SELECT
+            ""security_code"",
+            ""close"" AS ""first_close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2024-11-09'
+    ),
+    LastClose AS (
+        SELECT
+            ""security_code"",
+            ""close"" AS ""last_close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2024-11-19'
+    ),
+    PriceChanges AS (
+        SELECT
+            ""master_prime_1d"".""company_name"",
+            ""FirstClose"".""first_close"",
+            ""LastClose"".""last_close"",
+            (
+                CASE
+                    WHEN ""FirstClose"".""first_close"" = 0 THEN 0  -- Handling potential division by zero
+                    ELSE ((""LastClose"".""last_close"" - ""FirstClose"".""first_close"") / ""FirstClose"".""first_close"") * 100
+                END
+            ) AS ""percentage_change""
+        FROM ""master_prime_1d""
+        INNER JOIN ""FirstClose"" ON ""master_prime_1d"".""security_code"" = ""FirstClose"".""security_code""
+        INNER JOIN ""LastClose"" ON ""master_prime_1d"".""security_code"" = ""LastClose"".""security_code""
+        WHERE ""master_prime_1d"".""industry_name"" LIKE '%Sugar%'
+    )
+SELECT DISTINCT
+    ""company_name"",
+    ""percentage_change""
+FROM PriceChanges
+ORDER BY ""percentage_change"" DESC
+LIMIT 5
+UNION ALL
+SELECT DISTINCT
+    ""company_name"",
+    ""percentage_change""
+FROM PriceChanges
+ORDER BY ""percentage_change"" ASC
+LIMIT 5;
+
+```","
+WITH
+    FirstClose AS (
+        SELECT
+            ""security_code"",
+            ""close"" AS ""first_close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2024-11-09'
+    ),
+    LastClose AS (
+        SELECT
+            ""security_code"",
+            ""close"" AS ""last_close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" = '2024-11-19'
+    ),
+    PriceChanges AS (
+        SELECT
+            ""master_prime_1d"".""company_name"",
+            ""FirstClose"".""first_close"",
+            ""LastClose"".""last_close"",
+            (
+                CASE
+                    WHEN ""FirstClose"".""first_close"" = 0 THEN 0  -- Handling potential division by zero
+                    ELSE ((""LastClose"".""last_close"" - ""FirstClose"".""first_close"") / ""FirstClose"".""first_close"") * 100
+                END
+            ) AS ""percentage_change""
+        FROM ""master_prime_1d""
+        INNER JOIN ""FirstClose"" ON ""master_prime_1d"".""security_code"" = ""FirstClose"".""security_code""
+        INNER JOIN ""LastClose"" ON ""master_prime_1d"".""security_code"" = ""LastClose"".""security_code""
+        WHERE ""master_prime_1d"".""industry_name"" LIKE '%Sugar%'
+    )
+SELECT DISTINCT
+    ""company_name"",
+    ""percentage_change""
+FROM PriceChanges
+ORDER BY ""percentage_change"" DESC
+LIMIT 5
+UNION ALL
+SELECT DISTINCT
+    ""company_name"",
+    ""percentage_change""
+FROM PriceChanges
+ORDER BY ""percentage_change"" ASC
+LIMIT 5
+",success,
+Give me the top 10 best and worst performers of all Nifty500 stocks from 9th September 2024 to 27th September 2024.,"- Intent: Retrieve the top 10 best and worst performing Nifty 500 stocks based on percentage change in closing price between 2024-09-09 and 2024-09-27.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `close`, `date_time`, `index_name`
+- Conditions: `index_name` LIKE '%Nifty 500%', `date_time` BETWEEN '2024-09-09' AND '2024-09-27'
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None (Percentage change will be calculated)
+- Sorting/Grouping: Order by percentage change in closing price (ascending and descending for worst and best performers respectively), limit to 10 for each group.
+
+
+
+","```sql
+SELECT DISTINCT ""company_name"", (t2.""close"" - t1.""close"") * 100 / CASE WHEN t1.""close"" = 0 THEN 1 ELSE t1.""close"" END AS percentage_change
+FROM (
+    SELECT ""close"", ""security_code""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-09'
+) AS t1
+INNER JOIN (
+    SELECT ""close"", ""security_code""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-27'
+) AS t2 ON t1.""security_code"" = t2.""security_code""
+INNER JOIN ""master_prime_1d"" AS mp ON t1.""security_code"" = mp.""security_code""
+WHERE mp.""index_name"" LIKE '%Nifty 500%'
+ORDER BY percentage_change DESC
+LIMIT 10
+UNION ALL
+SELECT DISTINCT ""company_name"", (t2.""close"" - t1.""close"") * 100 / CASE WHEN t1.""close"" = 0 THEN 1 ELSE t1.""close"" END AS percentage_change
+FROM (
+    SELECT ""close"", ""security_code""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-09'
+) AS t1
+INNER JOIN (
+    SELECT ""close"", ""security_code""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-27'
+) AS t2 ON t1.""security_code"" = t2.""security_code""
+INNER JOIN ""master_prime_1d"" AS mp ON t1.""security_code"" = mp.""security_code""
+WHERE mp.""index_name"" LIKE '%Nifty 500%'
+ORDER BY percentage_change ASC
+LIMIT 10;
+
+```","
+SELECT DISTINCT ""company_name"", (t2.""close"" - t1.""close"") * 100 / CASE WHEN t1.""close"" = 0 THEN 1 ELSE t1.""close"" END AS percentage_change
+FROM (
+    SELECT ""close"", ""security_code""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-09'
+) AS t1
+INNER JOIN (
+    SELECT ""close"", ""security_code""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-27'
+) AS t2 ON t1.""security_code"" = t2.""security_code""
+INNER JOIN ""master_prime_1d"" AS mp ON t1.""security_code"" = mp.""security_code""
+WHERE mp.""index_name"" LIKE '%Nifty 500%'
+ORDER BY percentage_change DESC
+LIMIT 10
+UNION ALL
+SELECT DISTINCT ""company_name"", (t2.""close"" - t1.""close"") * 100 / CASE WHEN t1.""close"" = 0 THEN 1 ELSE t1.""close"" END AS percentage_change
+FROM (
+    SELECT ""close"", ""security_code""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-09'
+) AS t1
+INNER JOIN (
+    SELECT ""close"", ""security_code""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-27'
+) AS t2 ON t1.""security_code"" = t2.""security_code""
+INNER JOIN ""master_prime_1d"" AS mp ON t1.""security_code"" = mp.""security_code""
+WHERE mp.""index_name"" LIKE '%Nifty 500%'
+ORDER BY percentage_change ASC
+LIMIT 10
+",success,
+When was the last time ICICI Bank went up consecutively for 2 days?,"- Intent: Find the latest date when ICICI Bank's closing price increased cocutively for two days.
+- Required Tables: `equity_prices_1d`, `master_prime_1d`
+- Columns: `date_time`, `close`, `short_company_name`
+- Conditions: `short_company_name` LIKE '%ICICIBANKEQ%'
+- Joins: `equity_prices_1d.security_code = master_prime_1d.security_code`
+- Aggregations:  None
+- Sorting/Grouping: Order by `date_time` DESC, Limit 1
+
+
+","```sql
+SELECT ""date_time""
+FROM ""equity_prices_1d"" AS t1
+INNER JOIN ""master_prime_1d"" AS t2 ON t1.""security_code"" = t2.""security_code""
+WHERE t2.""short_company_name"" = 'ICICIBANKEQ'
+AND t1.""date_time"" = (SELECT MAX(""date_time"")
+                       FROM ""equity_prices_1d"" AS t3
+                       INNER JOIN ""master_prime_1d"" AS t4 ON t3.""security_code"" = t4.""security_code""
+                       WHERE t4.""short_company_name"" = 'ICICIBANKEQ'
+                       AND t3.""close"" > (SELECT ""close""
+                                         FROM ""equity_prices_1d"" AS t5
+                                         INNER JOIN ""master_prime_1d"" AS t6 ON t5.""security_code"" = t6.""security_code""
+                                         WHERE t6.""short_company_name"" = 'ICICIBANKEQ'
+                                         AND t5.""date_time"" = (SELECT toDate(subtractDays(MAX(""date_time""), 1)) -- Find the previous consecutive day
+                                                             FROM ""equity_prices_1d"" AS t7
+                                                             INNER JOIN ""master_prime_1d"" AS t8 ON t7.""security_code"" = t8.""security_code""
+                                                             WHERE t8.""short_company_name"" = 'ICICIBANKEQ'
+                                         )))
+ORDER BY ""date_time"" DESC
+LIMIT 1;
+
+```","
+SELECT ""date_time""
+FROM ""equity_prices_1d"" AS t1
+INNER JOIN ""master_prime_1d"" AS t2 ON t1.""security_code"" = t2.""security_code""
+WHERE t2.""short_company_name"" = 'ICICIBANKEQ'
+AND t1.""date_time"" = (SELECT MAX(""date_time"")
+                       FROM ""equity_prices_1d"" AS t3
+                       INNER JOIN ""master_prime_1d"" AS t4 ON t3.""security_code"" = t4.""security_code""
+                       WHERE t4.""short_company_name"" = 'ICICIBANKEQ'
+                       AND t3.""close"" > (SELECT ""close""
+                                         FROM ""equity_prices_1d"" AS t5
+                                         INNER JOIN ""master_prime_1d"" AS t6 ON t5.""security_code"" = t6.""security_code""
+                                         WHERE t6.""short_company_name"" = 'ICICIBANKEQ'
+                                         AND t5.""date_time"" = (SELECT toDate(subtractDays(MAX(""date_time""), 1)) -- Find the previous consecutive day
+                                                             FROM ""equity_prices_1d"" AS t7
+                                                             INNER JOIN ""master_prime_1d"" AS t8 ON t7.""security_code"" = t8.""security_code""
+                                                             WHERE t8.""short_company_name"" = 'ICICIBANKEQ'
+                                         )))
+ORDER BY ""date_time"" DESC
+LIMIT 1
+",success,
+"When was the last time the Nifty50 index went up for 3 weeks consecutively, and what was the performance in the next 3 months?","- Intent: Determine the last date when Nifty50 had three cocutive weeks of positive growth and calculate the index's performance over the following three months.
+
+- Required Tables: `equity_prices_1d`, `master_prime_1d`
+
+- Columns: `date_time`, `close`, `index_name`
+
+- Conditions: `index_name LIKE '%Nifty 50%'`
+
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+
+- Aggregations: None (Performance will be calculated as a percentage change)
+
+- Sorting/Grouping:  Order by `date_time` descending to find the last occurrence.
+
+
+This query requires complex sequential calculations and cannot be directly expressed in a single SQL query. It would need to be implemented using a procedural approach or a more advanced analytical function within SQL, or potentially pre-calculated and stored as a separate dataset. The basic steps would be:
+
+1. **Identify weeks:** Group data by week and calculate the weekly closing price (e.g., the last closing price of each week).
+2. **Calculate weekly changes:** Determine the percentage change between cocutive weekly closing prices.
+3. **Identify cocutive positive weeks:** Find sequences of three cocutive weeks where the percentage change is positive.
+4. **Find the last occurrence:** Select the most recent date from the identified sequences.
+5. **Calculate 3-month performance:** Calculate the percentage change in the closing price from the identified date to the closing price three months later.
+
+Because of the nature of the question, the usual SQL query cannot be generated with the currently available SQL capabilities. More advanced SQL features or a procedural approach with a scripting language would be required to complete this complex time series analysis.
+","This query requires a multi-step approach due to the complexity of calculating consecutive positive weeks and subsequent performance.  A pure SQL solution in ClickHouse, especially for versions prior to 22.8 (which introduced window functions with frames), is incredibly challenging for this specific scenario.  A stored procedure or a combination of SQL and client-side processing would be more suitable. I'll outline the general approach and provide a partial SQL framework.
+
+```sql
+-- Step 1 & 2: Calculate weekly changes (This requires date manipulation functions which may vary slightly depending on the ClickHouse version)
+
+WITH WeeklyData AS (
+    SELECT
+        toStartOfWeek(""date_time"") AS week_start,  -- Get the start of the week
+        ""security_code"",
+        last_value(""close"") OVER (PARTITION BY ""security_code"", toStartOfWeek(""date_time"") ORDER BY ""date_time"") AS week_close, -- Get the closing price for the last day of the week.
+        ""index_name""
+    FROM ""equity_prices_1d"" AS ep
+    INNER JOIN ""master_prime_1d"" AS mp ON ep.""security_code"" = mp.""security_code""
+    WHERE ""index_name"" LIKE '%Nifty 50%'
+),
+WeeklyChanges AS (
+    SELECT
+        week_start,
+        ""security_code"",
+        week_close,
+        week_close - prev_week_close AS weekly_change,  -- Calculate weekly changes, handling nulls
+        ""index_name""
+    FROM (
+        SELECT
+            week_start,
+            ""security_code"",
+            week_close,
+            lag(week_close,1,0) OVER (PARTITION BY ""security_code"" ORDER BY week_start ASC) as prev_week_close, --lag is only applicable for Clickhouse version 22.8 +
+            ""index_name""
+
+        FROM WeeklyData
+    )
+)
+
+--  Steps 3 & 4 (Identifying consecutive positive weeks and the last occurrence):  This would ideally be handled with window functions (available in ClickHouse 22.8 and later) or through a procedural approach outside of pure SQL due to the need for iterative comparisons.
+
+-- Placeholder for logic to identify 3 consecutive positive weeks and find the last date.  This is difficult to implement efficiently in older ClickHouse versions without procedural extensions or window functions.
+-- A stored procedure or client-side processing would be more practical.
+
+
+-- Step 5 (3-month performance): Requires the date identified in the previous step.
+SELECT
+    -- ... Calculations to find the closing price 3 months after the identified date ...
+    -- Calculate the percentage change using the closing prices.
+
+-- ... WHERE clause based on the date criteria determined in steps 3 and 4.  ...
+
+
+```
+
+
+Explanation and Limitations:
+
+* The provided SQL handles the initial steps of calculating weekly changes.
+* Identifying consecutive positive weeks requires more advanced techniques (window functions with frames or procedural logic) that weren't readily available in older ClickHouse versions.
+* The final performance calculation depends on the date identified in the consecutive-weeks step.
+
+A practical solution would involve either upgrading to a newer ClickHouse version with enhanced window function support or using a stored procedure or client-side script to handle the iterative logic for finding consecutive positive weeks.  A stored procedure would allow for more complex logic and potentially better performance than trying to force a very complex query into a single SQL statement.
+
+
+","This query requires a multi-step approach due to the complexity of calculating consecutive positive weeks and subsequent performance.  A pure SQL solution in ClickHouse, especially for versions prior to 22.8 (which introduced window functions with frames), is incredibly challenging for this specific scenario.  A stored procedure or a combination of SQL and client-side processing would be more suitable. I'll outline the general approach and provide a partial SQL framework.
+
+sql
+-- Step 1 & 2: Calculate weekly changes (This requires date manipulation functions which may vary slightly depending on the ClickHouse version)
+
+WITH WeeklyData AS (
+    SELECT
+        toStartOfWeek(""date_time"") AS week_start,  -- Get the start of the week
+        ""security_code"",
+        last_value(""close"") OVER (PARTITION BY ""security_code"", toStartOfWeek(""date_time"") ORDER BY ""date_time"") AS week_close, -- Get the closing price for the last day of the week.
+        ""index_name""
+    FROM ""equity_prices_1d"" AS ep
+    INNER JOIN ""master_prime_1d"" AS mp ON ep.""security_code"" = mp.""security_code""
+    WHERE ""index_name"" LIKE '%Nifty 50%'
+),
+WeeklyChanges AS (
+    SELECT
+        week_start,
+        ""security_code"",
+        week_close,
+        week_close - prev_week_close AS weekly_change,  -- Calculate weekly changes, handling nulls
+        ""index_name""
+    FROM (
+        SELECT
+            week_start,
+            ""security_code"",
+            week_close,
+            lag(week_close,1,0) OVER (PARTITION BY ""security_code"" ORDER BY week_start ASC) as prev_week_close, --lag is only applicable for Clickhouse version 22.8 +
+            ""index_name""
+
+        FROM WeeklyData
+    )
+)
+
+--  Steps 3 & 4 (Identifying consecutive positive weeks and the last occurrence):  This would ideally be handled with window functions (available in ClickHouse 22.8 and later) or through a procedural approach outside of pure SQL due to the need for iterative comparisons.
+
+-- Placeholder for logic to identify 3 consecutive positive weeks and find the last date.  This is difficult to implement efficiently in older ClickHouse versions without procedural extensions or window functions.
+-- A stored procedure or client-side processing would be more practical.
+
+
+-- Step 5 (3-month performance): Requires the date identified in the previous step.
+SELECT
+    -- ... Calculations to find the closing price 3 months after the identified date ...
+    -- Calculate the percentage change using the closing prices.
+
+-- ... WHERE clause based on the date criteria determined in steps 3 and 4.  ...
+
+
+
+
+
+Explanation and Limitations:
+
+* The provided SQL handles the initial steps of calculating weekly changes.
+* Identifying consecutive positive weeks requires more advanced techniques (window functions with frames or procedural logic) that weren't readily available in older ClickHouse versions.
+* The final performance calculation depends on the date identified in the consecutive-weeks step.
+
+A practical solution would involve either upgrading to a newer ClickHouse version with enhanced window function support or using a stored procedure or client-side script to handle the iterative logic for finding consecutive positive weeks.  A stored procedure would allow for more complex logic and potentially better performance than trying to force a very complex query into a single SQL statement.
+
+
+","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('This') (line 1, col 1): This query requires a multi-step approach due to the complexity of calculating consecutive positive weeks and subsequent performance.  A pure SQL solution in Cl. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+List stocks where today's low > yesterday's high and today's volume is 3x of the previous day's volume on 16th July 2024.,"- Intent: List stocks where today's low is greater than yesterday's high and today's volume is 3 times the previous day's volume on July 16, 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `company_name`, `date_time`, `low`, `high`, `volume`, `security_code`
+- Conditions: `date_time = '2024-07-16'`
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None
+
+
+
+```sql
+SELECT DISTINCT T1.company_name
+FROM master_prime_1d AS T1
+INNER JOIN equity_prices_1d AS T2
+  ON T1.security_code = T2.security_code
+WHERE
+  T2.date_time = '2024-07-16' AND T2.low > (
+    SELECT
+      high
+    FROM equity_prices_1d
+    WHERE
+      date_time = '2024-07-15' AND security_code = T2.security_code
+  )
+  AND T2.volume > 3 * (
+    SELECT
+      volume
+    FROM equity_prices_1d
+    WHERE
+      date_time = '2024-07-15' AND security_code = T2.security_code
+  );
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", ""low"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-07-16'
+) AS ""today_prices""
+ON ""master_prime_1d"".""security_code"" = ""today_prices"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""high"", ""volume"" AS ""yesterday_volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-07-15'
+) AS ""yesterday_prices""
+ON ""today_prices"".""security_code"" = ""yesterday_prices"".""security_code""
+WHERE ""today_prices"".""low"" > ""yesterday_prices"".""high"" AND ""today_prices"".""volume"" > 3 * ""yesterday_prices"".""yesterday_volume"";
+```
+","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", ""low"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-07-16'
+) AS ""today_prices""
+ON ""master_prime_1d"".""security_code"" = ""today_prices"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""high"", ""volume"" AS ""yesterday_volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-07-15'
+) AS ""yesterday_prices""
+ON ""today_prices"".""security_code"" = ""yesterday_prices"".""security_code""
+WHERE ""today_prices"".""low"" > ""yesterday_prices"".""high"" AND ""today_prices"".""volume"" > 3 * ""yesterday_prices"".""yesterday_volume""
+",success,
+"List stocks where today's price > yesterday's close, and one-day ago price > 2-day ago price, and 2-day ago price > 3-day ago price on 16th July 2024, and next day closing is lesser than the previous day close, and 17th July 2024 volume < previous day volume.","- Intent: List stocks where today's price > yesterday's close, and one-day ago price > 2-day ago price, and 2-day ago price > 3-day ago price on 16th July 2024, and next day closing is lesser than the previous day close, and 17th July 2024 volume < previous day volume.
+- Required Tables: `equity_prices_1d`
+- Columns: `company_name`, `date_time`, `close`,  `volume`
+- Conditions: 
+    - `date_time = '2024-07-16'`
+    - `close > (SELECT close FROM equity_prices_1d WHERE date_time = '2024-07-15')`
+    - `(SELECT close FROM equity_prices_1d WHERE date_time = '2024-07-15') > (SELECT close FROM equity_prices_1d WHERE date_time = '2024-07-14')`
+    - `(SELECT close FROM equity_prices_1d WHERE date_time = '2024-07-14') > (SELECT close FROM equity_prices_1d WHERE date_time = '2024-07-13')`
+    - `(SELECT close FROM equity_prices_1d WHERE date_time = '2024-07-17') < (SELECT close FROM equity_prices_1d WHERE date_time = '2024-07-16')`
+    - `(SELECT volume FROM equity_prices_1d WHERE date_time = '2024-07-17') < (SELECT volume FROM equity_prices_1d WHERE date_time = '2024-07-16')`
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None 
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS master
+INNER JOIN ""equity_prices_1d"" AS t1 ON master.""security_code"" = t1.""security_code""
+INNER JOIN ""equity_prices_1d"" AS t2 ON master.""security_code"" = t2.""security_code""
+INNER JOIN ""equity_prices_1d"" AS t3 ON master.""security_code"" = t3.""security_code""
+INNER JOIN ""equity_prices_1d"" AS t4 ON master.""security_code"" = t4.""security_code""
+INNER JOIN ""equity_prices_1d"" AS t5 ON master.""security_code"" = t5.""security_code""
+WHERE t1.""date_time"" = '2024-07-16'
+  AND t2.""date_time"" = '2024-07-15'
+  AND t3.""date_time"" = '2024-07-14'
+  AND t4.""date_time"" = '2024-07-13'
+  AND t5.""date_time"" = '2024-07-17'
+  AND t1.""close"" > t2.""close""
+  AND t2.""close"" > t3.""close""
+  AND t3.""close"" > t4.""close""
+  AND t5.""close"" < t1.""close""
+  AND t5.""volume"" < t1.""volume"";
+
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS master
+INNER JOIN ""equity_prices_1d"" AS t1 ON master.""security_code"" = t1.""security_code""
+INNER JOIN ""equity_prices_1d"" AS t2 ON master.""security_code"" = t2.""security_code""
+INNER JOIN ""equity_prices_1d"" AS t3 ON master.""security_code"" = t3.""security_code""
+INNER JOIN ""equity_prices_1d"" AS t4 ON master.""security_code"" = t4.""security_code""
+INNER JOIN ""equity_prices_1d"" AS t5 ON master.""security_code"" = t5.""security_code""
+WHERE t1.""date_time"" = '2024-07-16'
+  AND t2.""date_time"" = '2024-07-15'
+  AND t3.""date_time"" = '2024-07-14'
+  AND t4.""date_time"" = '2024-07-13'
+  AND t5.""date_time"" = '2024-07-17'
+  AND t1.""close"" > t2.""close""
+  AND t2.""close"" > t3.""close""
+  AND t3.""close"" > t4.""close""
+  AND t5.""close"" < t1.""close""
+  AND t5.""volume"" < t1.""volume""
+",success,
+List stocks whose volume is minus 20% than 2 days before volume on 27th September 2024.,"- Intent: Retrieve the list of stocks whose volume on 27th September 2024 was 20% less than their volume on 25th September 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `date_time`, `security_code`, `company_name`, `volume`
+- Conditions: `date_time = '2024-09-27'` AND volume < 0.8 * (volume on '2024-09-25')
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None
+
+
+```sql
+SELECT DISTINCT t1.company_name
+FROM master_prime_1d AS t1
+INNER JOIN equity_prices_1d AS t2
+ON t1.security_code = t2.security_code
+WHERE t2.date_time = '2024-09-27'
+AND t2.volume < 0.8 * (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE security_code = t2.security_code
+    AND date_time = '2024-09-25'
+);
+
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS t1
+INNER JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-25'
+) AS t2_25
+ON t1.""security_code"" = t2_25.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-27'
+) AS t2_27
+ON t1.""security_code"" = t2_27.""security_code""
+WHERE t2_27.""volume"" < 0.8 * t2_25.""volume"";
+```
+","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS t1
+INNER JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-25'
+) AS t2_25
+ON t1.""security_code"" = t2_25.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-27'
+) AS t2_27
+ON t1.""security_code"" = t2_27.""security_code""
+WHERE t2_27.""volume"" < 0.8 * t2_25.""volume""
+",success,
+List stocks whose volume is 20% higher than 2 days before volume on 27th September 2024.,"- Intent: Find stocks whose volume on 27th September 2024 was 20% higher than their volume on 25th September 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `security_code`, `date_time`, `volume`, `company_name`
+- Conditions:  `date_time = '2024-09-27'` and volume is 20% higher than volume on '2024-09-25' for same security code
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: None
+
+
+```sql
+SELECT DISTINCT T1.company_name
+FROM master_prime_1d AS T1
+INNER JOIN equity_prices_1d AS T2
+  ON T1.security_code = T2.security_code
+WHERE
+  T2.date_time = '2024-09-27'
+  AND T2.volume > (
+    SELECT
+      volume * 1.20
+    FROM equity_prices_1d
+    WHERE
+      security_code = T2.security_code AND date_time = '2024-09-25'
+  );
+
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-25'
+) AS ""t2_25""
+ON ""master_prime_1d"".""security_code"" = ""t2_25"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-27'
+) AS ""t2_27""
+ON ""master_prime_1d"".""security_code"" = ""t2_27"".""security_code""
+WHERE ""t2_27"".""volume"" > ""t2_25"".""volume"" * 1.20;
+
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-25'
+) AS ""t2_25""
+ON ""master_prime_1d"".""security_code"" = ""t2_25"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-27'
+) AS ""t2_27""
+ON ""master_prime_1d"".""security_code"" = ""t2_27"".""security_code""
+WHERE ""t2_27"".""volume"" > ""t2_25"".""volume"" * 1.20
+",success,
+"List stocks whose volume is between 20000 and 30000 on 27th September 2024. I need symbol, price, 10-day average volume in the columns.","- Intent: Retrieve the company names, closing prices, and 10-day average volumes of stocks whose volume was between 20000 and 30000 on 2024-09-27.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `close`, `volume`
+- Conditions: `equity_prices_1d.volume BETWEEN 20000 AND 30000`, `equity_prices_1d.date_time = '2024-09-27'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `AVG(volume) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY equity_prices_1d.date_time ASC ROWS BETWEEN 9 PRECEDING AND CURRENT ROW)`
+- Sorting/Grouping: None
+
+
+
+```sql
+SELECT DISTINCT company_name, T1.close, T2.volume_10day_avg
+FROM master_prime_1d AS T1
+INNER JOIN (
+    SELECT security_code, date_time, close, 
+           AVG(volume) OVER (PARTITION BY security_code ORDER BY date_time ASC ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) AS volume_10day_avg
+    FROM equity_prices_1d 
+) AS T2
+ON T1.security_code = T2.security_code
+WHERE T2.date_time = '2024-09-27' AND T2.volume BETWEEN 20000 AND 30000;
+
+```
+","```sql
+SELECT DISTINCT ""company_name"", ""close"", ""volume_10day_avg""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", ""date_time"", ""close"", 
+           avg(""volume"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) AS ""volume_10day_avg""
+    FROM ""equity_prices_1d""
+) AS ""equity_prices_1d_with_avg""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d_with_avg"".""security_code""
+WHERE ""equity_prices_1d_with_avg"".""date_time"" = '2024-09-27' AND ""equity_prices_1d_with_avg"".""volume_10day_avg"" BETWEEN 20000 AND 30000;
+
+```","
+SELECT DISTINCT ""company_name"", ""close"", ""volume_10day_avg""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", ""date_time"", ""close"", 
+           avg(""volume"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) AS ""volume_10day_avg""
+    FROM ""equity_prices_1d""
+) AS ""equity_prices_1d_with_avg""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d_with_avg"".""security_code""
+WHERE ""equity_prices_1d_with_avg"".""date_time"" = '2024-09-27' AND ""equity_prices_1d_with_avg"".""volume_10day_avg"" BETWEEN 20000 AND 30000
+",success,
+"Give me symbol, price, 10-day average volume where stocks are in between 5% and 10% below their 52-week high.","- Intent: Retrieve the symbol, price, and 10-day average volume for stocks that are currently between 5% and 10% below their 52-week high.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `short_company_name`, `close`, `high`, `volume`
+- Conditions:  `date_time BETWEEN '2023-11-19' AND '2024-11-19'`, `close BETWEEN 0.9 * MAX(high) AND 0.95 * MAX(high)` (calculated over the 52-week period)
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `AVG(volume)` (over the last 10 days) , `MAX(high)`
+- Sorting/Grouping: None
+
+
+Here's a more detailed breakdown of the conditions and aggregations:
+
+* **52-Week High Calculation**: This requires a subquery or window function within the SQL query to determine the maximum 'high' value for each stock over the past 52 weeks (2023-11-20 to 2024-11-19).
+
+* **Price Range Condition**:  The `close` price should be between 90% and 95% of the calculated 52-week high.
+
+* **10-Day Average Volume**: Another subquery or window function will calculate the average `volume` for each stock over the last 10 days (2024-11-09 to 2024-11-19). 
+
+
+","```sql
+SELECT ""mp"".""short_company_name"", ""ep"".""close"", ""ep"".""volume"", ""ten_day_avg_volume""
+FROM ""master_prime_1d"" AS ""mp""
+INNER JOIN ""equity_prices_1d"" AS ""ep"" ON ""mp"".""security_code"" = ""ep"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", avg(""volume"") AS ""ten_day_avg_volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+    GROUP BY ""security_code""
+) AS ""ten_day_volume"" ON ""ep"".""security_code"" = ""ten_day_volume"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", MAX(""high"") AS ""fifty_two_week_high""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2023-11-20' AND '2024-11-19'
+    GROUP BY ""security_code""
+) AS ""fifty_two_week_highs"" ON ""ep"".""security_code"" = ""fifty_two_week_highs"".""security_code""
+WHERE ""ep"".""date_time"" = '2024-11-19' AND ""ep"".""close"" BETWEEN 0.90 * ""fifty_two_week_high"" AND 0.95 * ""fifty_two_week_high"";
+
+```","
+SELECT ""mp"".""short_company_name"", ""ep"".""close"", ""ep"".""volume"", ""ten_day_avg_volume""
+FROM ""master_prime_1d"" AS ""mp""
+INNER JOIN ""equity_prices_1d"" AS ""ep"" ON ""mp"".""security_code"" = ""ep"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", avg(""volume"") AS ""ten_day_avg_volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+    GROUP BY ""security_code""
+) AS ""ten_day_volume"" ON ""ep"".""security_code"" = ""ten_day_volume"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", MAX(""high"") AS ""fifty_two_week_high""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2023-11-20' AND '2024-11-19'
+    GROUP BY ""security_code""
+) AS ""fifty_two_week_highs"" ON ""ep"".""security_code"" = ""fifty_two_week_highs"".""security_code""
+WHERE ""ep"".""date_time"" = '2024-11-19' AND ""ep"".""close"" BETWEEN 0.90 * ""fifty_two_week_high"" AND 0.95 * ""fifty_two_week_high""
+",success,
+Give me price and volume data for ICICI Bank for the last 5 days on 16th July 2024.,"- Intent: Retrieve the price and volume data for ICICI Bank over the last 5 days from 16th July 2024.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `date_time`, `open`, `high`, `low`, `close`, `volume`
+- Conditions: `company_name = 'ICICI Bank'`, `date_time BETWEEN '2024-07-11' AND '2024-07-16'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: None
+","```sql
+SELECT ""date_time"", ""open"", ""high"", ""low"", ""close"", ""volume""
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""master_prime_1d"".""company_name"" = 'ICICI Bank'
+  AND ""date_time"" BETWEEN '2024-07-11' AND '2024-07-16';
+```
+","
+SELECT ""date_time"", ""open"", ""high"", ""low"", ""close"", ""volume""
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""master_prime_1d"".""company_name"" = 'ICICI Bank'
+  AND ""date_time"" BETWEEN '2024-07-11' AND '2024-07-16'
+",success,
+Give me a list of stocks whose daily volume was at least three times higher than the average volume for the previous ten days on 16th July 2024.,"- Intent: Retrieve stocks whose volume on 2024-07-16 was at least three times their average volume over the preceding 10 days.
+- Required Tables: `equity_prices_1d`
+- Columns: `security_code`, `date_time`, `volume`
+- Conditions: `date_time = '2024-07-16'`
+- Joins: None
+- Aggregations: `AVG(volume)`
+- Sorting/Grouping: None
+```sql
+SELECT company_name
+FROM master_prime_1d
+WHERE security_code IN (
+    SELECT t1.security_code
+    FROM equity_prices_1d AS t1
+    WHERE t1.date_time = '2024-07-16'
+    AND t1.volume >= 3 * (
+        SELECT AVG(t2.volume)
+        FROM equity_prices_1d AS t2
+        WHERE t2.security_code = t1.security_code
+        AND t2.date_time BETWEEN '2024-07-06' AND '2024-07-15'
+    )
+)
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-07-16'
+) AS ep1
+ON mp.""security_code"" = ep1.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", avg(""volume"") AS avg_volume
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-07-06' AND '2024-07-15'
+    GROUP BY ""security_code""
+) AS ep2
+ON mp.""security_code"" = ep2.""security_code""
+WHERE ep1.""volume"" >= 3 * ep2.avg_volume;
+
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-07-16'
+) AS ep1
+ON mp.""security_code"" = ep1.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", avg(""volume"") AS avg_volume
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-07-06' AND '2024-07-15'
+    GROUP BY ""security_code""
+) AS ep2
+ON mp.""security_code"" = ep2.""security_code""
+WHERE ep1.""volume"" >= 3 * ep2.avg_volume
+",success,
+List stocks crossing below the previous week's low on 20th September 2024.,"- Intent: Retrieve the list of companies whose closing price on 20th September 2024 crossed below the previous week's low.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `date_time`, `close`, `low`
+- Conditions: `date_time = '2024-09-20'` (for current week's closing price), `date_time BETWEEN '2024-09-13' AND '2024-09-19'` (for the previous week's data)
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `MIN(low)` (to find the previous week's low)
+- Sorting/Grouping: None
+
+
+```sql
+SELECT DISTINCT T1.company_name
+FROM master_prime_1d AS T1
+INNER JOIN equity_prices_1d AS T2
+  ON T1.security_code = T2.security_code
+WHERE
+  T2.date_time = '2024-09-20'
+  AND T2.close < (
+    SELECT
+      MIN(low)
+    FROM equity_prices_1d AS T3
+    WHERE
+      T3.security_code = T2.security_code AND T3.date_time BETWEEN '2024-09-13' AND '2024-09-19'
+  );
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS T1
+INNER JOIN ""equity_prices_1d"" AS T2 ON T1.""security_code"" = T2.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", MIN(""low"") AS ""min_low""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-09-13' AND '2024-09-19'
+    GROUP BY ""security_code""
+) AS T3 ON T1.""security_code"" = T3.""security_code""
+WHERE T2.""date_time"" = '2024-09-20' AND T2.""close"" < T3.""min_low"";
+
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS T1
+INNER JOIN ""equity_prices_1d"" AS T2 ON T1.""security_code"" = T2.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", MIN(""low"") AS ""min_low""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-09-13' AND '2024-09-19'
+    GROUP BY ""security_code""
+) AS T3 ON T1.""security_code"" = T3.""security_code""
+WHERE T2.""date_time"" = '2024-09-20' AND T2.""close"" < T3.""min_low""
+",success,
+List stocks closing above the previous week's closing price on 20th September 2024.,"- **Intent**: Retrieve the list of company names whose closing price on 20-09-2024 was higher than their closing price on 13-09-2024 (one week prior).
+
+- **Required Tables**: `equity_prices_1d`
+
+- **Columns**: `date_time`, `security_code`, `close`, `company_name`
+
+- **Conditions**: 
+    - `date_time = '20-09-2024'` (for current week's closing price)
+    - `date_time = '13-09-2024'` (for previous week's closing price)
+
+
+- **Joins**: None (Self-join is needed within the same table.)
+
+- **Aggregations**: None
+
+- **Sorting/Grouping**: None
+
+
+```sql
+SELECT DISTINCT t1.company_name
+FROM (
+    SELECT ep.security_code, mp.company_name, ep.close AS current_close
+    FROM equity_prices_1d AS ep
+    INNER JOIN master_prime_1d AS mp ON ep.security_code = mp.security_code
+    WHERE ep.date_time = '20-09-2024'
+) AS t1
+INNER JOIN (
+    SELECT ep.security_code, ep.close AS previous_close
+    FROM equity_prices_1d AS ep
+    WHERE ep.date_time = '13-09-2024'
+) AS t2 ON t1.security_code = t2.security_code
+WHERE t1.current_close > t2.previous_close;
+
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN (
+    SELECT ""security_code"", ""close"" AS ""current_close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+) AS t1 ON mp.""security_code"" = t1.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""close"" AS ""previous_close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-13'
+) AS t2 ON t1.""security_code"" = t2.""security_code""
+WHERE t1.""current_close"" > t2.""previous_close"";
+
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN (
+    SELECT ""security_code"", ""close"" AS ""current_close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+) AS t1 ON mp.""security_code"" = t1.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""close"" AS ""previous_close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-13'
+) AS t2 ON t1.""security_code"" = t2.""security_code""
+WHERE t1.""current_close"" > t2.""previous_close""
+",success,
+List stocks closing above the previous Friday's closing price on 20th September 2024.,"- Intent: Retrieve the list of company names whose closing price on 2024-09-20 was higher than the closing price on the previous Friday (2024-09-13).
+
+- Required Tables: `equity_prices_1d`
+
+- Columns: `company_name`, `close`, `date_time`,`security_code`
+
+- Conditions: `date_time = '2024-09-20'` and `date_time = '2024-09-13'`
+
+- Joins:  `master_prime_1d.security_code = equity_prices_1d.security_code`
+
+- Aggregations: None
+
+- Sorting/Grouping: None
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN ""equity_prices_1d"" AS ep1 ON mp.""security_code"" = ep1.""security_code""
+INNER JOIN ""equity_prices_1d"" AS ep2 ON mp.""security_code"" = ep2.""security_code""
+WHERE ep1.""date_time"" = '2024-09-20' AND ep2.""date_time"" = '2024-09-13' AND ep1.""close"" > ep2.""close"";
+```
+","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS mp
+INNER JOIN ""equity_prices_1d"" AS ep1 ON mp.""security_code"" = ep1.""security_code""
+INNER JOIN ""equity_prices_1d"" AS ep2 ON mp.""security_code"" = ep2.""security_code""
+WHERE ep1.""date_time"" = '2024-09-20' AND ep2.""date_time"" = '2024-09-13' AND ep1.""close"" > ep2.""close""
+",success,
+"List stocks that have closed above their August 2024 high in September 2024, along with the dates and symbols.","- Intent: Find stocks that closed above their August 2024 high in September 2024, and display their names, dates, and symbols.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `short_company_name`, `date_time`, `close`
+- Conditions:  `date_time` in September 2024, `close` > Max(`close`) for August 2024 for the same stock
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: MAX(close)
+- Sorting/Grouping: None
+
+
+
+```sql
+SELECT DISTINCT T1.company_name, T1.short_company_name, T2.date_time
+FROM master_prime_1d AS T1
+INNER JOIN equity_prices_1d AS T2
+  ON T1.security_code = T2.security_code
+WHERE
+  T2.date_time BETWEEN '2024-09-01' AND '2024-09-30'
+  AND T2.close > (
+    SELECT
+      MAX(close)
+    FROM equity_prices_1d AS T3
+    WHERE
+      T3.security_code = T2.security_code
+      AND T3.date_time BETWEEN '2024-08-01' AND '2024-08-31'
+  );
+```
+","```sql
+SELECT DISTINCT ""company_name"", ""short_company_name"", ""date_time""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""date_time"" BETWEEN '2024-09-01' AND '2024-09-30' AND ""close"" > (
+    SELECT max(""close"")
+    FROM ""equity_prices_1d"" AS epd
+    WHERE epd.""security_code"" = ""equity_prices_1d"".""security_code""
+    AND epd.""date_time"" BETWEEN '2024-08-01' AND '2024-08-31'
+);
+```
+","
+SELECT DISTINCT ""company_name"", ""short_company_name"", ""date_time""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""date_time"" BETWEEN '2024-09-01' AND '2024-09-30' AND ""close"" > (
+    SELECT max(""close"")
+    FROM ""equity_prices_1d"" AS epd
+    WHERE epd.""security_code"" = ""equity_prices_1d"".""security_code""
+    AND epd.""date_time"" BETWEEN '2024-08-01' AND '2024-08-31'
+)
+",success,
+Give me the 5-week weekly average volume for ICICI Bank as of 20th September 2024.,"- Intent: Retrieve the 5-week weekly average volume for ICICI Bank up to 20th September 2024.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `volume`, `date_time`
+- Conditions: `company_name = 'ICICI Bank'`, `date_time BETWEEN '2024-08-16' AND '2024-09-20'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `avg(volume)`
+- Sorting/Grouping: `GROUP BY week(date_time)` 
+","```sql
+SELECT avg(""volume"") AS average_volume
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""master_prime_1d"".""company_name"" = 'ICICI Bank'
+  AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-08-16' AND '2024-09-20'
+GROUP BY toStartOfWeek(""date_time"");
+
+```","
+SELECT avg(""volume"") AS average_volume
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""master_prime_1d"".""company_name"" = 'ICICI Bank'
+  AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-08-16' AND '2024-09-20'
+GROUP BY toStartOfWeek(""date_time"")
+",success,
+List stocks that are within 5% of their 3-month low on 20th September 2024.,"- Intent: Find stocks whose closing price on 2024-09-20 was within 5% of their 3-month low.
+- Required Tables: `equity_prices_1d`
+- Columns: `date_time`, `close`, `security_code`
+- Conditions: `date_time = '2024-09-20'`
+- Joins: None
+- Aggregations: `MIN(close)`
+- Sorting/Grouping: None
+
+
+Here's a more detailed breakdown for clarity and SQL generation:
+
+1. **3-Month Low Calculation:** We need to determine the lowest closing price for each stock within the three months preceding 2024-09-20 (i.e., from 2024-06-20 to 2024-09-20). This requires a subquery or CTE (Common Table Expression).
+
+2. **5% Threshold:**  We'll calculate the 5% threshold above the 3-month low.  The condition would be `close >= 0.95 * three_month_low`.
+
+3. **Final Filtering:** Combine the conditions to filter for stocks meeting the criteria on 2024-09-20.
+
+
+
+```sql
+WITH ThreeMonthLows AS (
+    SELECT
+        security_code,
+        MIN(close) AS three_month_low
+    FROM
+        equity_prices_1d
+    WHERE
+        date_time BETWEEN '2024-06-20' AND '2024-09-20'
+    GROUP BY
+        security_code
+)
+SELECT DISTINCT
+    company_name
+FROM
+    master_prime_1d AS mp
+INNER JOIN
+    equity_prices_1d AS ep ON mp.security_code = ep.security_code
+INNER JOIN 
+    ThreeMonthLows AS tml ON ep.security_code = tml.security_code
+WHERE
+    ep.date_time = '2024-09-20'
+    AND ep.close BETWEEN 0.95 * tml.three_month_low and  1.05 * tml.three_month_low
+    ;
+```
+","```sql
+WITH ""ThreeMonthLows"" AS (
+    SELECT
+        ""security_code"",
+        MIN(""close"") AS ""three_month_low""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-06-20' AND '2024-09-20'
+    GROUP BY ""security_code""
+)
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+INNER JOIN ""ThreeMonthLows"" ON ""equity_prices_1d"".""security_code"" = ""ThreeMonthLows"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+  AND ""equity_prices_1d"".""close"" BETWEEN 0.95 * ""ThreeMonthLows"".""three_month_low"" AND 1.05 * ""ThreeMonthLows"".""three_month_low"";
+
+```","
+WITH ""ThreeMonthLows"" AS (
+    SELECT
+        ""security_code"",
+        MIN(""close"") AS ""three_month_low""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-06-20' AND '2024-09-20'
+    GROUP BY ""security_code""
+)
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN ""equity_prices_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+INNER JOIN ""ThreeMonthLows"" ON ""equity_prices_1d"".""security_code"" = ""ThreeMonthLows"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+  AND ""equity_prices_1d"".""close"" BETWEEN 0.95 * ""ThreeMonthLows"".""three_month_low"" AND 1.05 * ""ThreeMonthLows"".""three_month_low""
+",success,
+List stocks that are trading within 3% of their 3-year high on 20th September 2024.,"- Intent: Find stocks trading within 3% of their 3-year high on 20-09-2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `date_time`, `high`, `close`, `security_code`
+- Conditions: `date_time = '2024-09-20'`
+- Joins: None
+- Aggregations: `MAX(high)`
+- Sorting/Grouping: None
+
+
+```sql
+SELECT DISTINCT company_name
+FROM master_prime_1d AS t1
+INNER JOIN (
+    SELECT security_code, high
+    FROM equity_prices_1d
+    WHERE date_time = '2024-09-20'
+) AS t2
+ON t1.security_code = t2.security_code
+INNER JOIN (
+    SELECT security_code, MAX(high) as three_year_high
+    FROM equity_prices_1d
+    WHERE date_time BETWEEN '2021-09-20' AND '2024-09-20'
+    GROUP BY security_code
+) AS t3
+ON t1.security_code = t3.security_code
+WHERE t2.high BETWEEN  t3.three_year_high*0.97 AND  t3.three_year_high*1.03
+
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS t1
+INNER JOIN (
+    SELECT ""security_code"", ""high""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+) AS t2 ON t1.""security_code"" = t2.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", MAX(""high"") AS three_year_high
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2021-09-20' AND '2024-09-20'
+    GROUP BY ""security_code""
+) AS t3 ON t1.""security_code"" = t3.""security_code""
+WHERE t2.""high"" BETWEEN t3.three_year_high * 0.97 AND t3.three_year_high * 1.03;
+
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS t1
+INNER JOIN (
+    SELECT ""security_code"", ""high""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+) AS t2 ON t1.""security_code"" = t2.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", MAX(""high"") AS three_year_high
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2021-09-20' AND '2024-09-20'
+    GROUP BY ""security_code""
+) AS t3 ON t1.""security_code"" = t3.""security_code""
+WHERE t2.""high"" BETWEEN t3.three_year_high * 0.97 AND t3.three_year_high * 1.03
+",success,
+List stocks that have crossed above their August 2024 high on 20th September 2024.,"- Intent: Find stocks that had a closing price on 2024-09-20 higher than their highest price during August 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `security_code`, `close`, `high`, `date_time`
+- Conditions: `date_time = '2024-09-20'` for closing price check, `date_time BETWEEN '2024-08-01' AND '2024-08-31'` for August high.
+- Joins: None (self-join can be implemented for efficiency if the data is very large)
+- Aggregations: `MAX(high)` for August high.
+- Sorting/Grouping: None
+
+
+
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS master
+INNER JOIN (
+    SELECT ""security_code"", ""close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+) AS sep20
+ON master.""security_code"" = sep20.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", MAX(""high"") AS max_high
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-08-01' AND '2024-08-31'
+    GROUP BY ""security_code""
+) AS aug_high
+ON sep20.""security_code"" = aug_high.""security_code""
+WHERE sep20.""close"" > aug_high.max_high;
+
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d"" AS master
+INNER JOIN (
+    SELECT ""security_code"", ""close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+) AS sep20
+ON master.""security_code"" = sep20.""security_code""
+INNER JOIN (
+    SELECT ""security_code"", MAX(""high"") AS max_high
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-08-01' AND '2024-08-31'
+    GROUP BY ""security_code""
+) AS aug_high
+ON sep20.""security_code"" = aug_high.""security_code""
+WHERE sep20.""close"" > aug_high.max_high
+",success,
+List stocks that have broken their August 2024 high on 20th September 2024.,"- Intent: Find stocks that had a higher 'high' price on 2024-09-20 than their maximum 'high' price during August 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `date_time`, `security_code`, `high`, `company_name`
+- Conditions: `date_time = '2024-09-20'` for September high, `date_time BETWEEN '2024-08-01' AND '2024-08-31'` for August high.
+- Joins: None (Self-join conceptually to compare values within the same table but different date ranges)
+- Aggregations: `MAX(high)` for August high.
+- Sorting/Grouping: None
+
+
+```sql
+SELECT DISTINCT t1.company_name
+FROM (SELECT DISTINCT ep.company_name,ep.high FROM equity_prices_1d ep JOIN master_prime_1d mp ON ep.security_code =  mp.security_code WHERE ep.date_time = '2024-09-20') t1
+INNER JOIN (
+    SELECT DISTINCT ep.company_name, MAX(high) as max_high
+    FROM equity_prices_1d ep JOIN master_prime_1d mp ON ep.security_code =  mp.security_code
+    WHERE ep.date_time BETWEEN '2024-08-01' AND '2024-08-31'
+    GROUP BY ep.company_name
+) t2 ON t1.company_name = t2.company_name
+WHERE t1.high > t2.max_high;
+
+
+
+```
+","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", ""high""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+) AS ""sept_prices"" ON ""master_prime_1d"".""security_code"" = ""sept_prices"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", MAX(""high"") AS ""max_high""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-08-01' AND '2024-08-31'
+    GROUP BY ""security_code""
+) AS ""aug_prices"" ON ""master_prime_1d"".""security_code"" = ""aug_prices"".""security_code""
+WHERE ""sept_prices"".""high"" > ""aug_prices"".""max_high"";
+
+```","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", ""high""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-09-20'
+) AS ""sept_prices"" ON ""master_prime_1d"".""security_code"" = ""sept_prices"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", MAX(""high"") AS ""max_high""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-08-01' AND '2024-08-31'
+    GROUP BY ""security_code""
+) AS ""aug_prices"" ON ""master_prime_1d"".""security_code"" = ""aug_prices"".""security_code""
+WHERE ""sept_prices"".""high"" > ""aug_prices"".""max_high""
+",success,
+Give me the latest 5-day average volume for ICICI Bank.,"- Intent: Retrieve the 5-day average volume for ICICI Bank.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `short_company_name`, `volume`, `date_time`
+- Conditions: `short_company_name = 'ICICIBANKEQ'`, `date_time BETWEEN '2024-11-14' AND '2024-11-19'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `AVG(volume)`
+- Sorting/Grouping: None 
+","```sql
+SELECT AVG(""volume"") AS average_volume
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""short_company_name"" = 'ICICIBANKEQ'
+  AND ""date_time"" BETWEEN '2024-11-14' AND '2024-11-19';
+```
+","
+SELECT AVG(""volume"") AS average_volume
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""short_company_name"" = 'ICICIBANKEQ'
+  AND ""date_time"" BETWEEN '2024-11-14' AND '2024-11-19'
+",success,
+Give me the list of top 3 best-performing macroeconomic sectors in the last 20 days.,"- Intent: Retrieve the top 3 best-performing macroeconomic sectors based on their average closing price percentage change over the last 20 days.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `major_sector_name`, `close`, `date_time`
+- Conditions: `date_time` BETWEEN '2024-10-20' AND '2024-11-19'
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `AVG(close)`
+- Sorting/Grouping: Group by `major_sector_name`, Order by percentage change in average closing price DESC, Limit 3 
+
+
+","```sql
+SELECT ""major_sector_name"", (avg(""close"") - avg(CASE WHEN ""date_time"" = '2024-10-20' THEN ""close"" ELSE 0 END)) * 100 / (CASE WHEN avg(CASE WHEN ""date_time"" = '2024-10-20' THEN ""close"" ELSE NULL END) = 0 THEN 1 ELSE avg(CASE WHEN ""date_time"" = '2024-10-20' THEN ""close"" ELSE NULL END) END) AS percentage_change
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+GROUP BY ""major_sector_name""
+ORDER BY percentage_change DESC
+LIMIT 3;
+
+```","
+SELECT ""major_sector_name"", (avg(""close"") - avg(CASE WHEN ""date_time"" = '2024-10-20' THEN ""close"" ELSE 0 END)) * 100 / (CASE WHEN avg(CASE WHEN ""date_time"" = '2024-10-20' THEN ""close"" ELSE NULL END) = 0 THEN 1 ELSE avg(CASE WHEN ""date_time"" = '2024-10-20' THEN ""close"" ELSE NULL END) END) AS percentage_change
+FROM ""equity_prices_1d""
+INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+WHERE ""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+GROUP BY ""major_sector_name""
+ORDER BY percentage_change DESC
+LIMIT 3
+",success,
+Give me the list of top 10 worst-performing basic industry sectors in the previous month.,"- Intent: Retrieve the top 10 worst-performing basic industry sectors based on their average closing price percentage change over the last month.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `major_sector_name`, `close`, `date_time`
+- Conditions: `date_time BETWEEN '2024-10-19' AND '2024-11-19'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: `AVG(close)`
+- Sorting/Grouping: `GROUP BY major_sector_name`, `ORDER BY percentage_change ASC`, `LIMIT 10` (where `percentage_change` is calculated based on the average closing prices for the current and previous month)
+
+
+Note: The actual SQL generation would require calculating the percentage change, which can be done within the SQL query using subqueries or window functions.  The structured output above highlights the necessary components for that query.
+","```sql
+SELECT ""major_sector_name"", (current_month_avg_close - previous_month_avg_close) * 100 / CASE WHEN previous_month_avg_close = 0 THEN 1 ELSE previous_month_avg_close END AS percentage_change
+FROM (
+    SELECT ""major_sector_name"", AVG(""close"") AS current_month_avg_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""date_time"" BETWEEN '2024-10-19' AND '2024-11-19'
+    GROUP BY ""major_sector_name""
+) AS current_month_data
+INNER JOIN (
+    SELECT ""major_sector_name"", AVG(""close"") AS previous_month_avg_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""date_time"" BETWEEN '2024-09-19' AND '2024-10-19'
+    GROUP BY ""major_sector_name""
+) AS previous_month_data ON current_month_data.""major_sector_name"" = previous_month_data.""major_sector_name""
+ORDER BY percentage_change ASC
+LIMIT 10;
+
+```","
+SELECT ""major_sector_name"", (current_month_avg_close - previous_month_avg_close) * 100 / CASE WHEN previous_month_avg_close = 0 THEN 1 ELSE previous_month_avg_close END AS percentage_change
+FROM (
+    SELECT ""major_sector_name"", AVG(""close"") AS current_month_avg_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""date_time"" BETWEEN '2024-10-19' AND '2024-11-19'
+    GROUP BY ""major_sector_name""
+) AS current_month_data
+INNER JOIN (
+    SELECT ""major_sector_name"", AVG(""close"") AS previous_month_avg_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""date_time"" BETWEEN '2024-09-19' AND '2024-10-19'
+    GROUP BY ""major_sector_name""
+) AS previous_month_data ON current_month_data.""major_sector_name"" = previous_month_data.""major_sector_name""
+ORDER BY percentage_change ASC
+LIMIT 10
+",success,
+Give me the list of top 5 best-performing sectors in the last 1 month.,"- Intent: Retrieve the top 5 best-performing sectors based on average closing price percentage change over the last month.
+
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+
+- Columns: `major_sector_name`, `close`, `date_time`
+
+- Conditions: `date_time BETWEEN '2024-10-19' AND '2024-11-19'`
+
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+
+- Aggregations: `AVG(close)`
+
+- Sorting/Grouping: `GROUP BY major_sector_name`, `ORDER BY (AVG(close at current date) - AVG(close at one month before the current date)) / AVG(close at one month before the current date) DESC`, `LIMIT 5`
+","```sql
+SELECT ""major_sector_name""
+FROM (
+    SELECT 
+        ""major_sector_name"",
+        avg(CASE WHEN ""date_time"" = '2024-11-19' THEN ""close"" ELSE NULL END) AS current_avg_close,
+        avg(CASE WHEN ""date_time"" = '2024-10-19' THEN ""close"" ELSE NULL END) AS past_avg_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""date_time"" IN ('2024-10-19', '2024-11-19')
+    GROUP BY ""major_sector_name""
+)
+WHERE past_avg_close !=0
+ORDER BY (current_avg_close - past_avg_close) / past_avg_close DESC
+LIMIT 5;
+
+```","
+SELECT ""major_sector_name""
+FROM (
+    SELECT 
+        ""major_sector_name"",
+        avg(CASE WHEN ""date_time"" = '2024-11-19' THEN ""close"" ELSE NULL END) AS current_avg_close,
+        avg(CASE WHEN ""date_time"" = '2024-10-19' THEN ""close"" ELSE NULL END) AS past_avg_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d"" ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""date_time"" IN ('2024-10-19', '2024-11-19')
+    GROUP BY ""major_sector_name""
+)
+WHERE past_avg_close !=0
+ORDER BY (current_avg_close - past_avg_close) / past_avg_close DESC
+LIMIT 5
+",success,
+"Give me the list of top 2 best and worst-performing stocks within the fertilizer sector between 27th September 2024 to 21st November 2024, and what was the % change of the fertilizer sector within this timeframe?","- Intent: Retrieve the top 2 best and worst-performing stocks in the fertilizer sector between 27-09-2024 and 21-11-2024, along with the overall percentage change of the fertilizer sector during that period.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `close`, `industry_name`, `date_time`
+- Conditions: `industry_name LIKE '%Fertilizers%'`, `date_time BETWEEN '27-09-2024' AND '21-11-2024'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None (Calculations will be performed for percentage change)
+- Sorting/Grouping: Order by percentage change (ascending and descending for worst and best performers)
+
+
+
+","```sql
+SELECT DISTINCT ""company_name"", (last_close - first_close) * 100 / CASE WHEN first_close = 0 THEN 1 ELSE first_close END AS percentage_change
+FROM (
+    SELECT
+        ""company_name"",
+        first_value(""close"") OVER (PARTITION BY ""company_name"" ORDER BY ""date_time"" ASC) AS first_close,
+        last_value(""close"") OVER (PARTITION BY ""company_name"" ORDER BY ""date_time"" DESC) AS last_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d""
+        ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""industry_name"" LIKE '%Fertilizers%'
+      AND ""date_time"" BETWEEN '2024-09-27' AND '2024-11-21'
+)
+ORDER BY percentage_change DESC
+LIMIT 2
+UNION ALL
+SELECT DISTINCT ""company_name"", (last_close - first_close) * 100 / CASE WHEN first_close = 0 THEN 1 ELSE first_close END AS percentage_change
+FROM (
+    SELECT
+        ""company_name"",
+        first_value(""close"") OVER (PARTITION BY ""company_name"" ORDER BY ""date_time"" ASC) AS first_close,
+        last_value(""close"") OVER (PARTITION BY ""company_name"" ORDER BY ""date_time"" DESC) AS last_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d""
+        ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""industry_name"" LIKE '%Fertilizers%'
+      AND ""date_time"" BETWEEN '2024-09-27' AND '2024-11-21'
+)
+ORDER BY percentage_change ASC
+LIMIT 2;
+
+SELECT (last_close - first_close) * 100 / CASE WHEN first_close = 0 THEN 1 ELSE first_close END AS overall_percentage_change
+FROM (
+    SELECT
+        first_value(""close"") OVER (ORDER BY ""date_time"" ASC) AS first_close,
+        last_value(""close"") OVER (ORDER BY ""date_time"" DESC) AS last_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d""
+        ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""industry_name"" LIKE '%Fertilizers%'
+      AND ""date_time"" BETWEEN '2024-09-27' AND '2024-11-21'
+);
+```","
+SELECT DISTINCT ""company_name"", (last_close - first_close) * 100 / CASE WHEN first_close = 0 THEN 1 ELSE first_close END AS percentage_change
+FROM (
+    SELECT
+        ""company_name"",
+        first_value(""close"") OVER (PARTITION BY ""company_name"" ORDER BY ""date_time"" ASC) AS first_close,
+        last_value(""close"") OVER (PARTITION BY ""company_name"" ORDER BY ""date_time"" DESC) AS last_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d""
+        ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""industry_name"" LIKE '%Fertilizers%'
+      AND ""date_time"" BETWEEN '2024-09-27' AND '2024-11-21'
+)
+ORDER BY percentage_change DESC
+LIMIT 2
+UNION ALL
+SELECT DISTINCT ""company_name"", (last_close - first_close) * 100 / CASE WHEN first_close = 0 THEN 1 ELSE first_close END AS percentage_change
+FROM (
+    SELECT
+        ""company_name"",
+        first_value(""close"") OVER (PARTITION BY ""company_name"" ORDER BY ""date_time"" ASC) AS first_close,
+        last_value(""close"") OVER (PARTITION BY ""company_name"" ORDER BY ""date_time"" DESC) AS last_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d""
+        ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""industry_name"" LIKE '%Fertilizers%'
+      AND ""date_time"" BETWEEN '2024-09-27' AND '2024-11-21'
+)
+ORDER BY percentage_change ASC
+LIMIT 2
+
+SELECT (last_close - first_close) * 100 / CASE WHEN first_close = 0 THEN 1 ELSE first_close END AS overall_percentage_change
+FROM (
+    SELECT
+        first_value(""close"") OVER (ORDER BY ""date_time"" ASC) AS first_close,
+        last_value(""close"") OVER (ORDER BY ""date_time"" DESC) AS last_close
+    FROM ""equity_prices_1d""
+    INNER JOIN ""master_prime_1d""
+        ON ""equity_prices_1d"".""security_code"" = ""master_prime_1d"".""security_code""
+    WHERE ""industry_name"" LIKE '%Fertilizers%'
+      AND ""date_time"" BETWEEN '2024-09-27' AND '2024-11-21'
+)","failed because
+HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1380 ('SELECT') (line 32, col 1): SELECT (last_close - first_close) * 100 / CASE WHEN first_close = 0 THEN 1 ELSE first_close END AS overall_percentage_change
+FROM (
+    SELECT
+        first_val. Expected one of: token, DoubleColon, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, Comma, OFFSET, WITH TIES, BY, FETCH, LIMIT, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, end of query. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+Give me the list of basic industry sectors which have not broken the low of 4th November.,"- Intent: Retrieve the list of distinct major sector names whose lowest price from November 4th, 2024 onwards has not been lower than the closing price on November 4th, 2024.
+
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+
+- Columns: `major_sector_name`, `low`, `close`
+
+- Conditions: `date_time = '2024-11-04'` for closing price, `date_time >= '2024-11-04'` for minimum low price
+
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+
+- Aggregations: `MIN(low)`
+
+- Sorting/Grouping: None
+
+
+```sql
+SELECT DISTINCT T1.major_sector_name
+FROM master_prime_1d AS T1
+INNER JOIN equity_prices_1d AS T2
+  ON T1.security_code = T2.security_code
+WHERE
+  T2.date_time >= '2024-11-04'
+GROUP BY
+  T1.major_sector_name
+HAVING
+  MIN(T2.low) >= (
+    SELECT
+      close
+    FROM equity_prices_1d
+    WHERE
+      date_time = '2024-11-04' AND security_code = T2.security_code
+  );
+
+```
+","```sql
+SELECT DISTINCT ""major_sector_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", MIN(""low"") AS ""min_low""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" >= '2024-11-04'
+    GROUP BY ""security_code""
+) AS ""min_prices"" ON ""master_prime_1d"".""security_code"" = ""min_prices"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""close"" AS ""closing_price""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-11-04'
+) AS ""closing_prices"" ON ""master_prime_1d"".""security_code"" = ""closing_prices"".""security_code""
+WHERE ""min_prices"".""min_low"" >= ""closing_prices"".""closing_price"";
+
+```","
+SELECT DISTINCT ""major_sector_name""
+FROM ""master_prime_1d""
+INNER JOIN (
+    SELECT ""security_code"", MIN(""low"") AS ""min_low""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" >= '2024-11-04'
+    GROUP BY ""security_code""
+) AS ""min_prices"" ON ""master_prime_1d"".""security_code"" = ""min_prices"".""security_code""
+INNER JOIN (
+    SELECT ""security_code"", ""close"" AS ""closing_price""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" = '2024-11-04'
+) AS ""closing_prices"" ON ""master_prime_1d"".""security_code"" = ""closing_prices"".""security_code""
+WHERE ""min_prices"".""min_low"" >= ""closing_prices"".""closing_price""
+",success,

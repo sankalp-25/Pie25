@@ -1,0 +1,945 @@
+user_query,1st output,2nd output raw,2nd output processed,result,SQL_query_generated
+Find stocks where the price dropped by more than 5% with unusually high volume.,"- Intent: Find stocks where the price dropped by more than 5% with unusually high volume.
+- Required Tables: `equity_prices_1d`
+- Columns: `company_name`, `open`, `close`, `volume`
+- Conditions: Price drop percentage > 5%, Volume > (Average Volume for the last 20 days + 2 * Standard Deviation of Volume for the last 20 days)
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT DISTINCT ""company_name"", ""open"", ""close"", ""volume""
+FROM ""equity_prices_1d""
+WHERE ""close"" < ""open"" * 0.95
+AND ""volume"" > (
+    SELECT avg(""volume"") + 2 * stddevPop(""volume"")
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN toDate('2024-10-30') AND toDate('2024-11-19')
+);
+```","
+SELECT DISTINCT ""company_name"", ""open"", ""close"", ""volume""
+FROM ""equity_prices_1d""
+WHERE ""close"" < ""open"" * 0.95
+AND ""volume"" > (
+    SELECT avg(""volume"") + 2 * stddevPop(""volume"")
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN toDate('2024-10-30') AND toDate('2024-11-19')
+);","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""company_name"", ""open"", ""close"", ""volume""
+FROM ""equity_prices_1d""
+WHERE ""close"" < ""open"" * 0.95
+AND ""volume"" > (
+    SELECT avg(""volume"") + 2 * stddevPop(""volume"")
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN toDate('2024-10-30') AND toDate('2024-11-19')
+);
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""company_name"", ""open"", ""close"", ""volume""
+FROM ""equity_prices_1d""
+WHERE ""close"" < ""open"" * 0.95
+AND ""volume"" > (
+    SELECT avg(""volume""). Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+Can you list stocks with low price volatility and consistent trading volume over the past month?,"- Intent: List stocks with low price volatility and consistent trading volume over the past month.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `low`, `high`, `volume`
+- Conditions: Date range from 2024-10-20 to 2024-11-19
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""low"", ""equity_prices_1d"".""high"", ""equity_prices_1d"".""volume""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+AND ""equity_prices_1d"".""volume"" > (
+    SELECT avg(""volume"")
+    FROM ""equity_prices_1d""
+    WHERE ""equity_prices_1d"".""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+)
+AND (
+    ""equity_prices_1d"".""high"" - ""equity_prices_1d"".""low""
+) / ""equity_prices_1d"".""low"" < 0.05
+```  ","
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""low"", ""equity_prices_1d"".""high"", ""equity_prices_1d"".""volume""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+AND ""equity_prices_1d"".""volume"" > (
+    SELECT avg(""volume"")
+    FROM ""equity_prices_1d""
+    WHERE ""equity_prices_1d"".""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+)
+AND (
+    ""equity_prices_1d"".""high"" - ""equity_prices_1d"".""low""
+) / ""equity_prices_1d"".""low"" < 0.05
+`","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""low"", ""equity_prices_1d"".""high"", ""equity_prices_1d"".""volume""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+AND ""equity_prices_1d"".""volume"" > (
+    SELECT avg(""volume"")
+    FROM ""equity_prices_1d""
+    WHERE ""equity_prices_1d"".""date_time"" BETWEEN '2024-10-20' AND '2024-11-19'
+)
+AND (
+    ""equity_prices_1d"".""high"" - ""equity_prices_1d"".""low""
+) / ""equity_prices_1d"".""low"" < 0.05
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""low"", ""equity_prices_1d"".""high"", ""equity_prices_1d"".""volume""
+FROM ""master_prime_1d"". Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+"WhatåÕs the return of the sugar sector in the last 10 days, and give me the list of top 5 best performing stocks and top 5 worst performing stocks?","- Intent: Retrieve the return of the sugar sector over the last 10 days and provide the list of the top 5 best performing and worst performing stocks.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `close`, `industry_name`, `company_name`
+- Conditions: `industry_name = 'Sugar'`, `date_time BETWEEN '2024-11-09' AND '2024-11-19'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: `ORDER BY close DESC LIMIT 5` (for best performing stocks), `ORDER BY close ASC LIMIT 5` (for worst performing stocks)","```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""industry_name"" = 'Sugar'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+ORDER BY ""equity_prices_1d"".""close"" DESC
+LIMIT 5
+
+UNION DISTINCT
+
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""industry_name"" = 'Sugar'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+ORDER BY ""equity_prices_1d"".""close"" ASC
+LIMIT 5
+```","
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""industry_name"" = 'Sugar'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+ORDER BY ""equity_prices_1d"".""close"" DESC
+LIMIT 5
+
+UNION DISTINCT
+
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""industry_name"" = 'Sugar'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+ORDER BY ""equity_prices_1d"".""close"" ASC
+LIMIT 5","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""industry_name"" = 'Sugar'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+ORDER BY ""equity_prices_1d"".""close"" DESC
+LIMIT 5
+
+UNION DISTINCT
+
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""industry_name"" = 'Sugar'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-11-09' AND '2024-11-19'
+ORDER BY ""equity_prices_1d"".""close"" ASC
+LIMIT 5
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"". Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+When was the last time ICICI Bank went up consecutively for 2 days?,,,,N/A,Error generating SQL: Connection error.
+"When was the last time the Nifty50 index went up for 3 weeks consecutively, and what was the performance in the next 3 months?","- Intent: Retrieve the performance of the Nifty50 index after a period of cocutive 3-week upward movement.
+- Required Tables: `master_prime_1d`
+- Columns: `index_name`, `date_time`, `close`
+- Conditions: `index_name LIKE '%Nifty50%'`, Cocutive 3-week upward movement, Calculate performance over the next 3 months
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT ""index_name"", ""date_time"", ""close""
+FROM ""master_prime_1d""
+WHERE ""index_name"" LIKE '%Nifty50%'
+AND ""date_time"" >= DATEADD('week', -3, NOW()) 
+AND ""date_time"" <= DATEADD('month', 3, NOW())
+ORDER BY ""date_time"";
+```","
+SELECT ""index_name"", ""date_time"", ""close""
+FROM ""master_prime_1d""
+WHERE ""index_name"" LIKE '%Nifty50%'
+AND ""date_time"" >= DATEADD('week', -3, NOW()) 
+AND ""date_time"" <= DATEADD('month', 3, NOW())
+ORDER BY ""date_time"";","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT ""index_name"", ""date_time"", ""close""
+FROM ""master_prime_1d""
+WHERE ""index_name"" LIKE '%Nifty50%'
+AND ""date_time"" >= DATEADD('week', -3, NOW()) 
+AND ""date_time"" <= DATEADD('month', 3, NOW())
+ORDER BY ""date_time"";
+```') (line 1, col 1): ```sql
+SELECT ""index_name"", ""date_time"", ""close""
+FROM ""master_prime_1d""
+WHERE ""index_name"" LIKE '%Nifty50%'
+AND ""date_time"" >= DATEADD('week', -3, NOW()) 
+AND "". Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+"Give me 10-day, 20-day performance whenever weekly volumes have increased for two consecutive weeks as of 16th July 2024.","- Intent: Retrieve the 10-day and 20-day performance when weekly volumes have increased for two cocutive weeks as of 16th July 2024.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `close`, `volume`, `date_time`
+- Conditions: `date_time >= '2024-07-02' AND date_time <= '2024-07-16'`, weekly volumes increased for two cocutive weeks
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT ""t1"".""close"" AS ""10_day_performance"", ""t2"".""close"" AS ""20_day_performance""
+FROM (
+    SELECT ""equity_prices_1d"".""close""
+    FROM ""equity_prices_1d""
+    JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+    AND (
+        SELECT COUNT(DISTINCT date_trunc('week', ""equity_prices_1d"".""date_time""))
+        FROM ""equity_prices_1d""
+        WHERE ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-09'
+                AND ""equity_prices_1d"".""volume"" >
+                    (
+                        SELECT ""volume""
+                        FROM ""equity_prices_1d""
+                        WHERE ""equity_prices_1d"".""date_time"" = '2024-07-02'
+                    )
+            )
+        AND ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+            )
+    )
+    LIMIT 1
+) AS ""t1"",
+(
+    SELECT ""equity_prices_1d"".""close""
+    FROM ""equity_prices_1d""
+    JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+    AND (
+        SELECT COUNT(DISTINCT date_trunc('week', ""equity_prices_1d"".""date_time""))
+        FROM ""equity_prices_1d""
+        WHERE ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-02'
+            )
+        AND ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+            )
+    )
+    LIMIT 1
+) AS ""t2"";
+```  ","
+SELECT ""t1"".""close"" AS ""10_day_performance"", ""t2"".""close"" AS ""20_day_performance""
+FROM (
+    SELECT ""equity_prices_1d"".""close""
+    FROM ""equity_prices_1d""
+    JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+    AND (
+        SELECT COUNT(DISTINCT date_trunc('week', ""equity_prices_1d"".""date_time""))
+        FROM ""equity_prices_1d""
+        WHERE ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-09'
+                AND ""equity_prices_1d"".""volume"" >
+                    (
+                        SELECT ""volume""
+                        FROM ""equity_prices_1d""
+                        WHERE ""equity_prices_1d"".""date_time"" = '2024-07-02'
+                    )
+            )
+        AND ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+            )
+    )
+    LIMIT 1
+) AS ""t1"",
+(
+    SELECT ""equity_prices_1d"".""close""
+    FROM ""equity_prices_1d""
+    JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+    AND (
+        SELECT COUNT(DISTINCT date_trunc('week', ""equity_prices_1d"".""date_time""))
+        FROM ""equity_prices_1d""
+        WHERE ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-02'
+            )
+        AND ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+            )
+    )
+    LIMIT 1
+) AS ""t2"";
+`","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT ""t1"".""close"" AS ""10_day_performance"", ""t2"".""close"" AS ""20_day_performance""
+FROM (
+    SELECT ""equity_prices_1d"".""close""
+    FROM ""equity_prices_1d""
+    JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+    AND (
+        SELECT COUNT(DISTINCT date_trunc('week', ""equity_prices_1d"".""date_time""))
+        FROM ""equity_prices_1d""
+        WHERE ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-09'
+                AND ""equity_prices_1d"".""volume"" >
+                    (
+                        SELECT ""volume""
+                        FROM ""equity_prices_1d""
+                        WHERE ""equity_prices_1d"".""date_time"" = '2024-07-02'
+                    )
+            )
+        AND ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+            )
+    )
+    LIMIT 1
+) AS ""t1"",
+(
+    SELECT ""equity_prices_1d"".""close""
+    FROM ""equity_prices_1d""
+    JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+    AND (
+        SELECT COUNT(DISTINCT date_trunc('week', ""equity_prices_1d"".""date_time""))
+        FROM ""equity_prices_1d""
+        WHERE ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-02'
+            )
+        AND ""equity_prices_1d"".""volume"" >
+            (
+                SELECT ""volume""
+                FROM ""equity_prices_1d""
+                WHERE ""equity_prices_1d"".""date_time"" = '2024-07-16'
+            )
+    )
+    LIMIT 1
+) AS ""t2"";
+```') (line 1, col 1): ```sql
+SELECT ""t1"".""close"" AS ""10_day_performance"", ""t2"".""close"" AS ""20_day_performance""
+FROM (
+    SELECT ""equity_prices_1d"".""close""
+    FROM ""equity_prices_1d. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+List stocks going below the previous week's low on 20th September 2024.,"- Intent: Identify stocks that went below the previous week's low on 20th September 2024.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `low`, `high`, `date_time`
+- Conditions: Calculate previous week's low, then filter for stocks with low prices below the calculated value on 20th September 2024
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""low"", ""equity_prices_1d"".""high"", ""equity_prices_1d"".""date_time""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""low"" < (
+    SELECT MIN(""low"")
+    FROM ""equity_prices_1d"" ep_previous_week
+    WHERE (ep_previous_week.""date_time"" BETWEEN '2024-09-13' AND '2024-09-19')
+    AND ep_previous_week.""security_code"" = ""master_prime_1d"".""security_code""
+);
+```","
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""low"", ""equity_prices_1d"".""high"", ""equity_prices_1d"".""date_time""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""low"" < (
+    SELECT MIN(""low"")
+    FROM ""equity_prices_1d"" ep_previous_week
+    WHERE (ep_previous_week.""date_time"" BETWEEN '2024-09-13' AND '2024-09-19')
+    AND ep_previous_week.""security_code"" = ""master_prime_1d"".""security_code""
+);","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""low"", ""equity_prices_1d"".""high"", ""equity_prices_1d"".""date_time""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""low"" < (
+    SELECT MIN(""low"")
+    FROM ""equity_prices_1d"" ep_previous_week
+    WHERE (ep_previous_week.""date_time"" BETWEEN '2024-09-13' AND '2024-09-19')
+    AND ep_previous_week.""security_code"" = ""master_prime_1d"".""security_code""
+);
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""low"", ""equity_prices_1d"".""high"", ""equity_prices_1d"".""date_time""
+FROM ""master_prime_. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+"Give me the 10-day, 20-day, 30-day, and 6-month performance of all Nifty50 stocks whenever it has given 3 consecutive weeks of positive gains.","- Intent: Retrieve the performance of Nifty50 stocks over different time periods when there are 3 cocutive weeks of positive gains.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `close`, `index_name`, `company_name`
+- Conditions: `index_name LIKE '%Nifty50%'`, 3 cocutive weeks of positive gains
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: Performance for 10 days, 20 days, 30 days, and 6 months
+- Sorting/Grouping: None","```sql
+SELECT DISTINCT ""company_name"",
+    avg(case when ""date_time"" BETWEEN '2024-11-02' AND '2024-11-13' then ""close"" end) AS performance_10_days,
+    avg(case when ""date_time"" BETWEEN '2024-10-22' AND '2024-11-13' then ""close"" end) AS performance_20_days,
+    avg(case when ""date_time"" BETWEEN '2024-10-12' AND '2024-11-13' then ""close"" end) AS performance_30_days,
+    avg(case when ""date_time"" BETWEEN '2024-05-20' AND '2024-11-13' then ""close"" end) AS performance_6_months
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty50%'
+AND ""equity_prices_1d"".""close"" > 0
+GROUP BY ""company_name""
+HAVING count(distinct week(""date_time"")) >= 3;
+```","
+SELECT DISTINCT ""company_name"",
+    avg(case when ""date_time"" BETWEEN '2024-11-02' AND '2024-11-13' then ""close"" end) AS performance_10_days,
+    avg(case when ""date_time"" BETWEEN '2024-10-22' AND '2024-11-13' then ""close"" end) AS performance_20_days,
+    avg(case when ""date_time"" BETWEEN '2024-10-12' AND '2024-11-13' then ""close"" end) AS performance_30_days,
+    avg(case when ""date_time"" BETWEEN '2024-05-20' AND '2024-11-13' then ""close"" end) AS performance_6_months
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty50%'
+AND ""equity_prices_1d"".""close"" > 0
+GROUP BY ""company_name""
+HAVING count(distinct week(""date_time"")) >= 3;","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""company_name"",
+    avg(case when ""date_time"" BETWEEN '2024-11-02' AND '2024-11-13' then ""close"" end) AS performance_10_days,
+    avg(case when ""date_time"" BETWEEN '2024-10-22' AND '2024-11-13' then ""close"" end) AS performance_20_days,
+    avg(case when ""date_time"" BETWEEN '2024-10-12' AND '2024-11-13' then ""close"" end) AS performance_30_days,
+    avg(case when ""date_time"" BETWEEN '2024-05-20' AND '2024-11-13' then ""close"" end) AS performance_6_months
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty50%'
+AND ""equity_prices_1d"".""close"" > 0
+GROUP BY ""company_name""
+HAVING count(distinct week(""date_time"")) >= 3;
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""company_name"",
+    avg(case when ""date_time"" BETWEEN '2024-11-02' AND '2024-11-13' then ""close"" end) AS performance_10_days,
+    avg(cas. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+List stocks closing above the previous week's closing price on 20th September 2024.,"- Intent: Retrieve the list of stocks with closing prices above the previous week's closing price on 20th September 2024.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `close`
+- Conditions: Closing price > Previous week's closing price (calculated for the period including 13-09-2024 to 20-09-2024), `date_time = '2024-09-20'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""close""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""close"" > (
+    SELECT ""previous_week_close""
+    FROM (
+        SELECT ""close"" AS ""previous_week_close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" BETWEEN '2024-09-13' AND '2024-09-20'
+    )
+);
+```","
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""close""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""close"" > (
+    SELECT ""previous_week_close""
+    FROM (
+        SELECT ""close"" AS ""previous_week_close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" BETWEEN '2024-09-13' AND '2024-09-20'
+    )
+);","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""close""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""close"" > (
+    SELECT ""previous_week_close""
+    FROM (
+        SELECT ""close"" AS ""previous_week_close""
+        FROM ""equity_prices_1d""
+        WHERE ""date_time"" BETWEEN '2024-09-13' AND '2024-09-20'
+    )
+);
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""close""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""securit. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+List stocks closing above the previous Friday's closing price on 20th September 2024.,"
+- Intent: Retrieve the list of stocks with closing prices above the previous Friday's closing price as of 20th September 2024.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `close`
+- Conditions: `date_time = '2024-09-20'` (Friday), closing_price > (SELECT close FROM equity_prices_1d WHERE date_time = '2024-09-16') (Previous Friday's closing price)
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""close""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""close"" > 
+    (SELECT ""prev_friday"".""close""
+     FROM ""equity_prices_1d"" AS ""prev_friday""
+     WHERE ""prev_friday"".""date_time"" = '2024-09-16'
+    );
+```  ","
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""close""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""close"" > 
+    (SELECT ""prev_friday"".""close""
+     FROM ""equity_prices_1d"" AS ""prev_friday""
+     WHERE ""prev_friday"".""date_time"" = '2024-09-16'
+    );
+`","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""close""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""close"" > 
+    (SELECT ""prev_friday"".""close""
+     FROM ""equity_prices_1d"" AS ""prev_friday""
+     WHERE ""prev_friday"".""date_time"" = '2024-09-16'
+    );
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name"", ""equity_prices_1d"".""close""
+FROM ""master_prime_1d""
+JOIN ""equity_prices_1d""
+ON ""master_prime_1d"".""securit. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+List stocks with daily candle closing above the previous weekly open price on 20th September 2024.,"- Intent: Retrieve a list of stocks where the daily closing price is above the previous weekly open price on 20th September 2024.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `close`, `open`, `date_time`
+- Conditions: 
+  - Filter by date ranges: `date_time = '2024-09-20'` for the specific date of 20th September 2024
+  - Calculate previous weekly open price dynamically based on the '2024-09-20' reference date
+  - Condition for closing price above the previous weekly open price
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""close"" > (
+    SELECT ""open"" 
+    FROM ""equity_prices_1d"" 
+    WHERE ""date_time"" = toDate('2024-09-20') - toIntervalDay(7)
+)
+```   ","
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""close"" > (
+    SELECT ""open"" 
+    FROM ""equity_prices_1d"" 
+    WHERE ""date_time"" = toDate('2024-09-20') - toIntervalDay(7)
+)
+``","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""equity_prices_1d"".""date_time"" = '2024-09-20'
+AND ""equity_prices_1d"".""close"" > (
+    SELECT ""open"" 
+    FROM ""equity_prices_1d"" 
+    WHERE ""date_time"" = toDate('2024-09-20') - toIntervalDay(7)
+)
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""master_prime_1d"".""company_name""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"". Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+"Give me the 5 best-performing stocks of Nifty500 from 15th September 2023 to 26th October 2023 and filter out 2 among 5 which have the least performance in the next 10 days. Also, show the next 10-day performance.","- Intent: Retrieve the top 5 performing stocks of Nifty500 from 15th September 2023 to 26th October 2023, identify the 2 least performing stocks among the top 5 in the next 10 days, and display the performance of the selected stocks for the next 10 days.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `index_name`, `close`
+- Conditions: `index_name LIKE '%Nifty500%'`, `date_time BETWEEN 2023-09-15 AND 2023-10-26`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: `ORDER BY close DESC LIMIT 5`","```sql
+WITH top_performing_stocks AS (
+    SELECT DISTINCT ""company_name"", ""close""
+    FROM ""equity_prices_1d""
+    JOIN ""master_prime_1d""
+    ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty500%'
+    AND ""equity_prices_1d"".""date_time"" BETWEEN '2023-09-15' AND '2023-10-26'
+    ORDER BY ""close"" DESC
+    LIMIT 5
+),
+least_performing_stocks AS (
+    SELECT DISTINCT ""company_name""
+    FROM top_performing_stocks
+    ORDER BY ""close"" ASC
+    LIMIT 2
+)
+SELECT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2023-10-27' AND '2023-11-05'
+AND ""company_name"" IN
+    (SELECT ""company_name"" FROM least_performing_stocks);
+```  ","
+WITH top_performing_stocks AS (
+    SELECT DISTINCT ""company_name"", ""close""
+    FROM ""equity_prices_1d""
+    JOIN ""master_prime_1d""
+    ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty500%'
+    AND ""equity_prices_1d"".""date_time"" BETWEEN '2023-09-15' AND '2023-10-26'
+    ORDER BY ""close"" DESC
+    LIMIT 5
+),
+least_performing_stocks AS (
+    SELECT DISTINCT ""company_name""
+    FROM top_performing_stocks
+    ORDER BY ""close"" ASC
+    LIMIT 2
+)
+SELECT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2023-10-27' AND '2023-11-05'
+AND ""company_name"" IN
+    (SELECT ""company_name"" FROM least_performing_stocks);
+`","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+WITH top_performing_stocks AS (
+    SELECT DISTINCT ""company_name"", ""close""
+    FROM ""equity_prices_1d""
+    JOIN ""master_prime_1d""
+    ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+    WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty500%'
+    AND ""equity_prices_1d"".""date_time"" BETWEEN '2023-09-15' AND '2023-10-26'
+    ORDER BY ""close"" DESC
+    LIMIT 5
+),
+least_performing_stocks AS (
+    SELECT DISTINCT ""company_name""
+    FROM top_performing_stocks
+    ORDER BY ""close"" ASC
+    LIMIT 2
+)
+SELECT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d""
+ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2023-10-27' AND '2023-11-05'
+AND ""company_name"" IN
+    (SELECT ""company_name"" FROM least_performing_stocks);
+```') (line 1, col 1): ```sql
+WITH top_performing_stocks AS (
+    SELECT DISTINCT ""company_name"", ""close""
+    FROM ""equity_prices_1d""
+    JOIN ""master_prime_1d""
+    ON ""master_prime_1. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+Give me the top 10 best and worst performers of all Nifty500 stocks from 9th September 2024 to 27th September 2024.,"- Intent: Retrieve the top 10 best and worst performing Nifty 500 stocks between 9th September 2024 to 27th September 2024.
+- Required Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `company_name`, `close`
+- Conditions: `index_name LIKE '%Nifty 500%'`, `date_time BETWEEN '2024-09-09' AND '2024-09-27'`
+- Joins: `master_prime_1d.security_code = equity_prices_1d.security_code`
+- Aggregations: None
+- Sorting/Grouping: `ORDER BY close DESC LIMIT 10` for top performers, `ORDER BY close ASC LIMIT 10` for worst performers","```sql
+SELECT DISTINCT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty 500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+ORDER BY ""close"" DESC
+LIMIT 10
+
+UNION DISTINCT
+
+SELECT DISTINCT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty 500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+ORDER BY ""close"" ASC
+LIMIT 10;
+```","
+SELECT DISTINCT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty 500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+ORDER BY ""close"" DESC
+LIMIT 10
+
+UNION DISTINCT
+
+SELECT DISTINCT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty 500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+ORDER BY ""close"" ASC
+LIMIT 10;","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty 500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+ORDER BY ""close"" DESC
+LIMIT 10
+
+UNION DISTINCT
+
+SELECT DISTINCT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""security_code""
+WHERE ""master_prime_1d"".""index_name"" LIKE '%Nifty 500%'
+AND ""equity_prices_1d"".""date_time"" BETWEEN '2024-09-09' AND '2024-09-27'
+ORDER BY ""close"" ASC
+LIMIT 10;
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+JOIN ""master_prime_1d"" ON ""master_prime_1d"".""security_code"" = ""equity_prices_1d"".""securit. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+List stocks closing above the previous weekly candle closing price on 20th September 2024.,"
+- Intent: Identify stocks whose closing prices are above the previous weekly candle's closing price as of 20th September 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `company_name`, `close`
+- Conditions: Closing price > Previous weekly candle closing price as of 20th September 2024
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT DISTINCT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+WHERE ""close"" > (
+    SELECT ""close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-09-13' AND '2024-09-20'
+    ORDER BY ""date_time"" DESC
+    LIMIT 1
+) AND ""date_time"" = '2024-09-20';
+```","
+SELECT DISTINCT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+WHERE ""close"" > (
+    SELECT ""close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-09-13' AND '2024-09-20'
+    ORDER BY ""date_time"" DESC
+    LIMIT 1
+) AND ""date_time"" = '2024-09-20';","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+WHERE ""close"" > (
+    SELECT ""close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BETWEEN '2024-09-13' AND '2024-09-20'
+    ORDER BY ""date_time"" DESC
+    LIMIT 1
+) AND ""date_time"" = '2024-09-20';
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""company_name"", ""close""
+FROM ""equity_prices_1d""
+WHERE ""close"" > (
+    SELECT ""close""
+    FROM ""equity_prices_1d""
+    WHERE ""date_time"" BE. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+List stocks whose volume is minus 20% than 2 days before volume on 27th September 2024.,"- Intent: Identify stocks where the volume decreased by 20% compared to 2 days prior on 27th September 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `company_name`, `volume`, `date_time`
+- Conditions: Volume decreased by 20%, Date is 27th September 2024
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT DISTINCT ""company_name""
+FROM ""equity_prices_1d"" e1
+WHERE ""date_time"" = '2024-09-27'
+AND ""volume"" < (
+    SELECT ""volume"" * 0.8 AS decreased_volume
+    FROM ""equity_prices_1d"" e2
+    WHERE ""date_time"" = '2024-09-25'
+    AND e1.""company_name"" = e2.""company_name""
+);
+```","
+SELECT DISTINCT ""company_name""
+FROM ""equity_prices_1d"" e1
+WHERE ""date_time"" = '2024-09-27'
+AND ""volume"" < (
+    SELECT ""volume"" * 0.8 AS decreased_volume
+    FROM ""equity_prices_1d"" e2
+    WHERE ""date_time"" = '2024-09-25'
+    AND e1.""company_name"" = e2.""company_name""
+);","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""company_name""
+FROM ""equity_prices_1d"" e1
+WHERE ""date_time"" = '2024-09-27'
+AND ""volume"" < (
+    SELECT ""volume"" * 0.8 AS decreased_volume
+    FROM ""equity_prices_1d"" e2
+    WHERE ""date_time"" = '2024-09-25'
+    AND e1.""company_name"" = e2.""company_name""
+);
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""company_name""
+FROM ""equity_prices_1d"" e1
+WHERE ""date_time"" = '2024-09-27'
+AND ""volume"" < (
+    SELECT ""volume"" * 0.8 AS decreased_volume. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+List stocks where volume has increased for 2 consecutive days on 16th July 2024.,"- Intent: Retrieve the list of stocks where the volume has increased for 2 cocutive days on 16th July 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `company_name`, `volume`, `date_time`
+- Conditions: `date_time = '2024-07-16'`, Volume increase for 2 cocutive days
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT DISTINCT ""company_name""
+FROM ""equity_prices_1d"" AS ep1
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.""security_code"" = ep2.""security_code""
+JOIN ""equity_prices_1d"" AS ep3 ON ep1.""security_code"" = ep3.""security_code""
+WHERE ep1.""date_time"" = '2024-07-16' 
+AND ep2.""date_time"" = '2024-07-17' 
+AND ep3.""date_time"" = '2024-07-18' 
+AND ep2.""volume"" > ep1.""volume"" 
+AND ep3.""volume"" > ep2.""volume"";
+```","
+SELECT DISTINCT ""company_name""
+FROM ""equity_prices_1d"" AS ep1
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.""security_code"" = ep2.""security_code""
+JOIN ""equity_prices_1d"" AS ep3 ON ep1.""security_code"" = ep3.""security_code""
+WHERE ep1.""date_time"" = '2024-07-16' 
+AND ep2.""date_time"" = '2024-07-17' 
+AND ep3.""date_time"" = '2024-07-18' 
+AND ep2.""volume"" > ep1.""volume"" 
+AND ep3.""volume"" > ep2.""volume"";","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""company_name""
+FROM ""equity_prices_1d"" AS ep1
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.""security_code"" = ep2.""security_code""
+JOIN ""equity_prices_1d"" AS ep3 ON ep1.""security_code"" = ep3.""security_code""
+WHERE ep1.""date_time"" = '2024-07-16' 
+AND ep2.""date_time"" = '2024-07-17' 
+AND ep3.""date_time"" = '2024-07-18' 
+AND ep2.""volume"" > ep1.""volume"" 
+AND ep3.""volume"" > ep2.""volume"";
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""company_name""
+FROM ""equity_prices_1d"" AS ep1
+JOIN ""equity_prices_1d"" AS ep2 ON ep1.""security_code"" = ep2.""security_code""
+JOIN ""equity_pr. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",
+List stocks crossing below the previous week's low on 20th September 2024.,"- Intent: Identify stocks that crossed below the previous week's low on 20th September 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: `company_name`, `short_company_name`, `low`, `date_time`
+- Conditions: 
+  - Date Reference: 20th September 2024
+  - Comparison: Current day's low < Previous week's low
+- Joins: None
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT DISTINCT ""company_name"", COALESCE(""short_company_name"", 'None') AS short_company_name, ""low"", ""date_time""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-20'
+AND ""low"" < (
+    SELECT MIN(""low"")
+    FROM ""equity_prices_1d""
+    WHERE (""date_time"" BETWEEN '2024-09-13' AND '2024-09-19') -- Previous week range
+);
+```","
+SELECT DISTINCT ""company_name"", COALESCE(""short_company_name"", 'None') AS short_company_name, ""low"", ""date_time""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-20'
+AND ""low"" < (
+    SELECT MIN(""low"")
+    FROM ""equity_prices_1d""
+    WHERE (""date_time"" BETWEEN '2024-09-13' AND '2024-09-19') -- Previous week range
+);","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('```sql
+SELECT DISTINCT ""company_name"", COALESCE(""short_company_name"", 'None') AS short_company_name, ""low"", ""date_time""
+FROM ""equity_prices_1d""
+WHERE ""date_time"" = '2024-09-20'
+AND ""low"" < (
+    SELECT MIN(""low"")
+    FROM ""equity_prices_1d""
+    WHERE (""date_time"" BETWEEN '2024-09-13' AND '2024-09-19') -- Previous week range
+);
+```') (line 1, col 1): ```sql
+SELECT DISTINCT ""company_name"", COALESCE(""short_company_name"", 'None') AS short_company_name, ""low"", ""date_time""
+FROM ""equity_prices_1d""
+WHERE ""date_time. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+",

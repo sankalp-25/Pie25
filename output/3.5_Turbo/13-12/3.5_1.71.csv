@@ -1,0 +1,747 @@
+user_query,1st output,2nd output raw,2nd output processed,3rd output,result,Result_final
+Which stocks on NSE showed the highest price increase in the last trading session?,"- **Intent**: Find the stocks listed on  with the highest price increase in the last trading session.
+- **Required Tables**: `master_prime_2d`, `equity_prices_2d`
+- **Columns**: `short_company_name`, `close`, `date_time`
+- **Conditions**: `index_name = 'Nifty 500'` ( is represented by Nifty 500 in the `master_prime_2d` table),  `date_time = <Last Trading Date>` (This will need to be dynamically determined)
+- **Joins**: `master_prime_2d.security_code = equity_prices_2d.security_code`
+- **Aggregations**: None (though we implicitly are finding the *max* price increase)
+- **Sorting/Grouping**: Sort by `(close - Previous Day's Close)` in descending order, Limit 1 (or top N as required)
+
+
+**Explanation of the Approach and Additional Notes:**
+
+1. **Last Trading Date:**  The last trading date needs to be derived programmatically.  This could involve querying the `equity_prices_2d` table for the `max(date_time)`.
+2. **Previous Day's Close:** Calculating the price increase requires the closing price from the previous trading day.  This can be achieved with a subquery or window function depending on the SQL dialect used.  The subquery would fetch the close price for the `date_time = <Last Trading Date - 1 day>`.
+3. ** Representation:**  The provided schema doesn't have a direct """" column. I've used `index_name = 'Nifty 500'` as a proxy,  assuming this represents -listed stocks.  If there's a more accurate way to identify  stocks in your actual data, that should be used.
+4. **Top N:** The question asks for the ""highest"" increase, implying just the top stock. However, it can be easily modified to fetch the top N stocks by adjusting the `LIMIT` clause.
+5. **SQL Query Sketch (Illustrative - Adapt to your specific database):**
+
+```sql
+SELECT mp.short_company_name
+FROM master_prime_2d mp
+JOIN equity_prices_2d ep ON mp.security_code = ep.security_code
+WHERE mp.index_name = 'Nifty 500'
+  AND ep.date_time = <Last Trading Date>  -- Replace with dynamic query to get last trading date
+ORDER BY (ep.close - (SELECT close FROM equity_prices_2d WHERE security_code = ep.security_code AND date_time = <Last Trading Date - 1 day>)) DESC  -- Replace with dynamic date calculation
+LIMIT 1;
+```
+
+
+This preprocessed output provides the essential building blocks to construct a SQL query to answer the original natural language question.  It emphasizes extracting the key components in a structured way for easier query generation. Remember to replace placeholders like `<Last Trading Date>` and `<Last Trading Date - 1 day>` with appropriate dynamic date calculations in your final SQL.
+","```sql
+SELECT ""short_company_name""
+FROM ""master_prime_2d""
+INNER JOIN ""equity_prices_2d"" AS ""ep_latest"" ON ""master_prime_2d"".""security_code"" = ""ep_latest"".""security_code""
+INNER JOIN (
+    SELECT max(""date_time"") AS ""last_trading_date""
+    FROM ""equity_prices_2d""
+) AS ""latest_date"" ON ""ep_latest"".""date_time"" = ""latest_date"".""last_trading_date""
+INNER JOIN ""equity_prices_2d"" AS ""ep_prev"" ON ""master_prime_2d"".""security_code"" = ""ep_prev"".""security_code""
+INNER JOIN (
+    SELECT date_sub('day', 1, max(""date_time"")) AS ""previous_trading_date""
+    FROM ""equity_prices_2d""
+) AS ""previous_date"" ON ""ep_prev"".""date_time"" = ""previous_date"".""previous_trading_date""
+WHERE ""index_name"" LIKE '%Nifty 500%'
+ORDER BY (""ep_latest"".""close"" - ""ep_prev"".""close"") DESC
+LIMIT 1;
+```","```sql
+SELECT ""short_company_name""
+FROM ""master_prime_2d""
+INNER JOIN ""equity_prices_2d"" AS ""ep_latest"" ON ""master_prime_2d"".""security_code"" = ""ep_latest"".""security_code""
+INNER JOIN (
+    SELECT max(""date_time"") AS ""last_trading_date""
+    FROM ""equity_prices_2d""
+) AS ""latest_date"" ON ""ep_latest"".""date_time"" = ""latest_date"".""last_trading_date""
+INNER JOIN ""equity_prices_2d"" AS ""ep_prev"" ON ""master_prime_2d"".""security_code"" = ""ep_prev"".""security_code""
+INNER JOIN (
+    SELECT date('now', '-1 day') AS ""previous_trading_date""
+) AS ""previous_date"" ON ""ep_prev"".""date_time"" = ""previous_date"".""previous_trading_date""
+WHERE ""index_name"" LIKE '%Nifty 500%'
+ORDER BY (""ep_latest"".""close"" - ""ep_prev"".""close"") DESC
+LIMIT 1;
+```","
+SELECT ""short_company_name""
+FROM ""master_prime_2d""
+INNER JOIN ""equity_prices_2d"" AS ""ep_latest"" ON ""master_prime_2d"".""security_code"" = ""ep_latest"".""security_code""
+INNER JOIN (
+    SELECT max(""date_time"") AS ""last_trading_date""
+    FROM ""equity_prices_2d""
+) AS ""latest_date"" ON ""ep_latest"".""date_time"" = ""latest_date"".""last_trading_date""
+INNER JOIN ""equity_prices_2d"" AS ""ep_prev"" ON ""master_prime_2d"".""security_code"" = ""ep_prev"".""security_code""
+INNER JOIN (
+    SELECT date('now', '-1 day') AS ""previous_trading_date""
+) AS ""previous_date"" ON ""ep_prev"".""date_time"" = ""previous_date"".""previous_trading_date""
+WHERE ""index_name"" LIKE '%Nifty 500%'
+ORDER BY (""ep_latest"".""close"" - ""ep_prev"".""close"") DESC
+LIMIT 1;
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 709 (end of query) (line 15, col 8): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 709 (end of query) (line 15, col 8): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+"
+Can you list stocks with prices trading near their 52-week high on NSE?,"- **Intent**: Retrieve stocks trading near their 52-week high on .
+
+- **Required Tables**: `master_prime_2d`, `equity_prices_2d`
+
+- **Columns**: `equity_prices_2d.high`, `equity_prices_2d.close`, `master_prime_2d.index_name`
+
+- **Conditions**: `master_prime_2d.index_name = 'Nifty 500'`,  `equity_prices_2d.high` within a certain percentage range of the 52-week high (This requires a subquery or window function within the SQL to calculate the 52-week high based on the `high` column over the past year from the current date within the `equity_prices_2d` table.  The exact percentage range for ""near"" is not defined in the natural language query and would need clarification or a default assumption). The condition will likely look similar to `equity_prices_2d.high BETWEEN 0.95 * (52_week_high) AND (52_week_high)`, with a suitable way of calculating the `52_week_high`.
+
+- **Joins**: `master_prime_2d.security_code = equity_prices_2d.security_code`
+
+- **Aggregations**: None (unless we want to aggregate something based on the results)
+
+- **Sorting/Grouping**:  Potentially sort by the difference between the current price and the 52-week high. This isn't explicitly stated but would be a logical way to present the data.
+","```sql
+SELECT ""company_name""
+FROM ""master_prime_2d""
+INNER JOIN ""equity_prices_2d"" ON ""master_prime_2d"".""security_code"" = ""equity_prices_2d"".""security_code""
+WHERE ""index_name"" LIKE '%Nifty 500%'
+AND ""date_time"" = '2024-11-19'
+AND ""high"" BETWEEN 0.95 * (SELECT max(""high"") FROM ""equity_prices_2d"" AS epd2 WHERE epd2.""security_code"" = ""equity_prices_2d"".""security_code"" AND ""date_time"" BETWEEN '2023-11-19' AND '2024-11-19') AND (SELECT max(""high"") FROM ""equity_prices_2d"" AS epd3 WHERE epd3.""security_code"" = ""equity_prices_2d"".""security_code"" AND ""date_time"" BETWEEN '2023-11-19' AND '2024-11-19');
+
+```","```sql
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_2d""
+INNER JOIN ""equity_prices_2d"" ON ""master_prime_2d"".""security_code"" = ""equity_prices_2d"".""security_code""
+WHERE ""index_name"" LIKE '%Nifty 500%'
+AND ""date_time"" = '2024-11-19'
+AND ""high"" BETWEEN 0.95 * (SELECT max(""high"") FROM ""equity_prices_2d"" AS epd2 WHERE epd2.""security_code"" = ""equity_prices_2d"".""security_code"" AND ""date_time"" BETWEEN '2023-11-19' AND '2024-11-19') AND (SELECT max(""high"") FROM ""equity_prices_2d"" AS epd3 WHERE epd3.""security_code"" = ""equity_prices_2d"".""security_code"" AND ""date_time"" BETWEEN '2023-11-19' AND '2024-11-19');
+```
+","
+SELECT DISTINCT ""company_name""
+FROM ""master_prime_2d""
+INNER JOIN ""equity_prices_2d"" ON ""master_prime_2d"".""security_code"" = ""equity_prices_2d"".""security_code""
+WHERE ""index_name"" LIKE '%Nifty 500%'
+AND ""date_time"" = '2024-11-19'
+AND ""high"" BETWEEN 0.95 * (SELECT max(""high"") FROM ""equity_prices_2d"" AS epd2 WHERE epd2.""security_code"" = ""equity_prices_2d"".""security_code"" AND ""date_time"" BETWEEN '2023-11-19' AND '2024-11-19') AND (SELECT max(""high"") FROM ""equity_prices_2d"" AS epd3 WHERE epd3.""security_code"" = ""equity_prices_2d"".""security_code"" AND ""date_time"" BETWEEN '2023-11-19' AND '2024-11-19');
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 600 (end of query) (line 7, col 372): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 600 (end of query) (line 7, col 372): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+"
+Which stocks had the highest volume traded/volume buzzer compared to yesterday on NSE?,"- **Intent**: Retrieve the stocks traded on  with the highest volume compared to the previous day.
+- **Required Tables**: `equity_prices_2d`
+- **Columns**: `security_code`, `volume`, `date_time`
+- **Conditions**: `date_time = CURRENT_DATE` (for today's volume) and `date_time = CURRENT_DATE - INTERVAL '1 day'` (for yesterday's volume).  We'll also likely need to filter by exchange () if that information is available, but it isn't in the provided schema.  *If* there's a separate table with exchange information, a join would be needed.
+- **Joins**:  None based on the provided table schemas (see conditions note above).
+- **Aggregations**: None explicitly, but we'll implicitly be finding the maximum volume difference.
+- **Sorting/Grouping**: Sort by the difference in volume (today - yesterday) in descending order to get the ""highest.""  We can potentially add a `LIMIT` clause to get the top N stocks.
+
+
+
+
+**Explanation and Further Considerations:**
+
+1. ** Filter:** The question specifies ""on .""  The provided database schema doesn't include exchange information.  A practical implementation would require either:
+   - An additional table linking `security_code` to exchange.  This would necessitate a `JOIN`.
+   - A column in `equity_prices_2d` indicating the exchange.
+
+2. **Calculating Volume Difference:** The SQL query will need to calculate the difference between today's volume and yesterday's volume for each stock.  This might involve subqueries or window functions.
+
+3. **""Volume Buzzer"":** The term ""volume buzzer"" likely refers to unusual or significantly higher volume compared to the previous day or some other baseline.  A more sophisticated solution could involve comparing volume to a moving average or setting a threshold for what constitutes a ""buzzer.""
+
+4. **Handling Missing Data:** The query should consider cases where a stock didn't trade on either yesterday or today.  We might need to use `COALESCE` or other techniques to handle nulls gracefully.
+
+
+
+**Example SQL Snippet (Illustrative - assumes  data is available):**
+
+This is a simplified snippet; the exact implementation will depend on the database system and how  data is stored.
+
+```sql
+WITH TodayVolume AS (
+    SELECT security_code, volume
+    FROM equity_prices_2d
+    WHERE date_time = CURRENT_DATE AND exchange = ''
+),
+YesterdayVolume AS (
+    SELECT security_code, volume
+    FROM equity_prices_2d
+    WHERE date_time = CURRENT_DATE - INTERVAL '1 day' AND exchange = ''
+)
+SELECT t.security_code, (t.volume - COALESCE(y.volume, 0)) AS volume_difference
+FROM TodayVolume t
+LEFT JOIN YesterdayVolume y ON t.security_code = y.security_code
+ORDER BY volume_difference DESC;
+
+```
+","```sql
+WITH TodayVolume AS (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_2d""
+    WHERE ""date_time"" = '2024-11-19'
+),
+YesterdayVolume AS (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_2d""
+    WHERE ""date_time"" = '2024-11-18'
+)
+SELECT ""company_name""
+FROM ""master_prime_2d""
+WHERE ""security_code"" IN (
+    SELECT ""security_code""
+    FROM TodayVolume AS t
+    LEFT JOIN YesterdayVolume AS y ON t.""security_code"" = y.""security_code""
+    ORDER BY (t.""volume"" - COALESCE(y.""volume"", 0)) DESC
+)
+
+```
+","```sql
+WITH TodayVolume AS (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_2d""
+    WHERE ""date_time"" = '2024-11-19'
+),
+YesterdayVolume AS (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_2d""
+    WHERE ""date_time"" = '2024-11-18'
+)
+SELECT ""company_name""
+FROM ""master_prime_2d""
+WHERE ""security_code"" IN (
+    SELECT t.""security_code""
+    FROM TodayVolume AS t
+    LEFT JOIN YesterdayVolume AS y ON t.""security_code"" = y.""security_code""
+    ORDER BY (t.""volume"" - COALESCE(y.""volume"", 0)) DESC
+)
+
+```
+","
+WITH TodayVolume AS (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_2d""
+    WHERE ""date_time"" = '2024-11-19'
+),
+YesterdayVolume AS (
+    SELECT ""security_code"", ""volume""
+    FROM ""equity_prices_2d""
+    WHERE ""date_time"" = '2024-11-18'
+)
+SELECT ""company_name""
+FROM ""master_prime_2d""
+WHERE ""security_code"" IN (
+    SELECT t.""security_code""
+    FROM TodayVolume AS t
+    LEFT JOIN YesterdayVolume AS y ON t.""security_code"" = y.""security_code""
+    ORDER BY (t.""volume"" - COALESCE(y.""volume"", 0)) DESC
+)
+
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 60
+ Code: 60. DB::Exception: Unknown table expression identifier 'master_prime_2d' in scope WITH TodayVolume AS (SELECT security_code, volume FROM equity_prices_2d WHERE date_time = '2024-11-19'), YesterdayVolume AS (SELECT security_code, volume FROM equity_prices_2d WHERE date_time = '2024-11-18') SELECT company_name FROM master_prime_2d WHERE security_code IN (SELECT t.security_code FROM TodayVolume AS t LEFT JOIN YesterdayVolume AS y ON t.security_code = y.security_code ORDER BY t.volume - COALESCE(y.volume, 0) DESC). (UNKNOWN_TABLE) (version 24.12.1.1425 (official build))
+",success
+Which stocks had the highest volume traded/volume buzzer on NSE?,"- **Intent**: Retrieve the stocks with the highest trading volume on .
+- **Required Tables**: `equity_prices_2d`
+- **Columns**: `security_code`, `volume`
+- **Conditions**:  None explicitly stated, but implicitly looking for  stocks (this might require additional filtering if the exchange isn't directly in `equity_prices_2d`, potentially via another table or by filtering on security codes known to be on ).
+- **Joins**: None
+- **Aggregations**:  `max(volume)` or potentially ranking based on volume.
+- **Sorting/Grouping**: Sort by `volume` in descending order to get the highest volumes. Potentially limit the results to the top N stocks. 
+","```sql
+SELECT ""company_name""
+FROM ""master_prime_2d""
+WHERE ""security_code"" IN (SELECT ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-19' ORDER BY ""volume"" DESC LIMIT 10)
+```","```sql
+SELECT ""company_name""
+FROM ""master_prime_2d""
+WHERE ""security_code"" IN (SELECT ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-19' ORDER BY ""volume"" DESC LIMIT 10)
+```
+","
+SELECT ""company_name""
+FROM ""master_prime_2d""
+WHERE ""security_code"" IN (SELECT ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-19' ORDER BY ""volume"" DESC LIMIT 10)
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 60
+ Code: 60. DB::Exception: Unknown table expression identifier 'master_prime_2d' in scope SELECT company_name FROM master_prime_2d WHERE security_code IN (SELECT security_code FROM equity_prices_2d WHERE date_time = '2024-11-19' ORDER BY volume DESC LIMIT 10). (UNKNOWN_TABLE) (version 24.12.1.1425 (official build))
+",success
+Find stocks where the price dropped by more than 5% with unusually high volume.,"- **Intent**: Find stocks with a price drop of more than 5% and unusually high volume.
+
+- **Required Tables**: `equity_prices_2d`
+
+- **Columns**: `date_time`, `security_code`, `close`, `volume`
+
+- **Conditions**: 
+    - Calculate the percentage change in price:  `(close - close_previous_day) / close_previous_day * 100 < -5`  (where `close_previous_day` needs a subquery or window function to obtain).
+    - ""Unusually high volume"" needs further definition.  A possible approach is to compare the current day's volume to the average volume over a recent period (e.g., last 30 days) for the same stock: `volume > 1.5 * avg_volume_30_days` (where `avg_volume_30_days` requires a subquery or window function).  The 1.5 factor is an example and can be adjusted.
+
+- **Joins**: None explicitly stated, but self-join or window function required for previous day's closing price and average volume calculations.
+
+- **Aggregations**: `AVG(volume)` (over the last 30 days for each stock Ã¢ÂÂ to be used in the volume condition)
+
+
+- **Sorting/Grouping**: Possibly group by `security_code` to get results per stock.
+
+
+**Further Refinements and Considerations:**
+
+* **Defining ""Unusually High Volume""**: This requires a precise definition. Options include:
+    - Comparing to a fixed threshold.
+    - Comparing to a moving average.
+    - Comparing to the historical distribution of volumes for the specific stock (e.g., using percentiles).
+* **Time Window for Comparison**: The query doesn't specify a time window for the price drop or volume comparison.  This needs clarification.
+* **SQL Implementation**: The exact SQL query will depend on the specific database system used. Window functions (e.g., `LAG`, `AVG` with `OVER` clause) or self-joins can be used to calculate the previous day's closing price and the average volume.
+
+
+Example SQL Query Snippet (PostgreSQL syntax - illustrating some of the concepts):
+
+```sql
+SELECT
+    ep.date_time,
+    ep.security_code,
+    ep.close,
+    ep.volume
+FROM
+    equity_prices_2d ep
+WHERE
+    (ep.close - LAG(ep.close, 1) OVER (PARTITION BY ep.security_code ORDER BY ep.date_time)) / LAG(ep.close, 1) OVER (PARTITION BY ep.security_code ORDER BY ep.date_time) * 100 < -5
+    AND ep.volume > 1.5 * (
+        AVG(ep.volume) OVER (PARTITION BY ep.security_code ORDER BY ep.date_time ROWS BETWEEN 29 PRECEDING AND CURRENT ROW)
+    );
+```
+
+This snippet demonstrates calculating the percentage change and comparing the volume to a 30-day moving average.  Adaptations would be needed for different database systems and specific requirements for ""unusually high volume.""
+","```sql
+SELECT ""date_time"", ""security_code"", ""close"", ""volume""
+FROM ""equity_prices_2d""
+WHERE (""date_time"" BETWEEN '2024-10-20' AND '2024-11-19') AND ((""close"" - (COALESCE(LAG(""close"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time""), ""close""))) / (CASE WHEN LAG(""close"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"") = 0 THEN 1 ELSE LAG(""close"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"") END) * 100 < -5)
+AND ""volume"" > 1.5 * (AVG(""volume"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ROWS BETWEEN 19 PRECEDING AND CURRENT ROW));
+```","```sql
+SELECT ""date_time"", ""security_code"", ""close"", ""volume""
+FROM ""equity_prices_2d""
+WHERE (""date_time"" BETWEEN '2024-10-20' AND '2024-11-19') AND ((""close"" - (COALESCE(LAG(""close"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time""), ""close""))) / (CASE WHEN LAG(""close"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"") = 0 THEN 1 ELSE LAG(""close"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"") END) * 100 < -5)
+AND ""volume"" > 1.5 * (AVG(""volume"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ROWS BETWEEN 19 PRECEDING AND CURRENT ROW));
+```
+","
+SELECT ""date_time"", ""security_code"", ""close"", ""volume""
+FROM ""equity_prices_2d""
+WHERE (""date_time"" BETWEEN '2024-10-20' AND '2024-11-19') AND ((""close"" - (COALESCE(LAG(""close"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time""), ""close""))) / (CASE WHEN LAG(""close"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"") = 0 THEN 1 ELSE LAG(""close"", 1) OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"") END) * 100 < -5)
+AND ""volume"" > 1.5 * (AVG(""volume"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ROWS BETWEEN 19 PRECEDING AND CURRENT ROW));
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 577 (end of query) (line 5, col 136): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 577 (end of query) (line 5, col 136): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+"
+Which NSE stocks closed above ?1000 with a 10% increase in trading volume compared to their average?,"- **Intent**: Retrieve  stocks that closed above Ã¢ÂÂ¹1000 with a 10% increase in trading volume compared to their average volume.
+
+- **Required Tables**: `master_prime_2d`, `equity_prices_2d`
+
+- **Columns**: `master_prime_2d.security_code`, `master_prime_2d.index_name`, `equity_prices_2d.close`, `equity_prices_2d.volume`, `equity_prices_2d.date_time`
+
+- **Conditions**: 
+    - `master_prime_2d.index_name = 'Nifty 50'` (  Implies Nifty 50 Index)
+    - `equity_prices_2d.close > 1000`
+    - `equity_prices_2d.volume > 1.1 * (Average Volume for that security)` (This condition needs to be calculated as a subquery or using a window function within the SQL query itself)
+    -  Implicit condition:  We need the latest date's data for closing price and volume to evaluate against average volume.  This will likely involve a subquery or window function to determine the maximum date for each security.
+
+- **Joins**: `master_prime_2d.security_code = equity_prices_2d.security_code`
+
+- **Aggregations**: `AVG(equity_prices_2d.volume)` (To calculate the average volume for each security).
+
+- **Sorting/Grouping**:  Group by `equity_prices_2d.security_code` to calculate average volume for each stock. We'd likely also sort by date to get the most recent closing prices.
+","```sql
+SELECT ""security_code""
+FROM (
+    SELECT ""ep"".""security_code"", ""ep"".""close"", ""ep"".""volume"", ""ep"".""date_time"", avg(""ep"".""volume"") OVER (PARTITION BY ""ep"".""security_code"") AS ""average_volume""
+    FROM ""equity_prices_2d"" AS ""ep""
+    INNER JOIN ""master_prime_2d"" AS ""mp"" ON ""ep"".""security_code"" = ""mp"".""security_code""
+    WHERE ""mp"".""index_name"" LIKE '%Nifty 50%'
+)
+WHERE ""close"" > 1000 AND ""volume"" > 1.1 * ""average_volume""
+AND ""date_time"" = (SELECT max(""date_time"") FROM ""equity_prices_2d"");
+```","```sql
+SELECT ""security_code""
+FROM (
+    SELECT ""ep"".""security_code"", ""ep"".""close"", ""ep"".""volume"", ""ep"".""date_time"", avg(""ep"".""volume"") OVER (PARTITION BY ""ep"".""security_code"") AS ""average_volume""
+    FROM ""equity_prices_2d"" AS ""ep""
+    INNER JOIN ""master_prime_2d"" AS ""mp"" ON ""ep"".""security_code"" = ""mp"".""security_code""
+    WHERE ""mp"".""index_name"" LIKE '%Nifty 50%'
+)
+WHERE ""close"" > 1000 AND ""volume"" > 1.1 * ""average_volume""
+AND ""date_time"" = (SELECT max(""date_time"") FROM ""equity_prices_2d"");
+```
+","
+SELECT ""security_code""
+FROM (
+    SELECT ""ep"".""security_code"", ""ep"".""close"", ""ep"".""volume"", ""ep"".""date_time"", avg(""ep"".""volume"") OVER (PARTITION BY ""ep"".""security_code"") AS ""average_volume""
+    FROM ""equity_prices_2d"" AS ""ep""
+    INNER JOIN ""master_prime_2d"" AS ""mp"" ON ""ep"".""security_code"" = ""mp"".""security_code""
+    WHERE ""mp"".""index_name"" LIKE '%Nifty 50%'
+)
+WHERE ""close"" > 1000 AND ""volume"" > 1.1 * ""average_volume""
+AND ""date_time"" = (SELECT max(""date_time"") FROM ""equity_prices_2d"");
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 490 (end of query) (line 10, col 68): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 490 (end of query) (line 10, col 68): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+"
+Can you identify stocks trading below ?50 with high trading volumes?,"- **Intent**: Retrieve stocks trading below Ã¢ÂÂ¹50 with high trading volumes.
+- **Required Tables**: `equity_prices_2d`
+- **Columns**: `close`, `volume`
+- **Conditions**: `close < 50` ,  `volume > {high_volume_threshold}` (Note:  `high_volume_threshold` needs to be defined or determined based on domain knowledge or a separate subquery to determine what constitutes ""high"" volume. We can't derive this from the text alone.)
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**:  Potentially sort by `volume` in descending order to show the highest volume stocks first. This could be added if explicitly requested, but the core query doesn't require it. 
+","```sql
+SELECT ""close"", ""volume""
+FROM ""equity_prices_2d""
+WHERE ""close"" < 50 AND ""volume"" > (SELECT quantile(0.95)(""volume"") FROM ""equity_prices_2d"")
+
+```
+","```sql
+SELECT ""close"", ""volume""
+FROM ""equity_prices_2d""
+WHERE ""close"" < 50 AND ""volume"" > (SELECT quantile(0.95)(""volume"") FROM ""equity_prices_2d"")
+```
+","
+SELECT ""close"", ""volume""
+FROM ""equity_prices_2d""
+WHERE ""close"" < 50 AND ""volume"" > (SELECT quantile(0.95)(""volume"") FROM ""equity_prices_2d"")
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 60
+ Code: 60. DB::Exception: Unknown table expression identifier 'equity_prices_2d' in scope SELECT close, volume FROM equity_prices_2d WHERE (close < 50) AND (volume > (SELECT quantile(0.95)(volume) FROM equity_prices_2d)). (UNKNOWN_TABLE) (version 24.12.1.1425 (official build))
+",success
+What are the top 5 most actively traded stocks on NSE today?,"- **Intent**: Retrieve the top 5 most actively traded stocks on  for the current date.
+- **Required Tables**: `equity_prices_2d`
+- **Columns**: `security_code`, `volume`
+- **Conditions**: `date_time = CURRENT_DATE` (assuming today's date is available as CURRENT_DATE in the SQL environment)
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**: `ORDER BY volume DESC LIMIT 5` 
+","```sql
+SELECT ""security_code"", ""volume""
+FROM ""equity_prices_2d""
+WHERE ""date_time"" = CURRENT_DATE
+ORDER BY ""volume"" DESC
+LIMIT 5
+```","```sql
+SELECT ""security_code"", ""volume""
+FROM ""equity_prices_2d""
+WHERE ""date_time"" = CURRENT_DATE
+ORDER BY ""volume"" DESC
+LIMIT 5
+```
+","
+SELECT ""security_code"", ""volume""
+FROM ""equity_prices_2d""
+WHERE ""date_time"" = CURRENT_DATE
+ORDER BY ""volume"" DESC
+LIMIT 5
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 60
+ Code: 60. DB::Exception: Unknown table expression identifier 'equity_prices_2d' in scope SELECT security_code, volume FROM equity_prices_2d WHERE date_time = CURRENT_DATE ORDER BY volume DESC LIMIT 5. (UNKNOWN_TABLE) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 47
+ Code: 47. DB::Exception: Unknown expression or function identifier `CURRENT_DATE` in scope SELECT security_code, volume FROM equity_prices_2d WHERE date_time = CURRENT_DATE ORDER BY volume DESC LIMIT 5. (UNKNOWN_IDENTIFIER) (version 24.11.1.2557 (official build))
+"
+Which stocks saw a price gap-up at the open but closed lower than the opening price?,"- **Intent**: Find stocks that gapped up at the open but closed lower than the opening price.
+- **Required Tables**: `equity_prices_2d`
+- **Columns**: `open`, `close`
+- **Conditions**: `open > close` (implicitly comparing open and close prices of the same row/stock on a given day)
+- **Joins**: None
+- **Aggregations**: None
+- **Sorting/Grouping**: None 
+","SELECT ""open"", ""close""
+FROM ""equity_prices_2d""
+WHERE ""open"" > ""close""
+
+","```sql
+SELECT ""open"", ""close""
+FROM ""equity_prices_2d""
+WHERE ""open"" > ""close""
+```
+","
+SELECT ""open"", ""close""
+FROM ""equity_prices_2d""
+WHERE ""open"" > ""close""
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 60
+ Code: 60. DB::Exception: Unknown table expression identifier 'equity_prices_2d' in scope SELECT open, close FROM equity_prices_2d WHERE open > close. (UNKNOWN_TABLE) (version 24.12.1.1425 (official build))
+",success
+Give me the list of Gap Up stocks.,"- **Intent**: Retrieve a list of stocks that gapped up.
+- **Required Tables**: `equity_prices_2d`
+- **Columns**: `security_code`, `date_time`, `open`, `close`
+- **Conditions**: `open` >  yesterday's `close`  (This will require a self-join or subquery to access previous day's closing price for the same security)
+- **Joins**: Self-join of `equity_prices_2d` on `security_code` with a date offset of 1 day.  (OR a subquery approach could be used)
+- **Aggregations**: None
+- **Sorting/Grouping**:  Potentially sort by `date_time` to provide the most recent gap-ups first.
+","SELECT ""t1"".""security_code""
+FROM ""equity_prices_2d"" AS ""t1""
+INNER JOIN ""equity_prices_2d"" AS ""t2"" ON ""t1"".""security_code"" = ""t2"".""security_code"" AND toDate(""t1"".""date_time"") = addDays(toDate(""t2"".""date_time""), 1)
+WHERE ""t1"".""open"" > ""t2"".""close""
+ORDER BY ""t1"".""date_time"" DESC
+
+","```sql
+SELECT ""t1"".""security_code""
+FROM ""equity_prices_2d"" AS ""t1""
+INNER JOIN ""equity_prices_2d"" AS ""t2"" ON ""t1"".""security_code"" = ""t2"".""security_code"" AND toDate(""t1"".""date_time"") = addDays(toDate(""t2"".""date_time""), 1)
+WHERE ""t1"".""open"" > ""t2"".""close""
+ORDER BY ""t1"".""date_time"" DESC
+
+```
+","
+SELECT ""t1"".""security_code""
+FROM ""equity_prices_2d"" AS ""t1""
+INNER JOIN ""equity_prices_2d"" AS ""t2"" ON ""t1"".""security_code"" = ""t2"".""security_code"" AND toDate(""t1"".""date_time"") = addDays(toDate(""t2"".""date_time""), 1)
+WHERE ""t1"".""open"" > ""t2"".""close""
+ORDER BY ""t1"".""date_time"" DESC
+
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 60
+ Code: 60. DB::Exception: Unknown table expression identifier 'equity_prices_2d' in scope SELECT t1.security_code FROM equity_prices_2d AS t1 INNER JOIN equity_prices_2d AS t2 ON (t1.security_code = t2.security_code) AND (toDate(t1.date_time) = addDays(toDate(t2.date_time), 1)) WHERE t1.open > t2.close ORDER BY t1.date_time DESC. (UNKNOWN_TABLE) (version 24.12.1.1425 (official build))
+","failed because
+Error HTTPConnectionPool(host='202.131.150.31', port=8123): Max retries exceeded with url: /?date_time_input_format=best_effort&session_id=f411e5fd-66fc-4d25-b92a-dbb995f76319&database=db_strike&client_protocol_version=54405&enable_http_compression=1&wait_end_of_query=1&send_progress_in_http_headers=1&http_headers_progress_interval_ms=120000 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000179DC740F50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) executing HTTP request attempt 2 (http://202.131.150.31:8123)"
+Can you list stocks with low price volatility and consistent trading volume over the past month?,"- **Intent**: Retrieve stocks with low price volatility and consistent trading volume over the past month.
+- **Required Tables**: `equity_prices_2d`
+- **Columns**: `security_code`, `high`, `low`, `volume`, `date_time`
+- **Conditions**: `date_time BETWEEN DATE('now', '-1 month') AND DATE('now')`
+- **Joins**: None
+- **Aggregations**: None (Volatility and consistency will be calculated after retrieving the data.  Standard deviation for volatility, and potentially coefficient of variation for volume consistency would be appropriate metrics but requires post-processing of the retrieved data).
+- **Sorting/Grouping**:  `GROUP BY security_code` (to calculate volatility and consistency metrics per stock).  No specific sorting mentioned in the query.
+","```sql
+SELECT ""security_code"", ""high"", ""low"", ""volume""
+FROM ""equity_prices_2d""
+WHERE ""date_time"" BETWEEN DATE('now', '-1 month') AND DATE('now')
+GROUP BY ""security_code"";
+```","```sql
+SELECT ""security_code"", MAX(""high"") AS ""high"", MIN(""low"") AS ""low"", SUM(""volume"") AS ""volume""
+FROM ""equity_prices_2d""
+WHERE ""date_time"" BETWEEN DATE('now', '-1 month') AND DATE('now')
+GROUP BY ""security_code"";
+```
+","
+SELECT ""security_code"", MAX(""high"") AS ""high"", MIN(""low"") AS ""low"", SUM(""volume"") AS ""volume""
+FROM ""equity_prices_2d""
+WHERE ""date_time"" BETWEEN DATE('now', '-1 month') AND DATE('now')
+GROUP BY ""security_code"";
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 210 (end of query) (line 5, col 25): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+Error HTTPConnectionPool(host='202.131.150.31', port=8123): Max retries exceeded with url: /?date_time_input_format=best_effort&session_id=f411e5fd-66fc-4d25-b92a-dbb995f76319&database=db_strike&client_protocol_version=54405&enable_http_compression=1&wait_end_of_query=1&send_progress_in_http_headers=1&http_headers_progress_interval_ms=120000 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000179DC741A30>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) executing HTTP request attempt 1 (http://202.131.150.31:8123)"
+"What?s the return of the sugar sector in the last 10 days, and give me the list of top 5 best performing stocks and top 5 worst performing stocks?","- **Intent**: Calculate the return of the sugar sector over the last 10 days and identify the top 5 best and worst-performing stocks within that sector.
+
+- **Required Tables**: `master_prime_2d`, `equity_prices_2d`
+
+- **Columns**: 
+    - `master_prime_2d`: `security_code`, `short_company_name`, `major_sector_name`
+    - `equity_prices_2d`: `date_time`, `security_code`, `close`
+
+- **Conditions**:
+    - `master_prime_2d.major_sector_name = 'Sugar'`
+    - `equity_prices_2d.date_time` within the last 10 days (calculated relative to the current date)
+
+
+- **Joins**: `master_prime_2d.security_code = equity_prices_2d.security_code`
+
+- **Aggregations**: None explicitly mentioned in the query, but calculations will be needed for percentage change in closing price over the 10-day period.  This will likely involve selecting the closing price for the current date and the closing price 10 days prior.
+
+- **Sorting/Grouping**:
+    - Sort by percentage change in closing price (descending for best performers, ascending for worst performers).
+    - Limit to top 5 for both best and worst performers. This will require two separate queries or a union.
+
+
+  
+","```sql
+SELECT * FROM (SELECT ""short_company_name"", (t2.""close"" - t1.""close"") * 100 / t1.""close"" AS per_change FROM (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-19' ) AS t2 INNER JOIN (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-09' ) AS t1 ON t1.""security_code"" = t2.""security_code"" INNER JOIN (SELECT ""security_code"", ""short_company_name"" FROM ""master_prime_2d"" WHERE ""major_sector_name"" = 'Sugar') AS t3 ON t3.""security_code"" = t2.""security_code"" ORDER BY per_change DESC LIMIT 5) UNION ALL SELECT * FROM (SELECT ""short_company_name"", (t2.""close"" - t1.""close"") * 100 / t1.""close"" AS per_change FROM (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-19' ) AS t2 INNER JOIN (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-09' ) AS t1 ON t1.""security_code"" = t2.""security_code"" INNER JOIN (SELECT ""security_code"", ""short_company_name"" FROM ""master_prime_2d"" WHERE ""major_sector_name"" = 'Sugar') AS t3 ON t3.""security_code"" = t2.""security_code"" ORDER BY per_change ASC LIMIT 5)
+```","```sql
+SELECT ""short_company_name"", (t2.""close"" - t1.""close"") * 100 / t1.""close"" AS per_change FROM (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-19' ) AS t2 INNER JOIN (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-09' ) AS t1 ON t1.""security_code"" = t2.""security_code"" INNER JOIN (SELECT ""security_code"", ""short_company_name"" FROM ""master_prime_2d"" WHERE ""major_sector_name"" = 'Sugar') AS t3 ON t3.""security_code"" = t2.""security_code"" UNION ALL SELECT ""short_company_name"", (t4.""close"" - t5.""close"") * 100 / t5.""close"" AS per_change FROM (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-19' ) AS t4 INNER JOIN (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-09' ) AS t5 ON t5.""security_code"" = t4.""security_code"" INNER JOIN (SELECT ""security_code"", ""short_company_name"" FROM ""master_prime_2d"" WHERE ""major_sector_name"" = 'Sugar') AS t6 ON t6.""security_code"" = t4.""security_code"" 
+```
+","
+SELECT ""short_company_name"", (t2.""close"" - t1.""close"") * 100 / t1.""close"" AS per_change FROM (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-19' ) AS t2 INNER JOIN (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-09' ) AS t1 ON t1.""security_code"" = t2.""security_code"" INNER JOIN (SELECT ""security_code"", ""short_company_name"" FROM ""master_prime_2d"" WHERE ""major_sector_name"" = 'Sugar') AS t3 ON t3.""security_code"" = t2.""security_code"" UNION ALL SELECT ""short_company_name"", (t4.""close"" - t5.""close"") * 100 / t5.""close"" AS per_change FROM (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-19' ) AS t4 INNER JOIN (SELECT ""close"", ""security_code"" FROM ""equity_prices_2d"" WHERE ""date_time"" = '2024-11-09' ) AS t5 ON t5.""security_code"" = t4.""security_code"" INNER JOIN (SELECT ""security_code"", ""short_company_name"" FROM ""master_prime_2d"" WHERE ""major_sector_name"" = 'Sugar') AS t6 ON t6.""security_code"" = t4.""security_code"" 
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 60
+ Code: 60. DB::Exception: Unknown table expression identifier 'equity_prices_2d' in scope SELECT close, security_code FROM equity_prices_2d WHERE date_time = '2024-11-19'. (UNKNOWN_TABLE) (version 24.12.1.1425 (official build))
+","failed because
+Error HTTPConnectionPool(host='202.131.150.31', port=8123): Max retries exceeded with url: /?date_time_input_format=best_effort&session_id=f411e5fd-66fc-4d25-b92a-dbb995f76319&database=db_strike&client_protocol_version=54405&enable_http_compression=1&wait_end_of_query=1&send_progress_in_http_headers=1&http_headers_progress_interval_ms=120000 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000179DC741F40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) executing HTTP request attempt 1 (http://202.131.150.31:8123)"
+"Give me the 5 best-performing stocks of Nifty500 from 15th September 2023 to 26th October 2023 and filter out 2 among 5 which have the least performance in the next 10 days. Also, show the next 10-day performance.","- **Intent**: Find the 5 best-performing Nifty500 stocks between 15-09-2023 and 26-10-2023, then filter out 2 of those 5 with the lowest performance over the next 10 days. Show the next 10-day performance.
+
+- **Required Tables**: `master_prime_2d`, `equity_prices_2d`
+
+- **Columns**: `security_code`, `index_name`, `close`, `date_time`
+
+- **Conditions**: 
+    - `index_name = 'Nifty 500'`
+    - `date_time BETWEEN '2023-09-15' AND '2023-10-26'` (Period 1)
+    - `date_time BETWEEN '2023-10-27' AND '2023-11-05'` (Period 2 - next 10 days)
+
+- **Joins**: `master_prime_2d.security_code = equity_prices_2d.security_code`
+
+- **Aggregations**: None (Performance will be calculated based on the closing prices. Aggregation is not explicitly mentioned in the natural language query). Implicitly, to get performance some aggregation needs to be done e.g. last closing price in Period 1 - first closing price in Period 1 and last closing price in period 2 - first closing price in period 2
+
+- **Sorting/Grouping**:
+    - Sort by performance (calculated as percentage change in `close` price) during Period 1 in descending order (to get the top 5).
+    - Sort the top 5 by performance (calculated as percentage change in `close` price) during Period 2 in ascending order and filter out 2 stocks.
+
+
+
+","```sql
+SELECT ""security_code"", ""p2_performance""
+FROM (
+    SELECT ""security_code"", ""p2_performance"", ROW_NUMBER() OVER (ORDER BY ""p2_performance"" ASC) AS ""rn""
+    FROM (
+        SELECT ""security_code"", (last_close_p2 - first_close_p2) * 100 / first_close_p2 AS ""p2_performance""
+        FROM (
+            SELECT ""security_code"", ""date_time"", ""close"",
+                first_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS first_close_p2,
+                last_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS last_close_p2
+            FROM ""equity_prices_2d""
+            WHERE ""date_time"" BETWEEN '2023-10-27' AND '2023-11-05'
+        ) AS period2_prices
+    ) AS period2_performance
+    INNER JOIN (
+        SELECT ""security_code"", (last_close_p1 - first_close_p1) * 100 / first_close_p1 AS ""p1_performance""
+        FROM (
+            SELECT ""security_code"", ""date_time"", ""close"",
+                   first_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS first_close_p1,
+                   last_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS last_close_p1                   
+            FROM ""equity_prices_2d""
+            WHERE ""date_time"" BETWEEN '2023-09-15' AND '2023-10-26'
+        ) AS period1_prices
+        INNER JOIN ""master_prime_2d"" ON ""period1_prices"".""security_code"" = ""master_prime_2d"".""security_code""
+        WHERE ""index_name"" LIKE '%Nifty 500%'
+        ORDER BY ""p1_performance"" DESC
+        LIMIT 5
+    ) AS top5_period1 ON ""period2_performance"".""security_code"" = ""top5_period1"".""security_code""    
+)
+WHERE ""rn"" > 2;
+
+```","```sql
+SELECT ""security_code"", ""p2_performance""
+FROM (
+    SELECT ""security_code"", ""p2_performance"", ROW_NUMBER() OVER (ORDER BY ""p2_performance"" ASC) AS ""rn""
+    FROM (
+        SELECT ""security_code"", (last_close_p2 - first_close_p2) * 100 / first_close_p2 AS ""p2_performance""
+        FROM (
+            SELECT ""security_code"", ""date_time"", ""close"",
+                first_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS first_close_p2,
+                last_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS last_close_p2
+            FROM ""equity_prices_2d""
+            WHERE ""date_time"" BETWEEN '2023-10-27' AND '2023-11-05'
+        ) AS period2_prices
+    ) AS period2_performance
+    INNER JOIN (
+        SELECT ""security_code"", (last_close_p1 - first_close_p1) * 100 / first_close_p1 AS ""p1_performance""
+        FROM (
+            SELECT ""security_code"", ""date_time"", ""close"",
+                   first_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS first_close_p1,
+                   last_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS last_close_p1                   
+            FROM ""equity_prices_2d""
+            WHERE ""date_time"" BETWEEN '2023-09-15' AND '2023-10-26'
+        ) AS period1_prices
+        INNER JOIN ""master_prime_2d"" ON ""period1_prices"".""security_code"" = ""master_prime_2d"".""security_code""
+        WHERE ""index_name"" LIKE '%Nifty 500%'
+        ORDER BY ""p1_performance"" DESC
+        LIMIT 5
+    ) AS top5_period1 ON ""period2_performance"".""security_code"" = ""top5_period1"".""security_code""    
+)
+WHERE ""rn"" > 2;
+```","
+SELECT ""security_code"", ""p2_performance""
+FROM (
+    SELECT ""security_code"", ""p2_performance"", ROW_NUMBER() OVER (ORDER BY ""p2_performance"" ASC) AS ""rn""
+    FROM (
+        SELECT ""security_code"", (last_close_p2 - first_close_p2) * 100 / first_close_p2 AS ""p2_performance""
+        FROM (
+            SELECT ""security_code"", ""date_time"", ""close"",
+                first_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS first_close_p2,
+                last_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS last_close_p2
+            FROM ""equity_prices_2d""
+            WHERE ""date_time"" BETWEEN '2023-10-27' AND '2023-11-05'
+        ) AS period2_prices
+    ) AS period2_performance
+    INNER JOIN (
+        SELECT ""security_code"", (last_close_p1 - first_close_p1) * 100 / first_close_p1 AS ""p1_performance""
+        FROM (
+            SELECT ""security_code"", ""date_time"", ""close"",
+                   first_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS first_close_p1,
+                   last_value(""close"") OVER (PARTITION BY ""security_code"" ORDER BY ""date_time"" ASC) AS last_close_p1                   
+            FROM ""equity_prices_2d""
+            WHERE ""date_time"" BETWEEN '2023-09-15' AND '2023-10-26'
+        ) AS period1_prices
+        INNER JOIN ""master_prime_2d"" ON ""period1_prices"".""security_code"" = ""master_prime_2d"".""security_code""
+        WHERE ""index_name"" LIKE '%Nifty 500%'
+        ORDER BY ""p1_performance"" DESC
+        LIMIT 5
+    ) AS top5_period1 ON ""period2_performance"".""security_code"" = ""top5_period1"".""security_code""    
+)
+WHERE ""rn"" > 2;
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 1650 (end of query) (line 30, col 15): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 1650 (end of query) (line 30, col 15): ;
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+"
+Give me the performance of all Nifty500 stocks from 15th September 2023 to 26th October 2023.,"- **Intent**: Retrieve the performance (open, high, low, close, volume) of all Nifty 500 stocks from 15th September 2023 to 26th October 2023.
+- **Required Tables**: `master_prime_2d`, `equity_prices_2d`
+- **Columns**: `open`, `high`, `low`, `close`, `volume`, `date_time`
+- **Conditions**: `index_name = 'Nifty 500'`, `date_time BETWEEN '2023-09-15' AND '2023-10-26'`
+- **Joins**: `master_prime_2d.security_code = equity_prices_2d.security_code`
+- **Aggregations**: None
+- **Sorting/Grouping**: None 
+","```sql
+SELECT ""open"", ""high"", ""low"", ""close"", ""volume"", ""date_time""
+FROM ""equity_prices_2d""
+INNER JOIN ""master_prime_2d"" ON ""equity_prices_2d"".""security_code"" = ""master_prime_2d"".""security_code""
+WHERE ""index_name"" = 'Nifty 500' AND ""date_time"" BETWEEN '2023-09-15' AND '2023-10-26';
+```","```sql
+SELECT ""open"", ""high"", ""low"", ""close"", ""volume"", ""date_time""
+FROM ""equity_prices_2d""
+INNER JOIN ""master_prime_2d"" ON ""equity_prices_2d"".""security_code"" = ""master_prime_2d"".""security_code""
+WHERE ""index_name"" = 'Nifty 500' AND ""date_time"" BETWEEN '2023-09-15' AND '2023-10-26';
+```
+","
+SELECT ""open"", ""high"", ""low"", ""close"", ""volume"", ""date_time""
+FROM ""equity_prices_2d""
+INNER JOIN ""master_prime_2d"" ON ""equity_prices_2d"".""security_code"" = ""master_prime_2d"".""security_code""
+WHERE ""index_name"" = 'Nifty 500' AND ""date_time"" BETWEEN '2023-09-15' AND '2023-10-26';
+
+","HTTPDriver for http://localhost:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 276 (end of query) (line 5, col 87): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.12.1.1425 (official build))
+","failed because
+HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error (Multi-statements are not allowed): failed at position 276 (end of query) (line 5, col 87): ;
+
+
+ FORMAT Native. . (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+"

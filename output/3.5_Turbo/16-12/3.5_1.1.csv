@@ -1,0 +1,3237 @@
+user_query,Preprocessed,Raw SQL,Final SQL,result,
+"Give me the 10-day, 20-day, 30-day, and 6-month performance of all Nifty50 stocks whenever it has given 3 consecutive weeks of positive gains.","**Preprocessed Query:**
+
+Intent: Retrieve the 10-day, 20-day, 30-day, and 6-month performance of Nifty50 stocks when they have shown 3 cocutive weeks of positive gains.
+
+Required Tables:
+- `master_prime_1d`
+- `equity_prices_1d`
+
+Columns:
+- `security_code` (master_prime_1d, equity_prices_1d)
+- `company_name` (master_prime_1d)
+- `short_company_name` (master_prime_1d)
+- `industry_name` (master_prime_1d)
+- `broad_industry_name` (master_prime_1d)
+- `major_sector_name` (master_prime_1d)
+- `index_name` (master_prime_1d)
+- `date_time` (equity_prices_1d)
+- `open` (equity_prices_1d)
+- `high` (equity_prices_1d)
+- `low` (equity_prices_1d)
+- `close` (equity_prices_1d)
+- `volume` (equity_prices_1d)
+
+Conditions:
+- Identify Nifty50 stocks with 3 cocutive weeks of positive gains
+
+Aggregations:
+- Calculate the performance over 10-day, 20-day, 30-day, and 6-month periods for the identified stocks
+
+Sorting/Grouping:
+- No specific sorting/grouping mentioned
+
+Validation:
+- Validate that all columns strictly belong to the specified tables in the schema
+
+Adjusted Components:
+- Excluded any columns not present in the specified schema
+
+Structured Output:
+```
+SELECT 
+    m.security_code,
+    m.company_name,
+    m.short_company_name,
+    m.industry_name,
+    m.broad_industry_name,
+    m.major_sector_name,
+    m.index_name,
+    ep.date_time,
+    ep.open,
+    ep.high,
+    ep.low,
+    ep.close,
+    ep.volume
+FROM 
+    master_prime_1d m
+JOIN 
+    equity_prices_1d ep ON m.security_code = ep.security_code
+WHERE
+    -- Conditions for identifying Nifty50 stocks with 3 cocutive weeks of positive gains
+    -- Performance calculations over 10-day, 20-day, 30-day, and 6-month periods
+```","```sql
+SELECT 
+    m.security_code,
+    m.company_name,
+    m.short_company_name,
+    m.industry_name,
+    m.broad_industry_name,
+    m.major_sector_name,
+    m.index_name,
+    ep.date_time,
+    ep.open,
+    ep.high,
+    ep.low,
+    ep.close,
+    ep.volume
+FROM 
+    master_prime_1d AS m
+JOIN 
+    equity_prices_1d AS ep ON m.security_code = ep.security_code
+WHERE
+    ep.date_time <= '2024-11-19 00:00:00'
+    -- Conditions for identifying Nifty50 stocks with 3 consecutive weeks of positive gains
+    -- Performance calculations over 10-day, 20-day, 30-day, and 6-month periods
+```  ","SELECT 
+    m.security_code,
+    m.company_name,
+    m.short_company_name,
+    m.industry_name,
+    m.broad_industry_name,
+    m.major_sector_name,
+    m.index_name,
+    ep.date_time,
+    ep.open,
+    ep.high,
+    ep.low,
+    ep.close,
+    ep.volume
+FROM 
+    master_prime_1d AS m
+JOIN 
+    equity_prices_1d AS ep ON m.security_code = ep.security_code
+WHERE
+    ep.date_time <= '2024-11-19'",[],"('Connection broken: IncompleteRead(0 bytes read, 2 more expected)', IncompleteRead(0 bytes read, 2 more expected))"
+Which stocks on NSE showed the highest price increase in the last trading session?,"**Preprocessed Query:**
+
+Intent: Find the stocks on  that showed the highest price increase in the last trading session.
+
+Required Tables:
+- `master_prime_1d`
+- `equity_prices_1d`
+
+Columns:
+- `master_prime_1d.security_code`
+- `master_prime_1d.company_name`
+- `equity_prices_1d.date_time`
+- `equity_prices_1d.security_code`
+- `equity_prices_1d.open`
+- `equity_prices_1d.high`
+- `equity_prices_1d.low`
+- `equity_prices_1d.close`
+
+Conditions:
+- Filter data for the last trading session.
+
+Aggregations:
+- Calculate the price increase for each stock by subtracting the opening price from the closing price.
+
+Sorting:
+- Identify the stocks with the highest price increase.
+
+**Structured Query:**
+
+```sql
+SELECT mp.security_code, mp.company_name, ep.date_time, ep.open, ep.high, ep.low, ep.close, (ep.close - ep.open) AS price_increase
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = (SELECT MAX(date_time) FROM equity_prices_1d)
+ORDER BY price_increase DESC
+LIMIT 1;
+``` 
+
+This query will return the stock on  that showed the highest price increase in the last trading session, along with relevant details such as company name, prices, and the calculated price increase.","```sql
+SELECT mp.security_code, mp.company_name, ep.date_time, ep.open, ep.high, ep.low, ep.close, (ep.close - ep.open) AS price_increase
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-11-19 00:00:00'
+ORDER BY price_increase DESC
+LIMIT 1;
+``` ","SELECT mp.security_code, mp.company_name, ep.date_time, ep.open, ep.high, ep.low, ep.close, (ep.close - ep.open) AS price_increase
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-11-19'
+ORDER BY price_increase DESC
+LIMIT 1;",[],
+Which stocks had the highest volume traded/volume buzzer compared to yesterday on NSE?,"{
+    ""Intent"": ""Retrieve stocks with the highest volume traded compared to yesterday on "",
+    ""Tables"": [""equity_prices_1d""],
+    ""Columns"": [""security_code"", ""volume""],
+    ""Conditions"": [""date_time = CURRENT_DATE - INTERVAL 1 DAY""],
+    ""Join"": ""N/A"",
+    ""Aggregations"": [""MAX(volume) as max_volume""],
+    ""Sorting"": ""max_volume DESC"",
+    ""Grouping"": ""security_code""
+}","```sql
+SELECT security_code, MAX(volume) as max_volume
+FROM equity_prices_1d
+WHERE date_time = '2024-11-19' - INTERVAL 1 DAY
+GROUP BY security_code
+ORDER BY max_volume DESC
+```","SELECT e.security_code, MAX(e.volume) as max_volume
+FROM equity_prices_1d e
+WHERE e.date_time = '2024-11-18'
+GROUP BY e.security_code
+ORDER BY max_volume DESC",[],
+Which stocks had the highest volume traded/volume buzzer on NSE?,"**Preprocessed Query:**
+- **Intent:** Find the stocks with the highest volume traded on .
+- **Tables:** `equity_prices_1d`
+- **Columns:** `security_code`, `volume`
+- **Conditions:** None
+- **Aggregations:** `MAX(volume)`
+- **Sorting:** `volume DESC`
+
+**Structured Query:**
+```sql
+SELECT security_code, MAX(volume) AS max_volume
+FROM equity_prices_1d
+ORDER BY max_volume DESC;
+```","```sql
+SELECT ep.security_code, MAX(ep.volume) AS max_volume
+FROM equity_prices_1d AS ep
+WHERE ep.date_time = '2024-11-19 00:00:00'
+GROUP BY ep.security_code
+ORDER BY max_volume DESC
+LIMIT 1;
+```","SELECT ep.security_code, MAX(ep.volume) AS max_volume
+FROM equity_prices_1d AS ep
+WHERE ep.date_time = '2024-11-19'
+GROUP BY ep.security_code
+ORDER BY max_volume DESC
+LIMIT 1;",[],
+Which NSE stocks closed above ?1000 with a 10% increase in trading volume compared to their average?,"- Intent: Retrieve  stocks that closed above ?1000 with a 10% increase in trading volume compared to their average.
+- Tables: `equity_prices_1d`
+- Columns: `security_code`, `close`, `volume`
+- Conditions:
+    - Filter stocks where `close` > ?1000
+    - Calculate the average trading volume for each stock
+    - Filter stocks with a 10% increase in trading volume compared to their average
+- Aggregations: Average trading volume
+- Sorting/Grouping: None
+
+```sql
+SELECT security_code
+FROM equity_prices_1d
+WHERE close > 1000
+GROUP BY security_code
+HAVING AVG(volume) * 1.1 < MAX(volume)
+```","```sql
+SELECT ep.security_code
+FROM equity_prices_1d ep
+WHERE ep.close > 1000
+AND toDate(ep.date_time) = toDate('2024-11-19')
+GROUP BY ep.security_code
+HAVING AVG(ep.volume) * 1.1 < MAX(ep.volume)
+```","SELECT ep.security_code
+FROM equity_prices_1d ep
+INNER JOIN master_prime_1d mp ON ep.security_code = mp.security_code
+WHERE ep.close > 1000
+AND toDate(ep.date_time) = toDate('2024-11-19')
+GROUP BY ep.security_code
+HAVING AVG(ep.volume) * 1.1 < MAX(ep.volume)",[],
+What are the top 5 most actively traded stocks on NSE today?,"Based on the provided schema and query, here is the preprocessed structured format of the query components:
+
+Intent: Retrieve the top 5 most actively traded stocks on  today.
+
+Tables:
+- `master_prime_1d`
+- `equity_prices_1d`
+
+Columns:
+- `security_code` (from `master_prime_1d`)
+- `company_name` (from `master_prime_1d`)
+- `volume` (from `equity_prices_1d`)
+- `date_time` (from `equity_prices_1d`)
+
+Conditions:
+- Filter stocks from  (specific condition not available in schema)
+
+Aggregations:
+- Aggregate volume to identify the most actively traded stocks
+
+Sorting:
+- Sort by descending order of volume
+
+Note: The specific condition for  stocks is not available in the provided schema. However, the query can be structured to select the top 5 most actively traded stocks based on volume without filtering by stock exchange.
+
+Let me know if you need any SQL query generated based on this preprocessing.","```sql
+SELECT m.security_code, m.company_name, SUM(e.volume) AS total_volume
+FROM master_prime_1d m
+JOIN equity_prices_1d e ON m.security_code = e.security_code
+WHERE date_time = '2024-11-19 00:00:00'
+GROUP BY m.security_code, m.company_name
+ORDER BY total_volume DESC
+LIMIT 5;
+```","SELECT m.security_code, m.company_name, SUM(e.volume) AS total_volume
+FROM master_prime_1d m
+JOIN equity_prices_1d e ON m.security_code = e.security_code
+WHERE e.date_time = '2024-11-19'
+GROUP BY m.security_code, m.company_name
+ORDER BY total_volume DESC
+LIMIT 5;",[],
+Which stocks saw a price gap-up at the open but closed lower than the opening price?,"Structured Query:
+
+Intent: Identifying stocks that experienced a price gap-up at the open but closed lower than the opening price.
+
+Components:
+- Tables: equity_prices_1d
+- Columns: security_code, date_time, open, close
+- Conditions: open price < close price
+- Sorting/Grouping: Not specified
+
+SQL Query:
+```sql
+SELECT security_code, date_time, open, close
+FROM equity_prices_1d
+WHERE open < close
+ORDER BY date_time;
+```","```sql
+SELECT ep.security_code, ep.date_time, ep.open, ep.close
+FROM equity_prices_1d AS ep
+WHERE ep.open < ep.close
+AND ep.date_time = '2024-11-19'
+ORDER BY ep.date_time;
+```","SELECT ep.security_code, ep.date_time, ep.open, ep.close
+FROM equity_prices_1d AS ep
+JOIN master_prime_1d AS mp ON ep.security_code = mp.security_code
+WHERE ep.open < ep.close
+AND ep.date_time = '2024-11-19'
+ORDER BY ep.date_time;",[],
+"Give me the 5 best-performing stocks of Nifty500 from 15th September 2023 to 26th October 2023 and filter out 2 among 5 which have the least performance in the next 10 days. Also, show the next 10-day performance.","**Query Preprocessing:**
+
+**Intent:** Find the 5 best-performing stocks of Nifty500 from 15th September 2023 to 26th October 2023 and identify 2 stocks with the least performance in the next 10 days with their performance.
+
+**Required Tables:**
+- `master_prime_1d`
+- `equity_prices_1d`
+
+**Columns:**
+- `master_prime_1d`: security_code, company_name, short_company_name, industry_name, broad_industry_name, major_sector_name, index_name
+- `equity_prices_1d`: date_time, security_code, open, high, low, close, volume, version
+
+**Conditions:**
+- Stock market data for Nifty500
+- Date range: 15th September 2023 to 26th October 2023
+- Performance evaluation for the top 5 stocks and their performance for the next 10 days
+
+**Aggregations/Sorting:**
+- Identify the 5 best-performing stocks based on a certain metric (to be specified)
+- Sort the stocks based on the performance for further filtering
+
+**Next Steps:**
+1. Determine the metric for measuring stock performance (e.g., percentage change in closing price)
+2. Define the specific columns or computations required to assess stock performance over the given time frames.","```sql
+SELECT
+    mp.security_code,
+    mp.company_name,
+    mp.short_company_name,
+    mp.industry_name,
+    mp.broad_industry_name,
+    mp.major_sector_name,
+    mp.index_name,
+    ep.close AS closing_price,
+    ep.date_time AS price_date
+FROM
+    (
+        SELECT
+            security_code,
+            MAX(close) AS closing_price
+        FROM
+            equity_prices_1d
+        WHERE
+            date_time BETWEEN '2023-09-15' AND '2023-10-26'
+        GROUP BY
+            security_code
+        ORDER BY
+            closing_price DESC
+        LIMIT 5
+    ) top_performing
+JOIN
+    master_prime_1d mp ON top_performing.security_code = mp.security_code
+JOIN
+    equity_prices_1d ep ON top_performing.security_code = ep.security_code
+WHERE
+    ep.date_time BETWEEN '2023-10-27' AND '2023-11-05'
+ORDER BY
+    closing_price
+LIMIT 2;
+```  ","SELECT
+    mp.security_code,
+    mp.company_name,
+    mp.short_company_name,
+    mp.industry_name,
+    mp.broad_industry_name,
+    mp.major_sector_name,
+    mp.index_name,
+    ep.close AS closing_price,
+    ep.date_time AS price_date
+FROM
+    (
+        SELECT
+            security_code,
+            MAX(close) AS closing_price
+        FROM
+            equity_prices_1d
+        WHERE
+            date_time BETWEEN '2023-09-15' AND '2023-10-26'
+        GROUP BY
+            security_code
+        ORDER BY
+            closing_price DESC
+        LIMIT 5
+    ) top_performing
+JOIN
+    master_prime_1d mp ON top_performing.security_code = mp.security_code
+JOIN
+    equity_prices_1d ep ON top_performing.security_code = ep.security_code
+WHERE
+    ep.date_time BETWEEN '2023-10-27' AND '2023-11-05'
+ORDER BY
+    closing_price
+LIMIT 2;",[],
+Give me the performance of all Nifty500 stocks from 15th September 2023 to 26th October 2023.,"Structured Format of the Preprocessed Query:
+Intent: Retrieve the performance of all Nifty500 stocks
+Tables: equity_prices_1d
+Columns: date_time, security_code, open, high, low, close
+Conditions: Date range from 15th September 2023 to 26th October 2023
+Joins: None
+Aggregations: None
+Sorting/Grouping: None
+
+Preprocessed SQL Query:
+```sql
+SELECT date_time, security_code, open, high, low, close
+FROM equity_prices_1d
+WHERE date_time >= '2023-09-15' AND date_time <= '2023-10-26'
+```","SELECT date_time, equity_prices_1d.security_code, open, high, low, close
+FROM equity_prices_1d
+WHERE date_time >= '2023-09-15' AND date_time <= '2023-10-26'","SELECT equity_prices_1d.date_time, equity_prices_1d.security_code, equity_prices_1d.open, equity_prices_1d.high, equity_prices_1d.low, equity_prices_1d.close
+FROM equity_prices_1d
+WHERE equity_prices_1d.date_time >= '2023-09-15' AND equity_prices_1d.date_time <= '2023-10-26'",[],
+Give me the top 10 best and worst performers of all Nifty500 stocks from 9th September 2024 to 27th September 2024.,"**Query Preprocessing:**
+
+**Intent:** Find the top 10 best and worst performers of all Nifty500 stocks from 9th September 2024 to 27th September 2024.
+
+**Required Tables:**
+- `master_prime_1d`
+- `equity_prices_1d`
+
+**Columns:**
+- `date_time` (from `equity_prices_1d`)
+- `security_code` (from both `master_prime_1d` and `equity_prices_1d`)
+- `close` (from `equity_prices_1d`)
+
+**Conditions:**
+- Date range between 9th September 2024 and 27th September 2024
+- Stocks belong to Nifty500 index
+
+**Joins:**
+- Join on `security_code` between `master_prime_1d` and `equity_prices_1d`
+
+**Aggregations:**
+- Calculate the performance based on the percentage change in the `close` price over the specified date range
+
+**Sorting:**
+- Sort the results to identify the top 10 best and worst performers based on the calculated performance
+
+This preprocessing will help in constructing the SQL query to retrieve the top 10 best and worst performers of all Nifty500 stocks within the specified date range.","```sql
+SELECT
+    m.security_code,
+    m.company_name,
+    m.industry_name,
+    m.broad_industry_name,
+    m.major_sector_name,
+    m.index_name,
+    ((e.close - e_open) / e_open) * 100 AS performance
+FROM
+    equity_prices_1d e
+JOIN
+    master_prime_1d m ON e.security_code = m.security_code
+WHERE
+    e.date_time >= '2024-09-09' AND e.date_time <= '2024-09-27' AND m.index_name = 'Nifty500'
+ORDER BY
+    performance DESC
+LIMIT 10
+
+UNION ALL
+
+SELECT
+    m.security_code,
+    m.company_name,
+    m.industry_name,
+    m.broad_industry_name,
+    m.major_sector_name,
+    m.index_name,
+    ((e.close - e_open) / e_open) * 100 AS performance
+FROM
+    equity_prices_1d e
+JOIN
+    master_prime_1d m ON e.security_code = m.security_code
+WHERE
+    e.date_time >= '2024-09-09' AND e.date_time <= '2024-09-27' AND m.index_name = 'Nifty500'
+ORDER BY
+    performance ASC
+LIMIT 10
+```  ","SELECT
+    m.security_code,
+    m.company_name,
+    m.industry_name,
+    m.broad_industry_name,
+    m.major_sector_name,
+    m.index_name,
+    ((e.close - e.open) / e.open) * 100 AS performance
+FROM
+    equity_prices_1d e
+JOIN
+    master_prime_1d m ON e.security_code = m.security_code
+WHERE
+    e.date_time >= '2024-09-09' AND e.date_time <= '2024-09-27' AND m.index_name = 'Nifty500'
+ORDER BY
+    performance DESC
+LIMIT 10
+
+UNION ALL
+
+SELECT
+    m.security_code,
+    m.company_name,
+    m.industry_name,
+    m.broad_industry_name,
+    m.major_sector_name,
+    m.index_name,
+    ((e.close - e.open) / e.open) * 100 AS performance
+FROM
+    equity_prices_1d e
+JOIN
+    master_prime_1d m ON e.security_code = m.security_code
+WHERE
+    e.date_time >= '2024-09-09' AND e.date_time <= '2024-09-27' AND m.index_name = 'Nifty500'
+ORDER BY
+    performance ASC
+LIMIT 10",[],
+List stocks where today's low > yesterday's high and today's volume is 3x of the previous day's volume on 16th July 2024.,"Based on the provided query and schema, the preprocessed components are as follows:
+
+1. Intent: List stocks
+2. Required tables:
+   - `equity_prices_1d`
+3. Columns:
+   - `security_code`, `high`, `low`, `volume` for both today and yesterday
+4. Conditions:
+   - Today's low > Yesterday's high
+   - Today's volume is 3x of the previous day's volume on 16th July 2024
+5. Joins: Not applicable
+6. Aggregations: Not applicable
+7. Sorting/Grouping: Not specified
+
+Preprocessed structured query components:
+
+Intent: List stocks
+Tables: `equity_prices_1d`
+Columns: 
+- `security_code`
+- `high` (today and yesterday)
+- `low` (today and yesterday)
+- `volume` (today and previous day on 16th July 2024)
+Conditions:
+- Today's low > Yesterday's high
+- Today's volume is 3x of the previous day's volume on 16th July 2024","```sql
+SELECT ep.security_code, ep.high AS today_high, ep.low AS today_low, ep.volume AS today_volume, ep_prev.volume AS prev_day_volume
+FROM equity_prices_1d AS ep
+JOIN equity_prices_1d AS ep_prev ON ep.security_code = ep_prev.security_code AND ep.date_time = '2024-11-19 00:00:00' AND ep_prev.date_time = '2024-11-16 00:00:00'
+WHERE ep.low > ep_prev.high AND ep.volume >= 3 * ep_prev.volume
+```","SELECT ep.security_code, ep.high AS today_high, ep.low AS today_low, ep.volume AS today_volume, ep_prev.volume AS prev_day_volume
+FROM equity_prices_1d AS ep
+JOIN equity_prices_1d AS ep_prev ON ep.security_code = ep_prev.security_code AND ep.date_time = '2024-11-19' AND ep_prev.date_time = '2024-11-16'
+WHERE ep.low > ep_prev.high AND ep.volume >= 3 * ep_prev.volume",[],
+"List stocks where today's price > yesterday's close, and one-day ago price > 2-day ago price, and 2-day ago price > 3-day ago price on 16th July 2024, and next day closing is lesser than the previous day close, and 17th July 2024 volume < previous day volume.","**Preprocessed Query:**
+
+**Intent:** Identify stocks based on specified price and volume conditions on 16th and 17th July 2024.
+
+**Required Tables:**
+- `equity_prices_1d`
+
+**Columns:**
+- `security_code`
+- `close`
+- `volume`
+
+**Conditions:**
+- Today's price > Yesterday's close
+- One-day ago price > 2-day ago price
+- 2-day ago price > 3-day ago price on 16th July 2024
+- Next day closing is lesser than the previous day close on 17th July 2024
+- 17th July 2024 volume < previous day volume
+
+---
+
+```sql
+SELECT A.security_code
+FROM equity_prices_1d A
+JOIN equity_prices_1d B ON A.security_code = B.security_code
+JOIN equity_prices_1d C ON A.security_code = C.security_code
+JOIN equity_prices_1d D ON A.security_code = D.security_code
+WHERE A.date_time = '2024-07-16'
+    AND B.date_time = '2024-07-15'
+    AND C.date_time = '2024-07-14'
+    AND D.date_time = '2024-07-13'
+    AND A.close > B.close
+    AND B.close > C.close
+    AND C.close > D.close
+    AND A.volume < B.volume
+```
+
+Note: The query is structured based on the given schema and the specified conditions.","```sql
+SELECT A.security_code
+FROM equity_prices_1d A
+JOIN equity_prices_1d B ON A.security_code = B.security_code
+JOIN equity_prices_1d C ON A.security_code = C.security_code
+JOIN equity_prices_1d D ON A.security_code = D.security_code
+WHERE A.date_time = '2024-07-16'
+    AND B.date_time = '2024-07-15'
+    AND C.date_time = '2024-07-14'
+    AND D.date_time = '2024-07-13'
+    AND A.close > B.close
+    AND B.close > C.close
+    AND C.close > D.close
+    AND A.volume < B.volume
+```  ","SELECT A.security_code
+FROM equity_prices_1d A
+JOIN equity_prices_1d B ON A.security_code = B.security_code
+JOIN equity_prices_1d C ON A.security_code = C.security_code
+JOIN equity_prices_1d D ON A.security_code = D.security_code
+WHERE A.date_time = '2024-07-16'
+    AND B.date_time = '2024-07-15'
+    AND C.date_time = '2024-07-14'
+    AND D.date_time = '2024-07-13'
+    AND A.close > B.close
+    AND B.close > C.close
+    AND C.close > D.close
+    AND A.volume < B.volume",[],
+List stocks whose volume is +20% than 2 days before volume on 27th September 2024.,"**Intent:** Extract stocks whose volume increased by 20% compared to the volume two days prior on 27th September 2024.
+
+**Required Tables:**
+- `equity_prices_1d`
+
+**Columns:**
+- equity_prices_1d: ['date_time', 'security_code', 'open', 'high', 'low', 'close', 'volume', 'version']
+
+**Conditions:**
+- Calculate the percentage increase in volume between two days.
+- Filter for records on 27th September 2024.
+- Compare the volume on 27th September 2024 with the volume two days before.
+
+**Query:**
+```sql
+SELECT ep1.security_code
+FROM equity_prices_1d ep1
+JOIN equity_prices_1d ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-09-27'
+AND ep2.date_time = '2024-09-25'
+AND ep1.volume > 1.2 * ep2.volume
+```
+
+This query will list the stocks whose volume on 27th September 2024 is at least 20% higher than the volume on 25th September 2024.","```sql
+SELECT ep1.security_code
+FROM equity_prices_1d ep1
+JOIN equity_prices_1d ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-09-27'
+AND ep2.date_time = '2024-09-25'
+AND ep1.volume > 1.2 * ep2.volume
+```","SELECT ep1.security_code
+FROM equity_prices_1d ep1
+JOIN equity_prices_1d ep2 ON ep1.security_code = ep2.security_code
+WHERE ep1.date_time = '2024-09-27'
+AND ep2.date_time = '2024-09-25'
+AND ep1.volume > 1.2 * ep2.volume",[],
+List stocks whose volume is 20% higher than 2 days before volume on 27th September 2024.,"Intent: List stocks whose volume is 20% higher than 2 days before volume on 27th September 2024.
+
+Components:
+- Tables: equity_prices_1d
+- Columns: security_code, volume, date_time
+- Conditions: 
+    - Calculate volume on 27th September 2024 and 2 days before
+    - Filter stocks where volume on 27th September 2024 is 20% higher than 2 days before volume
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT ep.security_code
+FROM equity_prices_1d AS ep
+JOIN equity_prices_1d AS ep2 ON ep.security_code = ep2.security_code
+WHERE ep.date_time = '2024-09-27' 
+AND ep2.date_time = '2024-09-25' 
+AND ep.volume > 1.2 * ep2.volume
+```","SELECT ep.security_code
+FROM equity_prices_1d AS ep
+JOIN equity_prices_1d AS ep2 ON ep.security_code = ep2.security_code
+WHERE ep.date_time = '2024-09-27' 
+AND ep2.date_time = '2024-09-25' 
+AND ep.volume > 1.2 * ep2.volume",[],
+"List stocks whose volume is between 20000 and 30000 on 27th September 2024. I need symbol, price, 10-day average volume in the columns.","**Query Preprocessing:**
+
+- **Intent:** Retrieve stocks with volume between 20000 and 30000 on 27th September 2024 along with their symbol, price, and 10-day average volume.
+
+- **Required Tables:** `equity_prices_1d`
+
+- **Columns:**
+    - `security_code` (symbol)
+    - `close` (price)
+    - 10-day average volume  
+
+- **Conditions:**
+    - Volume between 20000 and 30000
+    - Date is 27th September 2024
+
+- **Joins:** No joins required as we are only selecting data from the `equity_prices_1d` table.
+
+- **Aggregations:** Calculate the 10-day average volume
+
+- **Sorting/Grouping:** Not specified in the query.
+
+By following the schema and the query requirements, the preprocessed SQL query could involve calculations for the 10-day average volume based on historical data.","```sql
+SELECT 
+    security_code AS symbol, 
+    close AS price, 
+    avg(volume) AS ""10-day average volume""
+FROM equity_prices_1d
+WHERE date_time = '2024-09-27' AND volume BETWEEN 20000 AND 30000
+GROUP BY security_code, close
+```","SELECT 
+    equity_prices_1d.security_code AS symbol, 
+    equity_prices_1d.close AS price, 
+    AVG(equity_prices_1d.volume) AS ""10-day average volume""
+FROM equity_prices_1d
+WHERE equity_prices_1d.date_time = '2024-09-27' AND equity_prices_1d.volume BETWEEN 20000 AND 30000
+GROUP BY equity_prices_1d.security_code, equity_prices_1d.close",[],
+"Give me symbol, price, 10-day average volume where stocks are in between 5% and 10% below their 52-week high.","**Structured Query Preprocessing:**
+- **Intent:** Retrieve symbol, price, and 10-day average volume for stocks that are between 5% and 10% below their 52-week high.
+- **Required Tables:** `equity_prices_1d`
+- **Columns:**
+    - `symbol`: Not present in the schema, will be derived from `security_code`
+    - `price`: Derived from `close` in `equity_prices_1d` table
+    - `10-day average volume`: Derived using volume data in `equity_prices_1d` table
+- **Conditions:**
+    - Stocks should be between 5% and 10% below their 52-week high
+- **Joins:** No explicit joins are required as we are working with a single table
+- **Aggregations:** Calculate the 10-day average volume
+- **Sorting/Grouping:** Not specified
+
+**Adjusted Query:**
+```sql
+SELECT security_code AS symbol, 
+       close AS price, 
+       AVG(volume) AS ""10-day average volume""
+FROM equity_prices_1d
+WHERE (high < 0.95 * 52_week_high) AND (high > 0.90 * 52_week_high)
+GROUP BY security_code, close
+```
+In the adjusted query:
+- `symbol` is derived from `security_code`
+- `price` is extracted from `close` column
+- `10-day average volume` is calculated using the `AVG()` function on the `volume` column
+- The conditions for being between 5% and 10% below 52-week high are applied
+- Grouping by `security_code` and `close` to include in the SELECT statement and for aggregating the data.","```sql
+SELECT ep.security_code AS symbol, 
+       ep.close AS price, 
+       AVG(ep.volume) AS ""10-day average volume""
+FROM equity_prices_1d AS ep
+JOIN (
+    SELECT security_code, 
+           MAX(high) AS 52_week_high
+    FROM equity_prices_1d
+    WHERE date_time >= '2023-11-19 00:00:00' AND date_time <= '2024-11-19 00:00:00'
+    GROUP BY security_code
+) AS max_high ON ep.security_code = max_high.security_code
+WHERE (ep.high < 0.95 * max_high.52_week_high) AND (ep.high > 0.90 * max_high.52_week_high)
+AND ep.date_time = '2024-11-19 00:00:00'
+GROUP BY ep.security_code, ep.close
+```","SELECT ep.security_code AS symbol, 
+       ep.close AS price, 
+       AVG(ep.volume) AS ""10-day average volume""
+FROM equity_prices_1d AS ep
+JOIN (
+    SELECT security_code, 
+           MAX(high) AS 52_week_high
+    FROM equity_prices_1d
+    WHERE date_time >= '2023-11-19' AND date_time <= '2024-11-19'
+    GROUP BY security_code
+) AS max_high ON ep.security_code = max_high.security_code
+WHERE (ep.high < 0.95 * max_high.52_week_high) AND (ep.high > 0.90 * max_high.52_week_high)
+AND ep.date_time = '2024-11-19'
+GROUP BY ep.security_code, ep.close",[],
+Give me a 5-day average price for Nifty50 stocks on 16th July 2024.,"**Preprocessed Query:**
+- **Intent:** Calculate the 5-day average price for Nifty50 stocks on 16th July 2024.
+- **Tables:** `equity_prices_1d`
+- **Columns:** `date_time`, `close`
+- **Conditions:** 
+  - Filter by `security_code` for Nifty50 stocks.
+  - Calculate the average of `close` prices for the past 5 days leading up to 16th July 2024.
+- **Aggregation:** Calculate the average of `close` prices.
+- **Sorting:** Not applicable for this query.
+
+**Structured Query:**
+```sql
+SELECT AVG(close) AS five_day_avg_price
+FROM equity_prices_1d
+WHERE security_code IN (SELECT security_code FROM master_prime_1d WHERE index_name = 'Nifty50')
+  AND date_time BETWEEN '2024-07-11' AND '2024-07-16'
+```
+
+This query calculates the 5-day average closing price for Nifty50 stocks on 16th July 2024 by filtering the relevant `security_code`s and date range within the `equity_prices_1d` table.","```sql
+SELECT AVG(close) AS five_day_avg_price
+FROM equity_prices_1d
+WHERE security_code IN (SELECT security_code FROM master_prime_1d WHERE index_name = 'Nifty50')
+  AND date_time BETWEEN '2024-07-11' AND '2024-07-16'
+```","SELECT AVG(ep.close) AS five_day_avg_price
+FROM equity_prices_1d ep
+INNER JOIN master_prime_1d mp ON ep.security_code = mp.security_code
+WHERE mp.index_name = 'Nifty50'
+  AND ep.date_time BETWEEN '2024-07-11' AND '2024-07-16'",[],
+Give me price and volume data for ICICI Bank for the last 5 days on 16th July 2024.,"**Preprocessed Query:**
+- Intent: Retrieve price and volume data
+- Tables: `equity_prices_1d`
+- Columns: `date_time`, `open`, `high`, `low`, `close`, `volume`
+- Conditions: `security_code` for ICICI Bank and date within the last 5 days of 16th July 2024
+- Sorting/Grouping: Not specified
+
+**Final Query:**
+```sql
+SELECT date_time, open, high, low, close, volume
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+AND date_time BETWEEN '2024-07-11 00:00:00' AND '2024-07-16 23:59:59'
+```
+
+Note: This query retrieves the price and volume data for ICICI Bank for the last 5 days leading up to 16th July 2024 from the `equity_prices_1d` table based on the provided schema.","```sql
+SELECT date_time, open, high, low, close, volume
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+AND date_time BETWEEN '2024-07-11 00:00:00' AND '2024-07-16 23:59:59'
+```  ","SELECT ep.date_time, ep.open, ep.high, ep.low, ep.close, ep.volume
+FROM equity_prices_1d AS ep
+INNER JOIN master_prime_1d AS mp ON ep.security_code = mp.security_code
+WHERE mp.company_name = 'ICICI Bank'
+AND ep.date_time BETWEEN '2024-07-11' AND '2024-07-16 23:59:59'",[],
+List stocks going below the previous week's low on 20th September 2024.,"**Intent:** List stocks going below the previous week's low on 20th September 2024.
+
+**Components:**
+- Required Tables:
+  - `master_prime_1d`
+  - `equity_prices_1d`
+  
+- Columns:
+  - `equity_prices_1d.date_time`
+  - `equity_prices_1d.security_code`
+  - `equity_prices_1d.low`
+  
+- Conditions:
+  - Filter stocks where the low price on 20th September 2024 is below the previous week's low
+  
+- Joins:
+  - Join `equity_prices_1d` with `master_prime_1d` on `equity_prices_1d.security_code = master_prime_1d.security_code`
+  
+- Aggregations:
+  - None
+  
+- Sorting/Grouping:
+  - None
+
+**Preprocessed Query:**
+
+```sql
+SELECT ep.date_time, ep.security_code, ep.low
+FROM equity_prices_1d ep
+JOIN master_prime_1d mp ON ep.security_code = mp.security_code
+WHERE ep.date_time = '2024-09-20'
+AND ep.low < (SELECT MIN(low) FROM equity_prices_1d WHERE date_time >= '2024-09-13' AND date_time < '2024-09-20')
+```
+
+This query retrieves the date, security code, and low price of stocks that went below the previous week's low on 20th September 2024 by joining the required tables and applying the necessary conditions.","```sql
+SELECT ep.date_time, ep.security_code, ep.low
+FROM equity_prices_1d ep
+JOIN master_prime_1d mp ON ep.security_code = mp.security_code
+WHERE ep.date_time = '2024-09-20'
+AND ep.low < (SELECT MIN(low) FROM equity_prices_1d WHERE date_time >= '2024-09-13' AND date_time < '2024-09-20')
+```","SELECT ep.date_time, ep.security_code, ep.low
+FROM equity_prices_1d ep
+JOIN master_prime_1d mp ON ep.security_code = mp.security_code
+WHERE ep.date_time = '2024-09-20'
+AND ep.low < (SELECT MIN(low) FROM equity_prices_1d WHERE date_time >= '2024-09-13' AND date_time < '2024-09-20')",[],
+List stocks closing below yesterday's high on 20th September 2024.,"Structured Query Preprocessing:
+Intent: Retrieve stocks closing below yesterday's high on 20th September 2024.
+Tables: master_prime_1d, equity_prices_1d
+Columns: security_code, company_name, short_company_name, industry_name, broad_industry_name, major_sector_name, index_name, date_time, open, high, low, close, volume, version
+Conditions: Filter for closing price below yesterday's high on 20th September 2024
+Joins: Join on security_code between master_prime_1d and equity_prices_1d
+Sorting: Not specified in the query
+
+Final Processed Query:
+```sql
+SELECT m.security_code, m.company_name, m.short_company_name, m.industry_name, m.broad_industry_name, m.major_sector_name, m.index_name,
+       e.date_time, e.open, e.high, e.low, e.close, e.volume, e.version
+FROM master_prime_1d m
+JOIN equity_prices_1d e ON m.security_code = e.security_code
+WHERE e.close < 
+    (SELECT MAX(high)
+     FROM equity_prices_1d
+     WHERE date_time = '2024-09-19')
+     AND e.date_time = '2024-09-20';
+```
+
+This query preprocesses the user's request by selecting the specified columns from the master_prime_1d and equity_prices_1d tables, filtering for stocks closing below yesterday's high on 20th September 2024 through a subquery comparison, and ensuring the join is on the security_code.","```sql
+SELECT m.security_code, m.company_name, m.short_company_name, m.industry_name, m.broad_industry_name, m.major_sector_name, m.index_name,
+       e.date_time, e.open, e.high, e.low, e.close, e.volume, e.version
+FROM master_prime_1d m
+JOIN equity_prices_1d e ON m.security_code = e.security_code
+WHERE e.close < 
+    (SELECT MAX(high)
+     FROM equity_prices_1d
+     WHERE date_time = '2024-09-19')
+     AND e.date_time = '2024-09-20';
+```  ","SELECT m.security_code, m.company_name, m.short_company_name, m.industry_name, m.broad_industry_name, m.major_sector_name, m.index_name,
+       e.date_time, e.open, e.high, e.low, e.close, e.volume, e.version
+FROM master_prime_1d m
+JOIN equity_prices_1d e ON m.security_code = e.security_code
+WHERE e.close < 
+    (SELECT MAX(high)
+     FROM equity_prices_1d
+     WHERE date_time = '2024-09-19')
+     AND e.date_time = '2024-09-20';",[],
+List stocks closing above the previous week's closing price on 20th September 2024.,"**Query Preprocessed:**
+
+- Intent: Retrieve stocks closing above the previous week's closing price on 20th September 2024.
+- Tables: `equity_prices_1d`
+- Columns: `security_code`, `close`
+- Conditions: Closing price on 20th September 2024 > Closing price previous week
+- Sorting: Not specified
+
+**Final Query:**
+
+```sql
+SELECT security_code, close
+FROM equity_prices_1d
+WHERE date_time = '2024-09-20'
+AND close > (
+    SELECT close
+    FROM equity_prices_1d
+    WHERE date_time = '2024-09-13' -- Assuming 13th September is the previous week's closing date
+)
+``` 
+
+This query will list the stocks closing above the previous week's closing price on September 20th, 2024, based on the provided schema.","```sql
+SELECT ep.security_code, ep.close
+FROM equity_prices_1d AS ep
+JOIN (
+    SELECT security_code, close
+    FROM equity_prices_1d
+    WHERE date_time = '2024-09-20'
+) AS ep_curr ON ep.security_code = ep_curr.security_code
+JOIN (
+    SELECT security_code, close
+    FROM equity_prices_1d
+    WHERE date_time = '2024-09-13'
+) AS ep_prev ON ep.security_code = ep_prev.security_code
+WHERE ep.date_time = '2024-09-20' 
+AND ep.close > ep_prev.close
+```","SELECT ep.security_code, ep.close
+FROM equity_prices_1d AS ep
+JOIN (
+    SELECT security_code, close
+    FROM equity_prices_1d
+    WHERE date_time = '2024-09-20'
+) AS ep_curr ON ep.security_code = ep_curr.security_code
+JOIN (
+    SELECT security_code, close
+    FROM equity_prices_1d
+    WHERE date_time = '2024-09-13'
+) AS ep_prev ON ep.security_code = ep_prev.security_code
+WHERE ep.date_time = '2024-09-20' 
+AND ep.close > ep_prev.close",[],
+List NIFTY500 stocks with their closing price 1% lower from the day's high on 20th September 2024.,"**Query Preprocessing:**
+
+**Intent:** Retrieve the NIFTY500 stocks with their closing price 1% lower from the day's high on 20th September 2024.
+
+**Required Tables and Columns:**
+- Table: `equity_prices_1d`
+- Columns: 
+    - `security_code`
+    - `close`
+    - `high`
+    - `date_time`
+
+**Conditions:**
+- Date: 20th September 2024
+- Closing price 1% lower than the day's high
+
+**Components:**
+- **Tables:** `equity_prices_1d`
+- **Columns:** `security_code`, `close`, `high`, `date_time`
+- **Conditions:** 
+    - Date: `date_time` = '2024-09-20'
+    - Closing price: `close` = 0.99 * `high`
+
+**Structured Query:**
+```sql
+SELECT security_code, close
+FROM equity_prices_1d
+WHERE date_time = '2024-09-20' AND close = 0.99 * high;
+```
+
+Please note that this preprocessing assumes that the column types are suitable for performing arithmetic operations like multiplying the high value by 0.99. If the data types are different, casting or conversion may be required.","```sql
+SELECT ep.security_code, ep.close
+FROM equity_prices_1d AS ep
+JOIN
+    (SELECT security_code, close, high
+    FROM equity_prices_1d
+    WHERE date_time = '2024-09-20' AND close = 0.99 * high) AS sub
+ON ep.security_code = sub.security_code
+WHERE ep.date_time = '2024-09-20'
+    AND ep.close = sub.close;
+```","SELECT ep.security_code, ep.close
+FROM equity_prices_1d AS ep
+JOIN
+    (SELECT security_code, close, high
+    FROM equity_prices_1d
+    WHERE date_time = '2024-09-20' AND close = 0.99 * high) AS sub
+ON ep.security_code = sub.security_code
+WHERE ep.date_time = '2024-09-20'
+    AND ep.close = sub.close;",[],
+List stocks with their closing price 5% lower from the day's high on 20th September 2024.,"**Query Preprocessing:**
+
+**Intent:** List stocks with their closing price 5% lower from the day's high on 20th September 2024.
+
+**Required Tables:**
+- `master_prime_1d`
+- `equity_prices_1d`
+
+**Columns:**
+- `equity_prices_1d.date_time`
+- `equity_prices_1d.security_code`
+- `equity_prices_1d.close`
+- `equity_prices_1d.high`
+
+**Conditions:**
+- Date: 20th September 2024
+- Filter: Closing price is 5% lower than the day's high
+
+**Joins:** No explicit joins are required as we are working with a single table.
+
+**Aggregations:** None
+
+**Sorting/Grouping:** None
+
+**Preprocessed Query:**
+```sql
+SELECT 
+    eqp.date_time,
+    eqp.security_code,
+    eqp.close,
+    eqp.high
+FROM
+    equity_prices_1d eqp
+WHERE
+    eqp.date_time = '2024-09-20'
+    AND (eqp.high * 0.95) >= eqp.close;
+```
+
+In the preprocessed query, we have structured the SQL statement to retrieve the required columns from the `equity_prices_1d` table for stocks with closing prices 5% lower than the day's high on September 20th, 2024.","```sql
+SELECT 
+    eqp.date_time,
+    eqp.security_code,
+    eqp.close,
+    eqp.high
+FROM
+    equity_prices_1d eqp
+WHERE
+    eqp.date_time = '2024-09-20'
+    AND (eqp.high * 0.95) >= eqp.close;
+```","SELECT 
+    eqp.date_time,
+    eqp.security_code,
+    eqp.close,
+    eqp.high
+FROM
+    equity_prices_1d eqp
+WHERE
+    eqp.date_time = '2024-09-20'
+    AND (eqp.high * 0.95) >= eqp.close;",[],
+"On 16th September 2024, which stocks have closed below their previous weekly candle low?","**Intent:** Find stocks that have closed below their previous weekly candle low on 16th September 2024.
+
+**Required Tables:**
+- `equity_prices_1d`
+
+**Columns:**
+- `security_code`
+- `date_time`
+- `close`
+- `low`
+
+**Conditions:**
+- Date: `16th September 2024`
+- Close price should be below the previous weekly candle low
+
+**Joins:** No joins are necessary as we are only using data from the `equity_prices_1d` table.
+
+**Aggregations:** None needed as we are looking for individual stock instances.
+
+**Sorting/Grouping:** None needed as the query does not require sorting or grouping.
+
+**Preprocessed Query:**
+```sql
+SELECT security_code, date_time, close, low
+FROM equity_prices_1d
+WHERE date_time = '2024-09-16'
+AND close < (
+    SELECT MIN(low) 
+    FROM equity_prices_1d 
+    WHERE date_time BETWEEN '2024-09-09' AND '2024-09-15'
+)
+```
+
+This query retrieves the `security_code`, `date_time`, `close`, and `low` columns from the `equity_prices_1d` table for stocks where the `close` price on 16th September 2024 is below the previous weekly candle low between 9th September 2024 and 15th September 2024.","```sql
+SELECT DISTINCT ep.security_code
+FROM equity_prices_1d ep
+WHERE ep.date_time = '2024-09-16'
+AND ep.close < (
+    SELECT MIN(ep2.low) 
+    FROM equity_prices_1d ep2
+    WHERE ep2.date_time BETWEEN '2024-09-09' AND '2024-09-15'
+)
+```","SELECT DISTINCT ep.security_code
+FROM equity_prices_1d ep
+WHERE ep.date_time = '2024-09-16'
+AND ep.close < (
+    SELECT MIN(ep2.low) 
+    FROM equity_prices_1d ep2
+    WHERE ep2.date_time BETWEEN '2024-09-09' AND '2024-09-15'
+)",[],
+"List stocks that have closed above their August 2024 high in September 2024, along with the dates and symbols.","**Structured Query:**
+
+**Intent:**  
+List stocks that have closed above their August 2024 high in September 2024, along with the dates and symbols.
+
+**Components:**
+- Tables: `equity_prices_1d`
+- Columns: `date_time`, `security_code`, `high`, `close`
+- Conditions:
+  - Close > August 2024 high
+  - Date range: September 2024
+- Sorting: By `date_time` and `security_code`
+
+**Validated Query:**
+```sql
+SELECT date_time, security_code
+FROM equity_prices_1d
+WHERE date_time >= '2024-09-01' AND date_time <= '2024-09-30'
+AND close > (
+    SELECT MAX(high)
+    FROM equity_prices_1d
+    WHERE date_time >= '2024-08-01' AND date_time <= '2024-08-31'
+    )
+ORDER BY date_time, security_code;
+```
+
+This query selects the `date_time` and `security_code` columns from the `equity_prices_1d` table for stocks whose closing price in September 2024 is above their highest closing price in August 2024. The query is sorted by `date_time` and `security_code`.","```sql
+SELECT ep.date_time, ep.security_code
+FROM equity_prices_1d AS ep
+JOIN (
+    SELECT security_code, MAX(high) AS max_high
+    FROM equity_prices_1d
+    WHERE date_time >= '2024-08-01' AND date_time <= '2024-08-31'
+    GROUP BY security_code
+) AS august_high
+ON ep.security_code = august_high.security_code
+WHERE ep.date_time >= '2024-09-01' 
+AND ep.date_time <= '2024-09-30'
+AND ep.close > august_high.max_high
+ORDER BY ep.date_time, ep.security_code;
+```  ","SELECT ep.date_time, ep.security_code
+FROM equity_prices_1d AS ep
+JOIN (
+    SELECT security_code, MAX(high) AS max_high
+    FROM equity_prices_1d
+    WHERE date_time >= '2024-08-01' AND date_time <= '2024-08-31'
+    GROUP BY security_code
+) AS august_high
+ON ep.security_code = august_high.security_code
+WHERE ep.date_time >= '2024-09-01' 
+AND ep.date_time <= '2024-09-30'
+AND ep.close > august_high.max_high
+ORDER BY ep.date_time, ep.security_code;",[],
+List stocks that are within 5% of their 3-month low on 20th September 2024.,"Intent: Retrieve stocks that are within 5% of their 3-month low on 20th September 2024.
+
+Tables:
+- equity_prices_1d
+
+Columns:
+- security_code
+- low
+
+Conditions:
+- Calculate the 3-month low for each stock.
+- Filter stocks where the close price on 20th September 2024 is within 5% of their 3-month low.
+
+Query:
+```sql
+SELECT security_code
+FROM equity_prices_1d
+WHERE date_time = '2024-09-20'
+AND close <= 1.05 * (SELECT MIN(low) FROM equity_prices_1d WHERE date_time >= '2024-06-20' AND date_time <= '2024-09-20')
+```
+This query retrieves the security codes of stocks that are within 5% of their 3-month low on 20th September 2024 from the equity_prices_1d table.","```sql
+SELECT ep.security_code
+FROM equity_prices_1d ep
+INNER JOIN (
+    SELECT security_code, MIN(low) AS three_month_low
+    FROM equity_prices_1d
+    WHERE date_time >= '2024-06-20' AND date_time <= '2024-09-20'
+    GROUP BY security_code
+) tml ON ep.security_code = tml.security_code
+WHERE ep.date_time = '2024-09-20' 
+AND ep.close <= 1.05 * tml.three_month_low
+```","SELECT ep.security_code
+FROM equity_prices_1d ep
+INNER JOIN (
+    SELECT e.security_code, MIN(e.low) AS three_month_low
+    FROM equity_prices_1d e
+    WHERE e.date_time >= '2024-06-20' AND e.date_time <= '2024-09-20'
+    GROUP BY e.security_code
+) tml ON ep.security_code = tml.security_code
+WHERE ep.date_time = '2024-09-20' 
+AND ep.close <= 1.05 * tml.three_month_low",[],
+List stocks that are trading within 3% of their 3-year high on 20th September 2024.,"**Intent:** List stocks that are trading within 3% of their 3-year high on 20th September 2024.
+
+**Components:**
+- **Tables:** `master_prime_1d`, `equity_prices_1d`
+- **Columns:** 
+  - From `master_prime_1d`: ['security_code', 'company_name']
+  - From `equity_prices_1d`: ['security_code', 'high']
+- **Conditions:** 
+  - Calculate the 3-year high as a value within 3% of the 'high' value from the `equity_prices_1d` table.
+  - Filter the data for the date 20th September 2024.
+- **Joins:** Use the 'security_code' column to join `master_prime_1d` and `equity_prices_1d`.
+- **Sorting/Grouping:** None specified.
+
+**Structured Query:**
+```sql
+SELECT mp.security_code, mp.company_name
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-09-20'
+AND ep.high >= (0.97 * (SELECT MAX(high) 
+                     FROM equity_prices_1d 
+                     WHERE date_time >= '2021-09-20' 
+                     AND date_time < '2024-09-20')
+               )
+```
+
+This query retrieves the security codes and company names of stocks that are trading within 3% of their 3-year high on 20th September 2024 by joining the `master_prime_1d` and `equity_prices_1d` tables and applying the specified conditions.","```sql
+SELECT mp.security_code, mp.company_name
+FROM master_prime_1d AS mp
+JOIN equity_prices_1d AS ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-09-20'
+AND ep.high >= (0.97 * (SELECT MAX(high) 
+                         FROM equity_prices_1d 
+                         WHERE date_time >= '2021-09-20' 
+                         AND date_time < '2024-09-20')
+                )
+```","SELECT mp.security_code, mp.company_name
+FROM master_prime_1d AS mp
+JOIN equity_prices_1d AS ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-09-20'
+AND ep.high >= (0.97 * (SELECT MAX(high) 
+                         FROM equity_prices_1d 
+                         WHERE date_time >= '2021-09-20' 
+                         AND date_time < '2024-09-20')
+                )",[],
+List stocks that are within 5% of their 52-week low on 20th September 2024.,"**Intent:**
+List stocks within 5% of their 52-week low on 20th September 2024.
+
+**Components:**
+- Tables:
+    - `equity_prices_1d`
+
+- Columns:
+    - `security_code`
+    - `low`
+
+- Conditions:
+    - Date: 20th September 2024
+    - Stock price within 5% of the 52-week low
+
+- Sorting/Grouping:
+    - No specific sorting or grouping mentioned.
+
+**Validated Query:**
+```sql
+SELECT security_code
+FROM equity_prices_1d
+WHERE date_time = '2024-09-20'
+AND low >= (SELECT MIN(low) * 0.95 FROM equity_prices_1d WHERE date_time >= '2023-09-20' AND date_time < '2024-09-20')
+AND low <= (SELECT MAX(high) FROM equity_prices_1d WHERE date_time >= '2023-09-20' AND date_time < '2024-09-20')
+```
+
+Please note that the query assumes that the 52-week low is considered within the year preceding the specified date.","```sql
+SELECT ep.security_code
+FROM equity_prices_1d ep
+JOIN (
+    SELECT security_code, 
+        MIN(low) as min_low,
+        MAX(high) as max_high
+    FROM equity_prices_1d
+    WHERE date_time >= '2023-09-20' AND date_time < '2024-09-20'
+    GROUP BY security_code
+) t
+ON ep.security_code = t.security_code
+WHERE ep.date_time = '2024-09-20'
+AND ep.low >= t.min_low * 0.95
+AND ep.low <= t.max_high
+```","SELECT ep.security_code
+FROM equity_prices_1d ep
+JOIN (
+    SELECT security_code, 
+        MIN(low) as min_low,
+        MAX(high) as max_high
+    FROM equity_prices_1d
+    WHERE date_time >= '2023-09-20' AND date_time < '2024-09-20'
+    GROUP BY security_code
+) t
+ON ep.security_code = t.security_code
+WHERE ep.date_time = '2024-09-20'
+AND ep.low >= t.min_low * 0.95
+AND ep.low <= t.max_high",[],
+Give me the 5-day average volume for ICICI Bank as of 23rd September 2024.,"**Query Preprocessing:**
+
+**Intent:** Calculate the 5-day average volume for ICICI Bank as of 23rd September 2024.
+
+**Required Tables:** `equity_prices_1d`
+
+**Columns:**
+- `volume`: to calculate the average volume
+- `date_time`: to identify the date of the data
+- `security_code`: to filter data for ICICI Bank
+
+**Conditions:**
+- Filter data for ICICI Bank (security_code for ICICI Bank)
+- Calculate the 5-day average volume as of 23rd September 2024
+
+**Aggregation:** Calculate the average volume over the 5-day period
+
+**Sorting/Grouping:** None required
+
+**Structured Query:**
+```sql
+SELECT AVG(volume) AS 5_day_avg_volume
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+AND date_time BETWEEN '2024-09-18' AND '2024-09-23';
+```
+
+**Note:** The query captures the average volume for ICICI Bank from 18th September 2024 to 23rd September 2024 to represent a 5-day period.","```sql
+SELECT AVG(volume) AS 5_day_avg_volume
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+AND date_time BETWEEN '2024-09-18' AND '2024-09-23';
+```","SELECT AVG(ep.volume) AS 5_day_avg_volume
+FROM equity_prices_1d ep
+JOIN master_prime_1d mp ON ep.security_code = mp.security_code
+WHERE mp.security_code = 'ICICI Bank'
+AND ep.date_time BETWEEN '2024-09-18' AND '2024-09-23';",[],
+Give me the list of top 10 worst-performing basic industry sectors in the previous month.,"### Preprocessed Query:
+
+- **Intent**: Retrieve the list of top 10 worst-performing basic industry sectors in the previous month.
+  
+- **Required Tables**:
+  - `master_prime_1d`
+  - `equity_prices_1d`
+  
+- **Columns**:
+  - `industry_name` (from `master_prime_1d`)
+  - `close` (from `equity_prices_1d`)
+  
+- **Conditions**:
+  - Filter data from the previous month
+  
+- **Sorting / Grouping**:
+  - Sort by the performance to identify the worst-performing sectors
+  
+- **Aggregations**: 
+  - Calculate the performance metric to determine the worst-performing sectors
+  
+- **Validated Columns**:
+  - `industry_name` from `master_prime_1d`
+  - `close` from `equity_prices_1d`
+
+### SQL Query (for MySQL):
+
+```sql
+SELECT 
+    m.industry_name, 
+    AVG(e.close) AS average_close
+FROM 
+    master_prime_1d m
+JOIN 
+    equity_prices_1d e ON m.security_code = e.security_code
+WHERE 
+    MONTH(e.date_time) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH) AND
+    YEAR(e.date_time) = YEAR(CURRENT_DATE) - IF(MONTH(CURRENT_DATE) = 1, 1, 0)
+GROUP BY 
+    m.industry_name
+ORDER BY 
+    average_close ASC
+LIMIT 10;
+```
+
+This query retrieves the top 10 worst-performing basic industry sectors by calculating the average closing prices for the previous month and sorting them in ascending order of average closing prices.","```sql
+SELECT 
+    m.industry_name, 
+    AVG(e.close) AS average_close
+FROM 
+    master_prime_1d m
+JOIN 
+    equity_prices_1d e ON m.security_code = e.security_code
+WHERE 
+    e.date_time >= '2024-10-01' AND e.date_time < '2024-11-01'
+GROUP BY 
+    m.industry_name
+ORDER BY 
+    average_close ASC
+LIMIT 10;
+```","SELECT 
+    m.industry_name, 
+    AVG(e.close) AS average_close
+FROM 
+    master_prime_1d m
+JOIN 
+    equity_prices_1d e ON m.security_code = e.security_code
+WHERE 
+    e.date_time >= '2024-10-01' AND e.date_time < '2024-11-01'
+GROUP BY 
+    m.industry_name
+ORDER BY 
+    average_close ASC
+LIMIT 10;",[],
+Give me the list of top 5 best-performing sectors in the last 1 month.,"Structured Query Preprocessing:
+
+Intent: Retrieve the list of the top 5 best-performing sectors in the last 1 month.
+
+Required Tables:
+- `master_prime_1d`
+- `equity_prices_1d`
+
+Columns:
+- `major_sector_name`: To identify sectors
+- `close`: To calculate the performance of sectors
+
+Conditions:
+- Filter the data for the last 1 month
+
+Aggregations:
+- Calculate the performance based on the change in `close` prices
+
+Sorting:
+- Sort the sectors based on their performance in descending order
+
+Grouping:
+- Group by `major_sector_name`
+
+Final Preprocessed Query:
+```sql
+SELECT mp.major_sector_name, SUM(ep.close) AS sector_performance
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+GROUP BY mp.major_sector_name
+ORDER BY sector_performance DESC
+LIMIT 5;
+```","```sql
+SELECT mp.major_sector_name, SUM(ep.close) AS sector_performance
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time >= '2024-10-19 00:00:00' AND ep.date_time < '2024-11-19 00:00:00'
+GROUP BY mp.major_sector_name
+ORDER BY sector_performance DESC
+LIMIT 5;
+```  ","SELECT mp.major_sector_name, SUM(ep.close) AS sector_performance
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time >= '2024-10-19' AND ep.date_time < '2024-11-19'
+GROUP BY mp.major_sector_name
+ORDER BY sector_performance DESC
+LIMIT 5;",[],
+Give me the list of macroeconomic sectors that are trading below the low of 4th June and whose trading volumes are above their 5-day average in the past 3 days.,"**Query Preprocessing:**
+
+**Intent:** Retrieve the list of macroeconomic sectors trading below the low of 4th June with trading volumes above their 5-day average in the past 3 days.
+
+**Required Tables:**
+- `master_prime_1d`
+- `equity_prices_1d`
+
+**Columns:**
+- From `master_prime_1d`: `major_sector_name`
+- From `equity_prices_1d`: `security_code`, `low`, `volume`, `date_time`
+
+**Conditions:**
+- For macroeconomic sectors trading below the low of 4th June.
+- Trading volumes above their 5-day average in the past 3 days.
+
+**Joins:** 
+- Join `master_prime_1d` and `equity_prices_1d` on `security_code` to link the sector with its corresponding daily stock prices.
+
+**Aggregations:** 
+- Calculate the 5-day average trading volume for each sector.
+
+**Sorting/Grouping:** 
+- Not specified.
+
+Thus, the structured query components are as follows:
+
+```sql
+SELECT mp.major_sector_name
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.low < (SELECT low FROM equity_prices_1d WHERE date_time = '2022-06-04')
+AND ep.volume > 
+    (SELECT AVG(volume) 
+     FROM equity_prices_1d 
+     WHERE date_time BETWEEN '2022-06-02' AND '2022-06-04')
+GROUP BY mp.major_sector_name;
+```
+
+This structured query will retrieve the macroeconomic sectors trading below the low of 4th June with trading volumes above their 5-day average in the past 3 days.","```sql
+SELECT mp.major_sector_name
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.low < (SELECT low FROM equity_prices_1d WHERE date_time = '2022-06-04')
+AND ep.volume > 
+    (SELECT AVG(volume) 
+     FROM equity_prices_1d 
+     WHERE date_time BETWEEN '2022-06-16' AND '2022-06-18')
+GROUP BY mp.major_sector_name;
+```  ","SELECT mp.major_sector_name
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.low < (SELECT low FROM equity_prices_1d WHERE date_time = '2022-06-04')
+AND ep.volume > 
+    (SELECT AVG(volume) 
+     FROM equity_prices_1d 
+     WHERE date_time BETWEEN '2022-06-16' AND '2022-06-18')
+GROUP BY mp.major_sector_name;",[],
+List stocks opening above yesterday's high on 20th September 2024.,"Structured Preprocessed Query:
+- Intent: Find stocks opening above yesterday's high.
+- Tables: equity_prices_1d
+- Columns: security_code, open, high
+- Conditions: open > high
+- Joins: N/A
+- Aggregations: N/A
+- Sorting/Grouping: N/A
+
+Processed Query:
+```sql
+SELECT security_code, open, high
+FROM equity_prices_1d
+WHERE open > high
+AND date_time = '2024-09-20';
+```","```sql
+SELECT ep.security_code, ep.open, ep.high
+FROM equity_prices_1d AS ep
+JOIN equity_prices_1d AS ep_yesterday ON ep.security_code = ep_yesterday.security_code
+WHERE ep.open > ep_yesterday.high
+AND ep.date_time = '2024-09-20';
+```","SELECT ep.security_code, ep.open, ep.high
+FROM equity_prices_1d AS ep
+JOIN equity_prices_1d AS ep_yesterday ON ep.security_code = ep_yesterday.security_code
+WHERE ep.open > ep_yesterday.close
+AND ep.date_time = '2024-09-20';","Error HTTPConnectionPool(host='202.131.150.31', port=8123): Max retries exceeded with url: /?date_time_input_format=best_effort&session_id=4b62cbd6-b3a2-482c-b544-61dd54cb4444&database=db_strike&client_protocol_version=54405&enable_http_compression=1&wait_end_of_query=1&send_progress_in_http_headers=1&http_headers_progress_interval_ms=120000 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002048C2CB2F0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) executing HTTP request attempt 1 (http://202.131.150.31:8123)",
+List stocks where today's low > yesterday's high and today's volume is 3x of its average volume on 16th July 2024.,"Structured Query Preprocessing:
+
+Intent: Extract stocks where today's low is higher than yesterday's high and today's volume is 3 times the average volume on the 16th of July 2024.
+
+Required Tables:
+- equity_prices_1d
+
+Columns:
+- security_code
+- high (yesterday's)
+- low (today's)
+- volume
+- date_time
+
+Conditions:
+- low > high
+- volume > 3 * average_volume_16thJuly2024
+
+Aggregations: 
+- Average volume on 16th July 2024
+
+Sorting/Grouping: 
+- None
+
+Final Query:
+```sql
+SELECT e.security_code
+FROM equity_prices_1d e
+WHERE e.low > (
+    SELECT high
+    FROM equity_prices_1d
+    WHERE date_time = CURRENT_DATE - INTERVAL '1' DAY AND security_code = e.security_code
+)
+AND e.volume > 3 * (
+    SELECT AVG(volume)
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-16'
+)
+```","```sql
+SELECT e.security_code
+FROM equity_prices_1d e
+WHERE e.low > (
+    SELECT high
+    FROM equity_prices_1d
+    WHERE date_time = '2024-11-18' AND security_code = e.security_code
+)
+AND e.volume > 3 * (
+    SELECT avg(volume)
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-16'
+)
+AND e.date_time = '2024-11-19 00:00:00'
+```  ","SELECT e.security_code
+FROM equity_prices_1d e
+WHERE e.low > (
+    SELECT high
+    FROM equity_prices_1d
+    WHERE date_time = '2024-11-18' AND security_code = e.security_code
+)
+AND e.volume > 3 * (
+    SELECT AVG(volume)
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-16'
+)
+AND e.date_time = '2024-11-19'","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 1
+ Code: 1. DB::Exception: Resolve identifier 'e.security_code' from parent scope only supported for constants and CTE. Actual e.security_code node type COLUMN. In scope (SELECT high FROM equity_prices_1d WHERE (date_time = '2024-11-18') AND (security_code = e.security_code)). (UNSUPPORTED_METHOD) (version 24.11.1.2557 (official build))
+",
+Can you identify stocks trading below ?50 with high trading volumes?,"**Query Preprocessing:**
+
+**Intent:**
+Identify stocks trading below $50 with high trading volumes.
+
+**Required Tables:**
+- `equity_prices_1d`
+
+**Columns:**
+- `security_code`
+- `open`
+- `high`
+- `low`
+- `close`
+- `volume`
+
+**Conditions:**
+- Stock price below $50
+- High trading volume
+
+**Joins:**
+No joins required as the query is focused on a single table `equity_prices_1d`.
+
+**Aggregations:**
+Not required for this query.
+
+**Sorting/Grouping:**
+Not required for this query.
+
+**Validation:**
+- Validated that all the specified columns strictly belong to the `equity_prices_1d` table.
+
+**Structured Query:**
+```sql
+SELECT security_code, open, high, low, close, volume
+FROM equity_prices_1d
+WHERE close < 50
+AND volume > (SELECT AVG(volume) FROM equity_prices_1d)
+```
+
+This structured query will identify stocks trading below $50 with high trading volumes based on the provided schema and query requirements.","```sql
+SELECT ep.security_code, ep.open, ep.high, ep.low, ep.close, ep.volume
+FROM equity_prices_1d AS ep
+WHERE ep.close < 50
+AND ep.volume > (SELECT AVG(volume) FROM equity_prices_1d WHERE date_time = '2024-11-19' AND security_code = ep.security_code)
+```","SELECT ep.security_code, ep.open, ep.high, ep.low, ep.close, ep.volume
+FROM equity_prices_1d AS ep
+WHERE ep.close < 50
+AND ep.volume > (SELECT AVG(volume) 
+                    FROM equity_prices_1d 
+                    WHERE date_time = '2024-11-19' 
+                    AND security_code = ep.security_code)","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 1
+ Code: 1. DB::Exception: Resolve identifier 'ep.security_code' from parent scope only supported for constants and CTE. Actual ep.security_code node type COLUMN. In scope (SELECT AVG(volume) FROM equity_prices_1d WHERE (date_time = '2024-11-19') AND (security_code = ep.security_code)). (UNSUPPORTED_METHOD) (version 24.11.1.2557 (official build))
+",
+"Whats the return of the sugar sector in the last 10 days, and give me the list of top 5 best performing stocks and top 5 worst performing stocks?","Intent: Analyze the return of the sugar sector in the last 10 days and identify the top 5 best and worst performing stocks.
+
+Components:
+- Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: 
+    - `master_prime_1d`: ['security_code', 'company_name', 'industry_name']
+    - `equity_prices_1d`: ['date_time', 'security_code', 'close']
+- Conditions: Filter by industry_name for the sugar sector and date_time within the last 10 days
+- Aggregations: Calculate the return by comparing the close prices of the latest date with the close prices 10 days ago
+- Sorting: Identify the top 5 best and worst performing stocks based on the return
+
+Structured Query: 
+```sql
+SELECT mp.security_code, mp.company_name, ep.close
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE mp.industry_name = 'Sugar'
+AND ep.date_time >= DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY)
+AND ep.date_time = (SELECT MAX(date_time) FROM equity_prices_1d ep2 WHERE ep2.security_code = ep.security_code)
+ORDER BY (ep.close - (SELECT close FROM equity_prices_1d ep2 WHERE ep2.security_code = ep.security_code AND DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY) = ep2.date_time)) DESC
+LIMIT 5
+
+UNION ALL
+
+SELECT mp.security_code, mp.company_name, ep.close
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE mp.industry_name = 'Sugar'
+AND ep.date_time >= DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY)
+AND ep.date_time = (SELECT MAX(date_time) FROM equity_prices_1d ep2 WHERE ep2.security_code = ep.security_code)
+ORDER BY (ep.close - (SELECT close FROM equity_prices_1d ep2 WHERE ep2.security_code = ep.security_code AND DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY) = ep2.date_time)) ASC
+LIMIT 5;
+```","```sql
+SELECT mp.security_code, mp.company_name, ep.close
+FROM master_prime_1d mp
+JOIN (SELECT security_code, MAX(date_time) AS max_date 
+      FROM equity_prices_1d 
+      WHERE date_time >= '2024-11-09 00:00:00' 
+      GROUP BY security_code) ep_max ON mp.security_code = ep_max.security_code
+JOIN equity_prices_1d ep ON ep_max.security_code = ep.security_code AND ep_max.max_date = ep.date_time
+WHERE mp.industry_name = 'Sugar'
+ORDER BY (ep.close - (SELECT close FROM equity_prices_1d WHERE security_code = ep.security_code AND date_time = '2024-11-09 00:00:00')) DESC
+LIMIT 5
+
+UNION ALL
+
+SELECT mp.security_code, mp.company_name, ep.close
+FROM master_prime_1d mp
+JOIN (SELECT security_code, MAX(date_time) AS max_date 
+      FROM equity_prices_1d 
+      WHERE date_time >= '2024-11-09 00:00:00' 
+      GROUP BY security_code) ep_max ON mp.security_code = ep_max.security_code
+JOIN equity_prices_1d ep ON ep_max.security_code = ep.security_code AND ep_max.max_date = ep.date_time
+WHERE mp.industry_name = 'Sugar'
+ORDER BY (ep.close - (SELECT close FROM equity_prices_1d WHERE security_code = ep.security_code AND date_time = '2024-11-09 00:00:00')) ASC
+LIMIT 5;
+```","SELECT mp.security_code, mp.company_name, ep.close 
+FROM master_prime_1d mp
+JOIN (
+    SELECT security_code, MAX(date_time) AS max_date 
+    FROM equity_prices_1d 
+    WHERE date_time >= '2024-11-09' 
+    GROUP BY security_code
+) ep_max ON mp.security_code = ep_max.security_code
+JOIN equity_prices_1d ep ON ep_max.security_code = ep.security_code AND ep_max.max_date = ep.date_time
+WHERE mp.industry_name = 'Sugar'
+ORDER BY (ep.close - (SELECT close FROM equity_prices_1d WHERE security_code = ep.security_code AND date_time = '2024-11-09')) DESC
+LIMIT 5
+
+UNION ALL
+
+SELECT mp.security_code, mp.company_name, ep.close 
+FROM master_prime_1d mp
+JOIN (
+    SELECT security_code, MAX(date_time) AS max_date 
+    FROM equity_prices_1d 
+    WHERE date_time >= '2024-11-09' 
+    GROUP BY security_code
+) ep_max ON mp.security_code = ep_max.security_code
+JOIN equity_prices_1d ep ON ep_max.security_code = ep.security_code AND ep_max.max_date = ep.date_time
+WHERE mp.industry_name = 'Sugar'
+ORDER BY (ep.close - (SELECT close FROM equity_prices_1d WHERE security_code = ep.security_code AND date_time = '2024-11-09')) ASC
+LIMIT 5;","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 1
+ Code: 1. DB::Exception: Resolve identifier 'ep.security_code' from parent scope only supported for constants and CTE. Actual ep.security_code node type COLUMN. In scope (SELECT close FROM equity_prices_1d WHERE (security_code = ep.security_code) AND (date_time = '2024-11-09')). (UNSUPPORTED_METHOD) (version 24.11.1.2557 (official build))
+",
+"List stocks that have closed above their August 2024 highest price in September 2024, along with the dates and symbols.","**Preprocessed Query:**
+
+**Intent:** Find stocks that closed above their August 2024 highest price in September 2024.
+
+**Required Tables:** `equity_prices_1d`
+
+**Columns:**
+- `date_time`
+- `security_code`
+- `close`
+
+**Conditions:**
+- Closing price in September 2024 > Highest price in August 2024
+
+**Validated Columns:**
+- `date_time` and `security_code` belong to `equity_prices_1d`
+- `close` belongs to `equity_prices_1d`
+
+**Structured Query:**
+```sql
+SELECT date_time, security_code
+FROM equity_prices_1d
+WHERE date_time >= '2024-09-01' AND date_time <= '2024-09-30'
+AND close > (
+    SELECT MAX(high) 
+    FROM equity_prices_1d 
+    WHERE date_time >= '2024-08-01' AND date_time <= '2024-08-31'
+    AND security_code = equity_prices_1d.security_code
+    )
+ORDER BY date_time;
+```","```sql
+SELECT ep.date_time, ep.security_code
+FROM equity_prices_1d AS ep
+WHERE ep.date_time >= '2024-09-01' AND ep.date_time <= '2024-09-30'
+AND ep.close > (
+    SELECT MAX(ep_inner.high) 
+    FROM equity_prices_1d AS ep_inner
+    WHERE ep_inner.date_time >= '2024-08-01' AND ep_inner.date_time <= '2024-08-31'
+    AND ep_inner.security_code = ep.security_code
+    )
+ORDER BY ep.date_time;
+```","SELECT ep.date_time, ep.security_code
+FROM equity_prices_1d AS ep
+WHERE ep.date_time >= '2024-09-01' AND ep.date_time <= '2024-09-30'
+AND ep.close > (
+    SELECT MAX(ep_inner.high) 
+    FROM equity_prices_1d AS ep_inner
+    WHERE ep_inner.date_time >= '2024-08-01' AND ep_inner.date_time <= '2024-08-31'
+    AND ep_inner.security_code = ep.security_code
+    )
+ORDER BY ep.date_time;","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 1
+ Code: 1. DB::Exception: Resolve identifier 'ep.security_code' from parent scope only supported for constants and CTE. Actual ep.security_code node type COLUMN. In scope (SELECT MAX(ep_inner.high) FROM equity_prices_1d AS ep_inner WHERE (ep_inner.date_time >= '2024-08-01') AND (ep_inner.date_time <= '2024-08-31') AND (ep_inner.security_code = ep.security_code)). (UNSUPPORTED_METHOD) (version 24.11.1.2557 (official build))
+",
+List stocks that have crossed above their August 2024 high on 20th September 2024.,"**Intent:** List stocks that have crossed above their August 2024 high on 20th September 2024.
+
+**Required Tables:**
+- `master_prime_1d`
+- `equity_prices_1d`
+
+**Columns:**
+- `security_code`
+- `company_name`
+- `short_company_name`
+- `industry_name`
+- `broad_industry_name`
+- `major_sector_name`
+- `index_name`
+- `date_time`
+- `open`
+- `high`
+- `low`
+- `close`
+- `volume`
+- `version`
+
+**Conditions:**
+- Date is 20th September 2024
+- The stock price should have crossed above its August 2024 high
+
+**Joins:** 
+- Join `master_prime_1d` and `equity_prices_1d` on `security_code`
+
+**Query:**
+```sql
+SELECT mp.security_code, mp.company_name, mp.short_company_name, mp.industry_name, mp.broad_industry_name, 
+       mp.major_sector_name, mp.index_name, ep.date_time, ep.open, ep.high, ep.low, ep.close, ep.volume, ep.version
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-09-20' 
+AND ep.high > (SELECT MAX(high) FROM equity_prices_1d WHERE date_time >= '2024-08-01' AND date_time < '2024-09-01' AND security_code = ep.security_code)
+```
+
+This structured query will list the stocks that have crossed above their August 2024 high on 20th September 2024 by joining the `master_prime_1d` and `equity_prices_1d` tables and applying the specified conditions.","
+```sql
+SELECT mp.security_code, mp.company_name, mp.short_company_name, mp.industry_name, mp.broad_industry_name, 
+       mp.major_sector_name, mp.index_name, ep.date_time, ep.open, ep.high, ep.low, ep.close, ep.volume, ep.version
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-09-20' 
+AND ep.high > (SELECT MAX(high) FROM equity_prices_1d WHERE date_time >= '2024-08-01' AND date_time < '2024-09-01' AND security_code = ep.security_code)
+```  ","SELECT mp.security_code, mp.company_name, mp.short_company_name, mp.industry_name, mp.broad_industry_name, 
+       mp.major_sector_name, mp.index_name, ep.date_time, ep.open, ep.high, ep.low, ep.close, ep.volume, ep.version
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-09-20' 
+AND ep.high > (SELECT MAX(high) FROM equity_prices_1d WHERE date_time >= '2024-08-01' AND date_time < '2024-09-01' AND security_code = ep.security_code)","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 1
+ Code: 1. DB::Exception: Resolve identifier 'ep.security_code' from parent scope only supported for constants and CTE. Actual ep.security_code node type COLUMN. In scope (SELECT MAX(high) FROM equity_prices_1d WHERE (date_time >= '2024-08-01') AND (date_time < '2024-09-01') AND (security_code = ep.security_code)). (UNSUPPORTED_METHOD) (version 24.11.1.2557 (official build))
+",
+Give me a list of stocks whose daily volume is greater than the sum of last week's volume on 16th July 2024.,"Structured Query Preprocessing:
+- Intent: Retrieve a list of stocks with a daily volume greater than the sum of last week's volume on 16th July 2024.
+- Tables: equity_prices_1d
+- Columns: security_code, volume, date_time
+- Conditions: Compare daily volume with the sum of last week's volume on a specific date.
+- Aggregations: Sum of volume for last week's data.
+
+Validated Components:
+- Tables: equity_prices_1d
+- Columns: security_code, volume, date_time
+- Conditions: volume > SUM(volume) OVER(PARTITION BY security_code ORDER BY date_time RANGE BETWEEN INTERVAL '1' WEEK PRECEDING AND INTERVAL '1' DAY PRECEDING) WHERE date_time = '2024-07-16'
+
+Structured SQL Query:
+```sql
+SELECT security_code
+FROM equity_prices_1d
+WHERE volume > (
+    SELECT SUM(volume) OVER(PARTITION BY security_code ORDER BY date_time RANGE BETWEEN INTERVAL '1' WEEK PRECEDING AND INTERVAL '1' DAY PRECEDING)
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-16'
+)
+```","```sql
+SELECT ep.security_code
+FROM equity_prices_1d AS ep
+WHERE ep.volume > (
+    SELECT SUM(ep_inner.volume)
+    FROM equity_prices_1d AS ep_inner
+    WHERE ep_inner.security_code = ep.security_code
+    AND ep_inner.date_time BETWEEN '2024-07-09' AND '2024-07-15'
+)
+AND ep.date_time = '2024-07-16'
+```","SELECT ep.security_code
+FROM equity_prices_1d AS ep
+WHERE ep.volume > (
+    SELECT SUM(ep_inner.volume)
+    FROM equity_prices_1d AS ep_inner
+    WHERE ep_inner.security_code = ep.security_code
+    AND ep_inner.date_time BETWEEN '2024-07-09' AND '2024-07-15'
+)
+AND ep.date_time = '2024-07-16'","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 1
+ Code: 1. DB::Exception: Resolve identifier 'ep.security_code' from parent scope only supported for constants and CTE. Actual ep.security_code node type COLUMN. In scope (SELECT SUM(ep_inner.volume) FROM equity_prices_1d AS ep_inner WHERE (ep_inner.security_code = ep.security_code) AND ((ep_inner.date_time >= '2024-07-09') AND (ep_inner.date_time <= '2024-07-15'))). (UNSUPPORTED_METHOD) (version 24.11.1.2557 (official build))
+",
+List stocks where volume has increased for 2 consecutive days on 16th July 2024.,"### Preprocessed Query:
+- **Intent:** Retrieve stocks where volume has increased for 2 cocutive days on 16th July 2024.
+- **Tables:** `equity_prices_1d`
+- **Columns:**
+    - `security_code`
+    - `volume`
+    - `date_time`
+- **Conditions:** 
+    - Volume increased for 2 cocutive days on 16th July 2024
+- **Joins:** None
+- **Aggregations:** None
+- **Sorting/Grouping:** None
+
+### SQL Query:
+```sql
+SELECT security_code
+FROM equity_prices_1d
+WHERE date_time = '2024-07-16'
+AND volume = (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-16'
+    AND security_code = equity_prices_1d.security_code
+    ORDER BY date_time DESC
+    LIMIT 1 OFFSET 1
+)
+AND volume > (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-16'
+    AND security_code = equity_prices_1d.security_code
+    ORDER BY date_time DESC
+    LIMIT 1 OFFSET 2
+);
+``` 
+
+### Note:
+- This query assumes that the `date_time` column in the `equity_prices_1d` table is of type `DATE`.
+- Adjustments can be made based on the actual data types and database system being used.","```sql
+SELECT ep.security_code
+FROM equity_prices_1d AS ep
+WHERE ep.date_time = '2024-07-16'
+AND ep.volume > (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-15'
+    AND security_code = ep.security_code
+)
+AND ep.volume > (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-14'
+    AND security_code = ep.security_code
+);
+```","SELECT ep.security_code
+FROM equity_prices_1d AS ep
+WHERE ep.date_time = '2024-07-16'
+AND ep.volume > (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-15'
+    AND security_code = ep.security_code
+)
+AND ep.volume > (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-14'
+    AND security_code = ep.security_code
+);","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 1
+ Code: 1. DB::Exception: Resolve identifier 'ep.security_code' from parent scope only supported for constants and CTE. Actual ep.security_code node type COLUMN. In scope (SELECT volume FROM equity_prices_1d WHERE (date_time = '2024-07-15') AND (security_code = ep.security_code)). (UNSUPPORTED_METHOD) (version 24.11.1.2557 (official build))
+",
+Give me the list of basic industry sectors which have not broken the low of 4th November.,"**Query Preprocessing:**
+
+Intent: Retrieve the list of basic industry sectors that have not broken the low of November 4th.
+
+- Required Tables:
+  - `master_prime_1d`
+  - `equity_prices_1d`
+
+- Columns:
+  - `industry_name` (from `master_prime_1d`)
+  - `low` (from `equity_prices_1d`)
+  - `date_time` (from `equity_prices_1d`)
+
+- Conditions:
+  - Filter records where the `low` value is greater than or equal to the lowest value of November 4th for each industry.
+
+- Joins:
+  - Join `master_prime_1d` and `equity_prices_1d` on `security_code`.
+
+- Aggregations:
+  - Identify the minimum `low` value for each industry on November 4th.
+
+- Sorting/Grouping:
+  - Return the list of basic industry sectors without any specific sorting requirement.
+
+Based on the provided schema and the query requirements, the SQL query can be formulated as follows:
+
+```sql
+SELECT m.industry_name
+FROM master_prime_1d m
+JOIN (
+    SELECT security_code, MIN(low) AS min_low
+    FROM equity_prices_1d
+    WHERE date_time = '2022-11-04'
+    GROUP BY security_code
+) e ON m.security_code = e.security_code
+WHERE m.major_sector_name = 'Basic Industry'
+GROUP BY m.industry_name
+HAVING MIN(e.min_low) >= 
+    (SELECT MIN(low) 
+     FROM equity_prices_1d 
+     WHERE date_time = '2022-11-04')
+```
+
+This query retrieves the list of basic industry sectors from the `master_prime_1d` table that have not broken the low value recorded on November 4th from the `equity_prices_1d` table.","```sql
+SELECT m.industry_name
+FROM master_prime_1d m
+JOIN (
+    SELECT security_code, MIN(low) AS min_low
+    FROM equity_prices_1d
+    WHERE date_time = '2022-11-04'
+    GROUP BY security_code
+) e ON m.security_code = e.security_code
+WHERE m.major_sector_name = 'Basic Industry'
+GROUP BY m.industry_name
+HAVING MIN(e.min_low) >= 
+    (SELECT MIN(low) 
+     FROM equity_prices_1d 
+     WHERE date_time = '2022-11-04')
+```  ","SELECT m.industry_name
+FROM master_prime_1d m
+JOIN (
+    SELECT security_code, MIN(low) AS min_low
+    FROM equity_prices_1d
+    WHERE date_time = '2022-11-04'
+    GROUP BY security_code
+) e ON m.security_code = e.security_code
+WHERE m.major_sector_name = 'Basic Industry'
+GROUP BY m.industry_name
+HAVING MIN(e.min_low) >= 
+    (SELECT MIN(low) 
+     FROM equity_prices_1d 
+     WHERE date_time = '2022-11-04' 
+     AND security_code = m.security_code)","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 1
+ Code: 1. DB::Exception: Resolve identifier 'm.security_code' from parent scope only supported for constants and CTE. Actual m.security_code node type COLUMN. In scope (SELECT MIN(low) FROM equity_prices_1d WHERE (date_time = '2022-11-04') AND (security_code = m.security_code)). (UNSUPPORTED_METHOD) (version 24.11.1.2557 (official build))
+",
+List stocks with daily candle closing above the previous weekly open price on 20th September 2024.,"**Preprocessed Query:**
+
+- **Intent:** Find stocks with daily candle closing above the previous weekly open price on 20th September 2024.
+  
+- **Required Tables:**
+  - `master_prime_1d`
+  - `equity_prices_1d`
+  
+- **Columns:**
+  - `master_prime_1d`: ['security_code', 'company_name']
+  - `equity_prices_1d`: ['date_time', 'security_code', 'open', 'high', 'low', 'close']
+  
+- **Conditions:**
+  - Closing price on 20th September 2024 > Open price of the previous week
+  
+- **Joins:** 
+  - Join `master_prime_1d` with `equity_prices_1d` on `security_code`
+  
+- **Aggregations:** None
+  
+- **Sorting/Grouping:** None","```sql
+SELECT m.security_code, m.company_name
+FROM master_prime_1d AS m
+JOIN equity_prices_1d AS e ON m.security_code = e.security_code
+WHERE e.date_time = '2024-09-20'
+AND e.close > (SELECT open FROM equity_prices_1d WHERE securities = m.security_code AND date_time = '2024-09-13')
+```  ","SELECT m.security_code, m.company_name
+FROM master_prime_1d AS m
+JOIN equity_prices_1d AS e ON m.security_code = e.security_code
+WHERE e.date_time = '2024-09-20'
+AND e.close > (SELECT open FROM equity_prices_1d WHERE security_code = m.security_code AND date_time = '2024-09-13')","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 1
+ Code: 1. DB::Exception: Resolve identifier 'm.security_code' from parent scope only supported for constants and CTE. Actual m.security_code node type COLUMN. In scope (SELECT open FROM equity_prices_1d WHERE (security_code = m.security_code) AND (date_time = '2024-09-13')). (UNSUPPORTED_METHOD) (version 24.11.1.2557 (official build))
+",
+"List stocks where today's volume > yesterday's volume, and one day ago volume > 2-day ago volume, and 2-day ago volume > 3-day ago volume on 19th July 2024.","**Intent:** List stocks where today's volume is greater than yesterday's volume, yesterday's volume is greater than 2-day ago volume, and 2-day ago volume is greater than 3-day ago volume on 19th July 2024.
+
+**Required Tables:**
+- `equity_prices_1d`
+
+**Columns:**
+- `date_time` (for filtering 19th July 2024)
+- `security_code` (for joining)
+- `volume` (for comparing volumes on different days)
+
+**Conditions:**
+- Volume on today is greater than volume on yesterday
+- Volume on yesterday is greater than volume 2 days ago
+- Volume 2 days ago is greater than volume 3 days ago
+- Date is 19th July 2024
+
+**Components:**
+- SELECT: List of columns from `equity_prices_1d`
+- FROM: `equity_prices_1d`
+- WHERE: Conditions mentioned above based on volume and date
+- ORDER BY: Not specified
+- GROUP BY: Not specified
+- JOIN: No additional join is required for this query","```sql
+SELECT ep.security_code
+FROM equity_prices_1d ep
+WHERE ep.date_time = '2024-07-19 00:00:00'
+AND ep.volume > (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-18 00:00:00'
+)
+AND (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-18 00:00:00'
+) > (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-17 00:00:00'
+)
+AND (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-17 00:00:00'
+) > (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-16 00:00:00'
+)
+```  ","SELECT ep.security_code
+FROM equity_prices_1d ep
+WHERE ep.date_time = '2024-07-19'
+AND ep.volume > (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-18'
+)
+AND (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-18'
+) > (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-17'
+)
+AND (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-17'
+) > (
+    SELECT volume
+    FROM equity_prices_1d
+    WHERE date_time = '2024-07-16'
+)","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 125
+ Code: 125. DB::Exception: Scalar subquery returned more than one row. (INCORRECT_RESULT_OF_SCALAR_SUBQUERY) (version 24.11.1.2557 (official build))
+",
+List stocks whose volume is -20% than 2 days before volume on 27th September 2024.,"**Query Preprocessing:**
+
+**Intent:** List stocks whose volume is -20% than 2 days before volume on 27th September 2024.
+
+**Required Tables:**
+- `equity_prices_1d`
+
+**Columns:**
+- `security_code`
+- `volume`
+- `date_time`
+
+**Conditions:**
+- Calculate the volume on 25th September 2024 and compare it with the volume on 27th September 2024 with a -20% difference.
+
+**Joins:** None required as we are querying a single table.
+
+**Aggregations:** None specified in the query.
+
+**Sorting/Grouping:** Not specified in the query.
+
+Considering the given schema, we will adjust the components accordingly to ensure that only columns existing in the `equity_prices_1d` table are used.","```sql
+SELECT security_code
+FROM equity_prices_1d
+WHERE date_time = '2024-09-25' AND volume < 0.8 * (SELECT volume FROM equity_prices_1d WHERE date_time = '2024-09-27')
+```","SELECT ep.security_code
+FROM equity_prices_1d ep
+WHERE ep.date_time = '2024-09-25' 
+AND ep.volume < 0.8 * (SELECT ep2.volume 
+                        FROM equity_prices_1d ep2 
+                        WHERE ep2.date_time = '2024-09-27')","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 125
+ Code: 125. DB::Exception: Scalar subquery returned more than one row. (INCORRECT_RESULT_OF_SCALAR_SUBQUERY) (version 24.11.1.2557 (official build))
+",
+List stocks that have broken their August 2024 high on 20th September 2024.,"Intent: Retrieve stocks that have broken their August 2024 high on 20th September 2024.
+
+Components:
+- Tables: equity_prices_1d
+- Columns: security_code, high, date_time
+- Conditions: Filter for stocks with high breaking their August 2024 high on 20th September 2024
+- Joins: No joins required
+- Sorting/Grouping: None needed
+
+SQL Query:
+```sql
+SELECT security_code, high, date_time
+FROM equity_prices_1d
+WHERE date_time = '2024-09-20' 
+AND high > (SELECT high FROM equity_prices_1d WHERE date_time >= '2024-08-01' AND date_time <= '2024-08-31')
+```
+
+This query retrieves the security codes, high prices, and date/time of stocks that broke their August 2024 high on 20th September 2024 from the equity_prices_1d table.","```sql
+SELECT ep.security_code, ep.high, ep.date_time
+FROM equity_prices_1d AS ep
+WHERE ep.date_time = '2024-09-20' 
+AND ep.high > (
+    SELECT high 
+    FROM equity_prices_1d 
+    WHERE date_time >= '2024-08-01' 
+    AND date_time <= '2024-08-31'
+)
+```","SELECT ep.security_code, ep.high, ep.date_time
+FROM equity_prices_1d AS ep
+WHERE ep.date_time = '2024-09-20' 
+AND ep.high > (
+    SELECT ep2.high 
+    FROM equity_prices_1d AS ep2
+    WHERE ep2.date_time >= '2024-08-01' 
+    AND ep2.date_time <= '2024-08-31'
+)","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 125
+ Code: 125. DB::Exception: Scalar subquery returned more than one row. (INCORRECT_RESULT_OF_SCALAR_SUBQUERY) (version 24.11.1.2557 (official build))
+",
+Can you list stocks with prices trading near their 52-week high on NSE?,"Intent: List stocks with prices trading near their 52-week high on 
+
+Components:
+- Tables: `master_prime_1d`, `equity_prices_1d`
+- Columns: `security_code`, `company_name`, `short_company_name`, `industry_name`, `broad_industry_name`, `major_sector_name`, `index_name`, `date_time`, `open`, `high`, `low`, `close`, `volume`
+- Conditions: Find stocks where the `close` price is near the `high` price for the last 52 weeks
+- Joins: Join `master_prime_1d` and `equity_prices_1d` on `security_code`
+- Aggregations: None
+- Sorting/Grouping: None","```sql
+SELECT mp.security_code, mp.company_name
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.close >= ep.high * 0.95
+AND ep.date_time >= toDate('2024-11-19') - 365
+AND ep.date_time <= toDate('2024-11-19')
+```","SELECT mp.security_code, mp.company_name
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.close >= ep.high * 0.95
+AND ep.date_time >= toDate('2023-11-19')
+AND ep.date_time <= toDate('2024-11-19')","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 386
+ Code: 386. DB::Exception: There is no supertype for types String, Date because some of them are String/FixedString/Enum and some of them are not. (NO_COMMON_TYPE) (version 24.11.1.2557 (official build))
+",
+Give me the list of Gap Up stocks.,"**Preprocessed Query:**
+
+- **Intent:** Retrieve the list of stocks that have gapped up.
+- **Tables:** `equity_prices_1d`
+- **Columns:** `security_code`, `open`, `high`, `low`, `close`
+- **Conditions:** Calculate the gap up by comparing the `open` price with the previous day's `close` price.
+- **Aggregations:** None
+- **Joins:** None
+- **Sorting/Grouping:** None
+
+**Structured Query:**
+
+```sql
+SELECT security_code, open, high, low, close
+FROM equity_prices_1d ep
+WHERE open > (SELECT close
+             FROM equity_prices_1d
+             WHERE date_time = DATE_ADD(ep.date_time, INTERVAL -1 DAY))
+```
+
+In this query, we are selecting the `security_code`, `open`, `high`, `low`, and `close` columns from the `equity_prices_1d` table where the `open` price is greater than the previous day's `close` price, indicating a gap up in the stock price.","```sql
+SELECT ep.security_code, ep.open, ep.high, ep.low, ep.close
+FROM equity_prices_1d AS ep
+WHERE ep.open > (SELECT close
+                 FROM equity_prices_1d
+                 WHERE date_time = toDateTime('2024-11-18 00:00:00'))
+```","SELECT ep.security_code, ep.open, ep.high, ep.low, ep.close
+FROM equity_prices_1d AS ep
+WHERE ep.open > (SELECT close
+                  FROM equity_prices_1d
+                  WHERE date_time = toDateTime('2024-11-18'))","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 386
+ Code: 386. DB::Exception: There is no supertype for types String, DateTime because some of them are String/FixedString/Enum and some of them are not. (NO_COMMON_TYPE) (version 24.11.1.2557 (official build))
+",
+Give me the 5-week average volume weekly for ICICI Bank as of 16th September 2024.,"**Query Preprocessing:**
+
+**Intent:** Calculate the 5-week average volume weekly for ICICI Bank as of 16th September 2024.
+
+**Required Tables:** `equity_prices_1d`
+
+**Columns:**
+- `date_time`
+- `security_code`
+- `volume`
+
+**Conditions:**
+- `security_code = ICICI Bank`
+- Date range to calculate the 5-week average volume weekly ending on 16th September 2024
+
+**Aggregations:** Calculate the average volume over 5 weeks
+
+**Sorting/Grouping:** Weekly grouping
+
+**Final Structured Query:**
+```sql
+SELECT WEEK(date_time) AS week_number, 
+       AVG(volume) AS average_volume_weekly
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+  AND date_time BETWEEN '2024-08-12' AND '2024-09-16' -- 5 weeks before 16th September 2024
+GROUP BY WEEK(date_time)
+```
+
+This query will calculate the average volume weekly for ICICI Bank over 5 weeks ending on 16th September 2024.","```sql
+SELECT toStartOfWeek(date_time) AS week_start_date,
+       avg(volume) AS average_volume_weekly
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+  AND date_time >= '2024-08-12'
+  AND date_time <= '2024-09-16'
+GROUP BY toStartOfWeek(date_time)
+```","SELECT DATE_TRUNC('week', date_time) AS week_start_date,
+       AVG(volume) AS average_volume_weekly
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+  AND date_time >= '2024-08-12'
+  AND date_time <= '2024-09-16'
+GROUP BY DATE_TRUNC('week', date_time)","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 43
+ Code: 43. DB::Exception: Illegal type String of 2nd argument of function dateTrunc. Should be a date or a date with time: In scope SELECT DATE_TRUNC('week', date_time) AS week_start_date, AVG(volume) AS average_volume_weekly FROM equity_prices_1d WHERE (security_code = 'ICICI Bank') AND (date_time >= '2024-08-12') AND (date_time <= '2024-09-16') GROUP BY DATE_TRUNC('week', date_time). (ILLEGAL_TYPE_OF_ARGUMENT) (version 24.11.1.2557 (official build))
+",
+Give me the 5-week weekly average volume for ICICI Bank as of 20th September 2024.,"Intent: Calculate the 5-week weekly average volume for ICICI Bank as of 20th September 2024.
+
+Required Tables: `equity_prices_1d`
+
+Columns:
+- `date_time`
+- `security_code`
+- `volume`
+
+Conditions:
+- `security_code = 'ICICI Bank'`
+- `date_time <= '2024-09-20'`  
+- Calculate the 5-week weekly average volume
+
+Aggregations:
+- Calculate the average volume per week over the past 5 weeks
+
+Output:
+
+```sql
+SELECT AVG(volume) AS weekly_average_volume
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank' 
+  AND date_time <= '2024-09-20' 
+  AND date_time >= DATE_SUB('2024-09-20', INTERVAL 5 WEEK)
+GROUP BY WEEK(date_time)
+ORDER BY date_time DESC
+LIMIT 5
+```","```sql
+SELECT AVG(volume) AS weekly_average_volume
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank' 
+  AND date_time <= '2024-09-20' 
+  AND date_time >= '2024-08-16' -- Assuming 5 weeks are counted from the 20th of September back
+GROUP BY toStartOfWeek(date_time)
+ORDER BY date_time DESC
+LIMIT 5
+```  ","SELECT AVG(ep.volume) AS weekly_average_volume
+FROM equity_prices_1d ep
+WHERE ep.security_code = 'ICICI Bank' 
+  AND ep.date_time <= '2024-09-20' 
+  AND ep.date_time >= '2024-08-16'
+GROUP BY toStartOfWeek(ep.date_time)
+ORDER BY ep.date_time DESC
+LIMIT 5","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 43
+ Code: 43. DB::Exception: Illegal type String of argument of function toStartOfWeek. Must be Date, Date32, DateTime or DateTime64.: In scope SELECT AVG(ep.volume) AS weekly_average_volume FROM equity_prices_1d AS ep WHERE (ep.security_code = 'ICICI Bank') AND (ep.date_time <= '2024-09-20') AND (ep.date_time >= '2024-08-16') GROUP BY toStartOfWeek(ep.date_time) ORDER BY ep.date_time DESC LIMIT 5. (ILLEGAL_TYPE_OF_ARGUMENT) (version 24.11.1.2557 (official build))
+",
+List stocks crossing below the previous week's low on 20th September 2024.,"**Intent**: Preprocess query to list stocks crossing below the previous week's low on 20th September 2024.
+
+**Components**:
+- **Required Tables**:
+  - `equity_prices_1d`
+
+- **Columns**:
+  - `security_code`
+  - `open`
+  - `high`
+  - `low`
+  - `close`
+  - `volume`
+  - `date_time`
+
+- **Conditions**:
+  - Stocks crossing below the previous week's low on 20th September 2024
+
+- **Joins**: None required in this query
+
+- **Aggregations**: None required in this query
+
+- **Sorting/Grouping**: None specified in the query
+
+Please let me know if you need the complete SQL query constructed based on these components.","```sql
+SELECT 
+    ep.security_code
+FROM 
+    equity_prices_1d AS ep
+WHERE 
+    ep.date_time = '2024-09-20' 
+    AND ep.low < (
+        SELECT 
+            MIN(low) 
+        FROM 
+            equity_prices_1d 
+        WHERE 
+            toMonday(date_time) = '2024-09-13'
+    )
+```","SELECT 
+    ep.security_code
+FROM 
+    equity_prices_1d AS ep
+WHERE 
+    ep.date_time = '2024-09-20' 
+    AND ep.low < (
+        SELECT 
+            MIN(ep2.low) 
+        FROM 
+            equity_prices_1d AS ep2
+        WHERE 
+            DATE_FORMAT(ep2.date_time, '%Y-%m-%d') = '2024-09-13'
+    )","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 43
+ Code: 43. DB::Exception: Illegal type String of first argument of function formatDateTime. Should be a date or a date with time: In scope (SELECT MIN(ep2.low) FROM equity_prices_1d AS ep2 WHERE DATE_FORMAT(ep2.date_time, '%Y-%m-%d') = '2024-09-13'). (ILLEGAL_TYPE_OF_ARGUMENT) (version 24.11.1.2557 (official build))
+",
+Give me the list of top 3 best-performing macroeconomic sectors in the last 20 days.,"### Preprocessed Query:
+- **Intent:** Retrieve the list of the top 3 best-performing macroeconomic sectors in the last 20 days.
+- **Required Tables:** `master_prime_1d`, `equity_prices_1d`
+- **Columns:**
+    - From `master_prime_1d`: ['major_sector_name']
+    - From `equity_prices_1d`: ['security_code', 'close', 'date_time']
+- **Conditions:** Data from the last 20 days
+- **Aggregations:** Calculate sector performance based on the price change over the last 20 days
+- **Sorting:** Sort the sectors based on their performance in descending order
+- **Limit:** Display the top 3 best-performing macroeconomic sectors
+
+### SQL Query:
+```sql
+SELECT mp.major_sector_name, AVG(ep.close) AS avg_close_price
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time >= CURRENT_DATE - INTERVAL '20 day'
+GROUP BY mp.major_sector_name
+ORDER BY avg_close_price DESC
+LIMIT 3;
+```","```sql
+SELECT mp.major_sector_name, AVG(ep.close) AS avg_close_price
+FROM master_prime_1d AS mp
+JOIN equity_prices_1d AS ep ON mp.security_code = ep.security_code
+WHERE ep.date_time >= '2024-11-19' - INTERVAL 20 DAY
+GROUP BY mp.major_sector_name
+ORDER BY avg_close_price DESC
+LIMIT 3;
+```","SELECT mp.major_sector_name, AVG(ep.close) AS avg_close_price
+FROM master_prime_1d AS mp
+JOIN equity_prices_1d AS ep ON mp.security_code = ep.security_code
+WHERE ep.date_time >= '2024-11-19' - INTERVAL 20 DAY
+GROUP BY mp.major_sector_name
+ORDER BY avg_close_price DESC
+LIMIT 3;","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 43
+ Code: 43. DB::Exception: No operation greaterOrEquals between String and DateTime64(3). (ILLEGAL_TYPE_OF_ARGUMENT) (version 24.11.1.2557 (official build))
+",
+List stocks closing above the previous Friday's closing price on 20th September 2024.,"Structured Query Preprocessing:
+
+Intent: Extract stocks closing above the previous Friday's closing price on 20th September 2024.
+
+Components:
+- Tables: equity_prices_1d
+- Columns: date_time, security_code, close
+- Conditions: 
+    - Closing price on 20th September 2024
+    - Closing price above the previous Friday's closing price
+- Aggregations: None
+- Sorting/Grouping: None
+
+Query:
+```sql
+SELECT security_code, close
+FROM equity_prices_1d
+WHERE date_time = '2024-09-20'
+AND close > (SELECT close 
+             FROM equity_prices_1d 
+             WHERE date_time = (SELECT MAX(date_time) 
+                                FROM equity_prices_1d 
+                                WHERE WEEKDAY(date_time) = 4 AND date_time < '2024-09-20'))
+```
+
+In the query above, we are selecting the security codes and closing prices from the `equity_prices_1d` table for stocks that have a closing price above the closing price on September 20th, 2024, and higher than the previous Friday's closing price.","```sql
+SELECT ep.security_code, ep.close
+FROM equity_prices_1d ep
+WHERE ep.date_time = '2024-09-20'
+AND ep.close > (
+    SELECT close 
+    FROM equity_prices_1d 
+    WHERE date_time = (
+        SELECT max(date_time) 
+        FROM equity_prices_1d 
+        WHERE toDate(date_time) = toDate('2024-09-20') - numberOfWeek('2024-09-20', -1))
+    )
+```  ","SELECT ep.security_code, ep.close
+FROM equity_prices_1d ep
+WHERE ep.date_time = '2024-09-20'
+AND ep.close > (
+    SELECT close 
+    FROM equity_prices_1d 
+    WHERE date_time = (
+        SELECT max(date_time) 
+        FROM equity_prices_1d 
+        WHERE toDate(date_time) = toDate('2024-09-20') - numberOfWeeks('2024-09-20', -1))
+    )","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 46
+ Code: 46. DB::Exception: Function with name `numberOfWeeks` does not exist. In scope (SELECT max(date_time) FROM equity_prices_1d WHERE toDate(date_time) = (toDate('2024-09-20') - numberOfWeeks('2024-09-20', -1))). (UNKNOWN_FUNCTION) (version 24.11.1.2557 (official build))
+",
+"Give me the list of top 2 best and worst-performing stocks within the fertilizer sector between 27th September 2024 to 21st November 2024, and what was the % change of the fertilizer sector within this timeframe?","### Query Preprocessing:
+
+**Intent:** Retrieve the list of top 2 best and worst-performing stocks within the fertilizer sector and calculate the % change of the fertilizer sector between 27th September 2024 to 21st November 2024.
+
+**Components:**
+- **Tables:** `master_prime_1d`, `equity_prices_1d`
+- **Columns:**
+  - `master_prime_1d`: ['security_code', 'company_name', 'industry_name']
+  - `equity_prices_1d`: ['date_time', 'security_code', 'close']
+- **Conditions:**
+  - Fertilizer sector stocks
+  - Timeframe: 27th September 2024 to 21st November 2024
+- **Aggregations:**
+  - Calculate % change for the fertilizer sector stocks
+- **Sorting:**
+  - Top 2 best-performing stocks
+  - Top 2 worst-performing stocks
+
+### Structured Query:
+
+```sql
+SELECT mp.security_code, mp.company_name, ep.close AS stock_price
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE mp.industry_name = 'Fertilizer'
+AND ep.date_time BETWEEN '2024-09-27' AND '2024-11-21'
+ORDER BY ep.close DESC
+LIMIT 2
+UNION
+SELECT mp.security_code, mp.company_name, ep.close AS stock_price
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE mp.industry_name = 'Fertilizer'
+AND ep.date_time BETWEEN '2024-09-27' AND '2024-11-21'
+ORDER BY ep.close
+LIMIT 2;
+```
+
+**Note:** Calculation of the % change of the fertilizer sector is not included in the SQL query as it requires additional processing outside the scope of a single SQL query.","```sql
+SELECT mp.security_code, mp.company_name, ep.close AS stock_price
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE mp.industry_name = 'Fertilizer'
+AND ep.date_time BETWEEN '2024-09-27' AND '2024-11-21'
+ORDER BY ep.close DESC
+LIMIT 2
+UNION
+SELECT mp.security_code, mp.company_name, ep.close AS stock_price
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE mp.industry_name = 'Fertilizer'
+AND ep.date_time BETWEEN '2024-09-27' AND '2024-11-21'
+ORDER BY ep.close
+LIMIT 2;
+```","SELECT mp.security_code, mp.company_name, ep.close AS stock_price
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE mp.industry_name = 'Fertilizer'
+AND ep.date_time BETWEEN '2024-09-27' AND '2024-11-21'
+ORDER BY ep.close DESC
+LIMIT 2
+UNION
+SELECT mp.security_code, mp.company_name, ep.close AS stock_price
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE mp.industry_name = 'Fertilizer'
+AND ep.date_time BETWEEN '2024-09-27' AND '2024-11-21'
+ORDER BY ep.close
+LIMIT 2;","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 558
+ Code: 558. DB::Exception: Expected ALL or DISTINCT in SelectWithUnion query, because setting (union_default_mode) is empty: While processing SELECT mp.security_code, mp.company_name, ep.close AS stock_price FROM master_prime_1d AS mp INNER JOIN equity_prices_1d AS ep ON mp.security_code = ep.security_code WHERE (mp.industry_name = 'Fertilizer') AND ((ep.date_time >= '2024-09-27') AND (ep.date_time <= '2024-11-21')) ORDER BY ep.close DESC LIMIT 2 UNION SELECT mp.security_code, mp.company_name, ep.close AS stock_price FROM master_prime_1d AS mp INNER JOIN equity_prices_1d AS ep ON mp.security_code = ep.security_code WHERE (mp.industry_name = 'Fertilizer') AND ((ep.date_time >= '2024-09-27') AND (ep.date_time <= '2024-11-21')) ORDER BY ep.close ASC LIMIT 2 FORMAT Native. (EXPECTED_ALL_OR_DISTINCT) (version 24.11.1.2557 (official build))
+",
+Give me the latest 5-day average volume for ICICI Bank.,"#### Preprocessed Query:
+- **Intent:** Calculate the latest 5-day average volume for ICICI Bank.
+- **Tables:** `equity_prices_1d`
+- **Columns:** `date_time`, `security_code`, `volume`
+- **Conditions:** `security_code = 'ICICI Bank'`
+- **Aggregations:** Calculate 5-day average volume
+- **Sorting/Grouping:** Not specified
+
+#### SQL Query:
+```sql
+SELECT AVG(volume) AS avg_volume_5d
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+AND date_time >= DATE_SUB(CURDATE(), INTERVAL 5 DAY);
+```","```sql
+SELECT AVG(volume) AS avg_volume_5d
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+AND date_time >= '2024-11-14 00:00:00';
+```","The corrected SQL query based on the provided rules is:
+
+
+SELECT AVG(volume) AS avg_volume_5d
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+AND date_time >= '2024-11-14';","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('The') (line 1, col 1): The corrected SQL query based on the provided rules is:
+
+
+SELECT AVG(volume) AS avg_volume_5d
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+AND date_. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+",
+Give me the 5-week average volume for ICICI Bank using weekly data as of 16th September 2024.,"Intent: Calculate the 5-week average volume for ICICI Bank using weekly data as of 16th September 2024.
+
+Components:
+- Tables: equity_prices_1d
+- Columns: date_time, security_code, volume
+- Conditions: security_code = 'ICICI Bank' AND date_time <= '2024-09-16' AND date_time >= DATE_ADD('2024-09-16', INTERVAL -5 WEEK)
+- Aggregation: Calculate average volume
+- Grouping: By security_code
+
+Structured Query:
+```sql
+SELECT security_code, AVG(volume) AS avg_volume
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank' AND date_time <= '2024-09-16' AND date_time >= DATE_ADD('2024-09-16', INTERVAL -5 WEEK)
+GROUP BY security_code;
+```","```sql
+SELECT security_code, AVG(volume) AS avg_volume
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank' AND date_time <= '2024-09-16' AND date_time >= toDate('2024-09-16') - INTERVAL 5 WEEK
+GROUP BY security_code;
+```","The corrected SQL query based on the provided schema is as follows:
+
+
+SELECT security_code, AVG(volume) AS avg_volume
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank' AND date_time <= '2024-09-16' AND date_time >= date('2024-09-16', '-5 week')
+GROUP BY security_code;","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('The') (line 1, col 1): The corrected SQL query based on the provided schema is as follows:
+
+
+SELECT security_code, AVG(volume) AS avg_volume
+FROM equity_prices_1d
+WHERE security_code . Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+",
+List stocks closing above the previous weekly candle closing price on 20th September 2024.,"**Query Preprocessing:**
+
+**Intent:** Select stocks closing above the previous weekly candle closing price on 20th September 2024.
+
+**Required Tables:**
+- `equity_prices_1d`
+
+**Columns:**
+- `security_code`
+- `close`
+
+**Conditions:**
+- Closing price on 20th September 2024 > Previous weekly candle closing price
+
+**Sorting/Grouping:**
+- No specific sorting or grouping mentioned
+
+Based on the provided schema and the query requirements, here is the structured SQL query:
+```sql
+SELECT e.security_code
+FROM equity_prices_1d e
+WHERE e.date_time = '2024-09-20' 
+AND e.close > (SELECT close 
+               FROM equity_prices_1d 
+               WHERE date_time = '2024-09-13' 
+               AND e.security_code = security_code)
+```
+
+Please note that the query assumes that the date format in the `equity_prices_1d` table is in 'YYYY-MM-DD' format. Adjust it accordingly if the actual format is different.","```sql
+SELECT e.security_code
+FROM equity_prices_1d e
+WHERE e.date_time = '2024-09-20' 
+AND e.close > (SELECT close 
+               FROM equity_prices_1d 
+               WHERE date_time = '2024-09-13' 
+               AND e.security_code = security_code)
+```","The corrected SQL query based on the provided schema is:
+
+
+SELECT e1.security_code
+FROM equity_prices_1d e1
+WHERE e1.date_time = '2024-09-20' 
+AND e1.close > (SELECT e2.close 
+                FROM equity_prices_1d e2
+                WHERE e2.date_time = '2024-09-13' 
+                AND e1.security_code = e2.security_code)","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('The') (line 1, col 1): The corrected SQL query based on the provided schema is:
+
+
+SELECT e1.security_code
+FROM equity_prices_1d e1
+WHERE e1.date_time = '2024-09-20' 
+AND e1.close > (S. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+",
+List stocks whose volume is minus 20% than 2 days before volume on 27th September 2024.,"Structured Query Preprocessing:
+
+Intent: List stocks
+Tables: equity_prices_1d
+Columns: security_code, volume
+Conditions: volume is 0.8 * volume on 25th September 2024
+Joins: N/A
+Aggregations: N/A
+Sorting/Grouping: N/A","```sql
+SELECT ep.security_code
+FROM equity_prices_1d AS ep
+WHERE ep.date_time = '2024-09-27' AND ep.volume < 0.8 * (SELECT volume
+                                                        FROM equity_prices_1d
+                                                        WHERE date_time = '2024-09-25') * 0.8
+```  ","The corrected SQL query based on the provided schema is:
+
+
+SELECT ep.security_code
+FROM equity_prices_1d AS ep
+WHERE ep.date_time = '2024-09-27' 
+AND ep.volume < 0.8 * (
+    SELECT ep2.volume 
+    FROM equity_prices_1d AS ep2
+    WHERE ep2.date_time = '2024-09-25'
+) * 0.8","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('The') (line 1, col 1): The corrected SQL query based on the provided schema is:
+
+
+SELECT ep.security_code
+FROM equity_prices_1d AS ep
+WHERE ep.date_time = '2024-09-27' 
+AND ep.volume . Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+",
+Give me a list of stocks whose daily volume was at least three times higher than the average volume for the previous ten days on 16th July 2024.,"Structured Query Preprocessing:
+- Intent: Retrieve a list of stocks whose daily volume was at least three times higher than the average volume for the previous ten days on 16th July 2024.
+- Required Tables: `equity_prices_1d`
+- Columns: 
+    - `security_code`
+    - `volume`
+- Conditions:
+    - Filter stocks based on daily volume being at least three times higher than the average volume for the previous ten days.
+    - Date condition: 16th July 2024
+- Aggregations: 
+    - Calculate average volume for the previous ten days
+- Sorting/Grouping: No specific sorting or grouping mentioned
+
+Please let me know if you need the constructed SQL query for this preprocessing.","```sql
+SELECT
+    ep.security_code
+FROM
+    equity_prices_1d AS ep
+INNER JOIN (
+    SELECT
+        security_code,
+        AVG(volume) AS avg_volume
+    FROM
+        equity_prices_1d
+    WHERE
+        date_time >= '2024-07-06 00:00:00' 
+        AND date_time < '2024-07-16 00:00:00'
+    GROUP BY
+        security_code
+) AS ten_day_avg ON ep.security_code = ten_day_avg.security_code
+WHERE
+    ep.date_time = '2024-07-16 00:00:00'
+    AND ep.volume >= 3 * ten_day_avg.avg_volume
+```","The corrected SQL query based on the provided schema is:
+
+
+SELECT
+    ep.security_code
+FROM
+    equity_prices_1d AS ep
+INNER JOIN (
+    SELECT
+        security_code,
+        AVG(volume) AS avg_volume
+    FROM
+        equity_prices_1d
+    WHERE
+        date_time >= '2024-07-06' 
+        AND date_time < '2024-07-16'
+    GROUP BY
+        security_code
+) AS ten_day_avg ON ep.security_code = ten_day_avg.security_code
+WHERE
+    ep.date_time = '2024-07-16'
+    AND ep.volume >= 3 * ten_day_avg.avg_volume","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('The') (line 1, col 1): The corrected SQL query based on the provided schema is:
+
+
+SELECT
+    ep.security_code
+FROM
+    equity_prices_1d AS ep
+INNER JOIN (
+    SELECT
+        security_. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+",
+"On 16th September 2024, which stocks have closed below their previous week's low?","Structured Query Preprocessing:
+Intent: Find stocks that closed below their previous week's low on 16th September 2024.
+Tables: equity_prices_1d
+Columns: security_code, close, low, date_time
+Conditions: date_time = '2024-09-16' AND close < (SELECT low FROM equity_prices_1d WHERE date_time = '2024-09-09')
+Sorting: None
+
+Final SQL query:
+```sql
+SELECT security_code, close, low, date_time
+FROM equity_prices_1d
+WHERE date_time = '2024-09-16'
+AND close < (SELECT low FROM equity_prices_1d WHERE date_time = '2024-09-09')
+```","```sql
+SELECT e.security_code, e.close, e.low, e.date_time
+FROM equity_prices_1d AS e
+JOIN equity_prices_1d AS e_prev
+ON e.security_code = e_prev.security_code
+WHERE e.date_time = '2024-09-16'
+AND e.close < e_prev.low
+AND e_prev.date_time = '2024-09-09'
+```","The corrected SQL query based on the provided schema would be:
+
+
+SELECT e.security_code, e.close, e.low, e.date_time
+FROM equity_prices_1d AS e
+JOIN equity_prices_1d AS e_prev ON e.security_code = e_prev.security_code
+WHERE e.date_time = '2024-09-16'
+AND e.close < e_prev.low
+AND e_prev.date_time = '2024-09-09'","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('The') (line 1, col 1): The corrected SQL query based on the provided schema would be:
+
+
+SELECT e.security_code, e.close, e.low, e.date_time
+FROM equity_prices_1d AS e
+JOIN equity_pric. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+",
+List stocks with their closing price 2% higher from the day's low on 20th September 2024.,"**Intent**: List stocks with their closing price 2% higher from the day's low on 20th September 2024.
+
+**Required Tables**: `equity_prices_1d`
+
+**Columns**:
+- `security_code`
+- `close`
+- `low`
+- `date_time`
+
+**Conditions**:
+- Closing price is 2% higher than the day's low
+- Date is 20th September 2024
+
+```sql
+SELECT security_code, close, low, date_time
+FROM equity_prices_1d
+WHERE date_time = '2024-09-20' 
+    AND close >= 1.02 * low;
+```","```sql
+SELECT ep.security_code, ep.close, ep.low, ep.date_time
+FROM equity_prices_1d AS ep
+WHERE ep.date_time = '2024-09-20' 
+    AND ep.close >= 1.02 * ep.low;
+```","The validated SQL query based on the provided schema is:
+
+
+SELECT ep.security_code, ep.close, ep.low, ep.date_time
+FROM equity_prices_1d AS ep
+WHERE ep.date_time = '2024-09-20' 
+    AND ep.close >= 1.02 * ep.low;","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 1 ('The') (line 1, col 1): The validated SQL query based on the provided schema is:
+
+
+SELECT ep.security_code, ep.close, ep.low, ep.date_time
+FROM equity_prices_1d AS ep
+WHERE ep.date_tim. Expected one of: Query, Query with output, EXPLAIN, EXPLAIN, SELECT query, possibly with UNION, list of union elements, SELECT query, subquery, possibly with UNION, SELECT subquery, SELECT query, WITH, FROM, SELECT, SHOW CREATE QUOTA query, SHOW CREATE, SHOW [FULL] [TEMPORARY] TABLES|DATABASES|CLUSTERS|CLUSTER|MERGES 'name' [[NOT] [I]LIKE 'str'] [LIMIT expr], SHOW, SHOW COLUMNS query, SHOW ENGINES query, SHOW ENGINES, SHOW FUNCTIONS query, SHOW FUNCTIONS, SHOW INDEXES query, SHOW SETTING query, SHOW SETTING, EXISTS or SHOW CREATE query, EXISTS, DESCRIBE FILESYSTEM CACHE query, DESCRIBE, DESC, DESCRIBE query, SHOW PROCESSLIST query, SHOW PROCESSLIST, CREATE TABLE or ATTACH TABLE query, CREATE, ATTACH, REPLACE, CREATE DATABASE query, CREATE VIEW query, CREATE DICTIONARY, CREATE LIVE VIEW query, CREATE WINDOW VIEW query, ALTER query, ALTER TABLE, ALTER TEMPORARY TABLE, ALTER DATABASE, RENAME query, RENAME DATABASE, RENAME TABLE, EXCHANGE TABLES, RENAME DICTIONARY, EXCHANGE DICTIONARIES, RENAME, DROP query, DROP, DETACH, TRUNCATE, UNDROP query, UNDROP, CHECK ALL TABLES, CHECK TABLE, KILL QUERY query, KILL, OPTIMIZE query, OPTIMIZE TABLE, WATCH query, WATCH, SHOW ACCESS query, SHOW ACCESS, ShowAccessEntitiesQuery, SHOW GRANTS query, SHOW GRANTS, SHOW PRIVILEGES query, SHOW PRIVILEGES, BACKUP or RESTORE query, BACKUP, RESTORE, INSERT query, INSERT INTO, USE query, USE, SET ROLE or SET DEFAULT ROLE query, SET ROLE DEFAULT, SET ROLE, SET DEFAULT ROLE, SET query, SET, SYSTEM query, SYSTEM, CREATE USER or ALTER USER query, ALTER USER, CREATE USER, CREATE ROLE or ALTER ROLE query, ALTER ROLE, CREATE ROLE, CREATE QUOTA or ALTER QUOTA query, ALTER QUOTA, CREATE QUOTA, CREATE ROW POLICY or ALTER ROW POLICY query, ALTER POLICY, ALTER ROW POLICY, CREATE POLICY, CREATE ROW POLICY, CREATE SETTINGS PROFILE or ALTER SETTINGS PROFILE query, ALTER SETTINGS PROFILE, ALTER PROFILE, CREATE SETTINGS PROFILE, CREATE PROFILE, CREATE FUNCTION query, DROP FUNCTION query, CREATE WORKLOAD query, DROP WORKLOAD query, CREATE RESOURCE query, DROP RESOURCE query, CREATE NAMED COLLECTION, DROP NAMED COLLECTION query, Alter NAMED COLLECTION query, ALTER, CREATE INDEX query, DROP INDEX query, DROP access entity query, MOVE access entity query, MOVE, GRANT or REVOKE query, REVOKE, GRANT, CHECK GRANT, CHECK GRANT, EXTERNAL DDL query, EXTERNAL DDL FROM, TCL query, BEGIN TRANSACTION, START TRANSACTION, COMMIT, ROLLBACK, SET TRANSACTION SNAPSHOT, Delete query, DELETE. (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+",
+Can you list stocks with low price volatility and consistent trading volume over the past month?,"**Query Preprocessed:**
+
+- **Intent:** List stocks with low price volatility and consistent trading volume over the past month.
+
+- **Required Tables:** `master_prime_1d`, `equity_prices_1d`
+
+- **Columns:**
+    - From `master_prime_1d`: `security_code`, `company_name`
+    - From `equity_prices_1d`: `security_code`, `high`, `low`, `volume`
+
+- **Conditions:**
+    - Price volatility can be calculated using the `high` and `low` prices over the past month.
+    - Consistent trading volume can be determined by analyzing the `volume` over the past month.
+
+- **Joins:** 
+    - Join `master_prime_1d` and `equity_prices_1d` tables on the `security_code` column.
+
+- **Aggregations:** 
+    - Calculate the price volatility by finding the difference between `high` and `low` prices.
+    - Analyze the trading volume to identify consistent trading behavior.
+
+- **Sorting/Grouping:**
+    - Possible sorting by price volatility (low to high) and trading volume (consistent to inconsistent).
+
+**Note:** Please confirm the definition of ""low price volatility"" and ""consistent trading volume"" for more specific query construction.","```sql
+SELECT mp.security_code, mp.company_name
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time >= '2024-10-19 00:00:00' AND ep.date_time < '2024-11-19 00:00:00'
+GROUP BY mp.security_code, mp.company_name
+HAVING MAX(ep.high) - MIN(ep.low) <= <define_low_price_volatility_threshold>
+ORDER BY MAX(ep.volume) - MIN(ep.volume) DESC
+```","SELECT mp.security_code, mp.company_name
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time >= '2024-10-19' AND ep.date_time < '2024-11-19'
+GROUP BY mp.security_code, mp.company_name
+HAVING MAX(ep.high) - MIN(ep.low) <= <define_low_price_volatility_threshold>
+ORDER BY MAX(ep.volume) - MIN(ep.volume) DESC","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: Syntax error: failed at position 277 ('<') (line 6, col 38): <define_low_price_volatility_threshold>
+ORDER BY MAX(ep.volume) - MIN(ep.volume) DESC
+ FORMAT Native. Expected one of: CAST operator, ANY, ALL, NOT, INTERVAL, CASE, DATE, TIMESTAMP, tuple, collection of literals, array, number, literal, NULL, NULL, Bool, TRUE, FALSE, string literal, asterisk, qualified asterisk, compound identifier, identifier, COLUMNS matcher, COLUMNS, qualified COLUMNS matcher, function name, substitution, MySQL-style global variable. (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+",
+List stocks that closed above the previous month's high and above the previous week's high on 16th July 2024.,"**Intent:** Preprocess query to list stocks that closed above the previous month's high and previous week's high on 16th July 2024.
+
+**Components:**
+- **Tables:** `master_prime_1d`, `equity_prices_1d`
+- **Columns:** 
+    - `equity_prices_1d`: `security_code`, `close`, `high`
+    - `master_prime_1d`: `company_name`
+- **Conditions:** 
+    - Close price on 16th July 2024 > Previous month's high
+    - Close price on 16th July 2024 > Previous week's high
+- **Joins:** Joining `master_prime_1d` with `equity_prices_1d` on `security_code`
+- **Sorting/Grouping:** NA
+
+**Structured Query:**
+```sql
+SELECT mp.company_name
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-07-16'
+AND ep.close > (SELECT MAX(high) FROM equity_prices_1d WHERE MONTH(date_time) = MONTH('2024-07-16')-1)
+AND ep.close > (SELECT MAX(high) FROM equity_prices_1d WHERE WEEK(date_time) = WEEK('2024-07-16'))
+```
+
+This structured query extracts the intent, required tables, columns, conditions, joins, and validates the specified columns in the schema for the given query to list stocks meeting the mentioned criteria.","```sql
+SELECT mp.company_name
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-07-16'
+AND ep.close > (SELECT max(high) FROM equity_prices_1d WHERE toMonth(date_time) = toMonth('2024-07-16') - 1)
+AND ep.close > (SELECT max(high) FROM equity_prices_1d WHERE toWeek(date_time) = toWeek('2024-07-16'))
+```","SELECT mp.company_name
+FROM master_prime_1d mp
+JOIN equity_prices_1d ep ON mp.security_code = ep.security_code
+WHERE ep.date_time = '2024-07-16'
+AND ep.close > (SELECT max(high) FROM equity_prices_1d WHERE EXTRACT(MONTH FROM date_time) = (EXTRACT(MONTH FROM '2024-07-16') - 1))
+AND ep.close > (SELECT max(high) FROM equity_prices_1d WHERE EXTRACT(WEEK FROM date_time) = EXTRACT(WEEK FROM '2024-07-16'))","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 62
+ Code: 62. DB::Exception: The syntax 'EXTRACT(WEEK FROM date)' is not supported, cannot extract the number of a week. (SYNTAX_ERROR) (version 24.11.1.2557 (official build))
+",
+When was the last time ICICI Bank went up consecutively for 2 days?,"Structured Query Preprocessing:
+- Intent: Find the last time ICICI Bank went up cocutively for 2 days
+- Required Tables: equity_prices_1d
+- Columns: date_time, security_code, close
+- Conditions: Cocutive increase in close price for ICICI Bank for 2 days
+- Sorting: By date_time in descending order
+
+Final Query:
+```sql
+SELECT date_time, security_code, close
+FROM equity_prices_1d
+WHERE security_code = 'ICICI Bank'
+ORDER BY date_time DESC
+```
+
+Please note that the query only selects the required columns from the specified table based on the given conditions.","```sql
+SELECT date_time
+FROM (
+    SELECT date_time, close,
+           LAG(close, 1) OVER (PARTITION BY security_code ORDER BY date_time) AS prev_close,
+           LAG(close, 2) OVER (PARTITION BY security_code ORDER BY date_time) AS prev_prev_close
+    FROM equity_prices_1d
+    WHERE security_code = 'ICICI Bank' AND date_time < '2024-11-19 00:00:00'
+)
+WHERE close > prev_close AND prev_close > prev_prev_close
+ORDER BY date_time DESC
+LIMIT 1
+```  ","SELECT date_time
+FROM (
+    SELECT e.date_time, e.close,
+           LAG(e.close, 1) OVER (PARTITION BY e.security_code ORDER BY e.date_time) AS prev_close,
+           LAG(e.close, 2) OVER (PARTITION BY e.security_code ORDER BY e.date_time) AS prev_prev_close
+    FROM equity_prices_1d e
+    WHERE e.security_code = 'ICICI Bank' AND e.date_time < '2024-11-19'
+) AS sub
+WHERE sub.close > sub.prev_close AND sub.prev_close > sub.prev_prev_close
+ORDER BY sub.date_time DESC
+LIMIT 1","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 63
+ Code: 63. DB::Exception: Aggregate function with name 'LAG' does not exist. In scope SELECT e.date_time, e.close, LAG(e.close, 1) OVER (PARTITION BY e.security_code ORDER BY e.date_time ASC) AS prev_close, LAG(e.close, 2) OVER (PARTITION BY e.security_code ORDER BY e.date_time ASC) AS prev_prev_close FROM equity_prices_1d AS e WHERE (e.security_code = 'ICICI Bank') AND (e.date_time < '2024-11-19'). (UNKNOWN_AGGREGATE_FUNCTION) (version 24.11.1.2557 (official build))
+",
+"When was the last time the Nifty50 index went up for 3 weeks consecutively, and what was the performance in the next 3 months?","**Intent:** 
+Find the last time the Nifty50 index showed 3 cocutive weeks of positive growth and determine its performance in the next 3 months.
+
+**Required Tables:** 
+- `master_prime_1d`
+- `equity_prices_1d`
+
+**Columns:**
+- `equity_prices_1d`: [`date_time`, `security_code`, `close`]
+- `master_prime_1d`: [`index_name`]
+
+**Conditions:**
+- Positive growth for 3 cocutive weeks in the Nifty50 index.
+
+**Aggregations:**
+- None specified.
+
+**Sorting/Grouping:**
+- Identify the last occurrence of 3 cocutive weeks of positive growth in the Nifty50 index.
+
+**Query Preprocessing:**
+```sql
+SELECT ep.date_time, ep.close
+FROM equity_prices_1d ep
+JOIN master_prime_1d mp ON ep.security_code = mp.security_code
+WHERE mp.index_name = 'Nifty50'
+ORDER BY ep.date_time DESC;
+```
+
+This query retrieves the date and closing price of the Nifty50 index from the `equity_prices_1d` table and `master_prime_1d` table for the specified index.","```sql
+SELECT ep.date_time AS last_positive_grow_date, ep.close AS last_positive_grow_close,
+       (SELECT MIN(date_time) FROM equity_prices_1d WHERE date_time > ep.date_time) AS next_3_months_start_date,
+       (SELECT MAX(date_time) FROM equity_prices_1d WHERE date_time <= next_3_months_start_date + 3 MONTH) AS next_3_months_end_date
+FROM (
+    SELECT ep1.date_time, ep1.close,
+           SUM(sign(ep2.close - ep2.close) + 1) OVER (ORDER BY ep1.date_time DESC ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS consec_weeks_growth
+    FROM equity_prices_1d ep1
+    JOIN equity_prices_1d ep2 ON ep1.date_time = ep2.date_time + 7 DAYS
+    JOIN master_prime_1d mp ON ep1.security_code = mp.security_code
+    WHERE mp.index_name = 'Nifty50'
+) ep
+WHERE consec_weeks_growth = 3
+ORDER BY ep.date_time DESC
+LIMIT 1;
+```","SELECT
+    ep.date_time AS last_positive_grow_date,
+    ep.close AS last_positive_grow_close,
+    (SELECT MIN(date_time) FROM equity_prices_1d WHERE date_time > ep.date_time) AS next_3_months_start_date,
+    (SELECT MAX(date_time) FROM equity_prices_1d WHERE date_time <= DATE_ADD(next_3_months_start_date, INTERVAL 3 MONTH)) AS next_3_months_end_date
+FROM (
+    SELECT 
+        ep1.date_time, ep1.close,
+        SUM(sign(ep1.close - LAG(ep1.close, 1) OVER (ORDER BY ep1.date_time)) + 1) OVER (ORDER BY ep1.date_time DESC ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS consec_weeks_growth
+    FROM equity_prices_1d ep1
+    JOIN equity_prices_1d ep2 ON ep1.date_time = DATE_ADD(ep2.date_time, INTERVAL 7 DAY)
+    JOIN master_prime_1d mp ON ep1.security_code = mp.security_code
+    WHERE mp.index_name = 'Nifty50'
+) ep
+WHERE consec_weeks_growth = 3
+ORDER BY last_positive_grow_date DESC
+LIMIT 1;","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 63
+ Code: 63. DB::Exception: Aggregate function with name 'LAG' does not exist. In scope SELECT ep1.date_time, ep1.close, SUM(sign(ep1.close - LAG(ep1.close, 1) OVER (ORDER BY ep1.date_time ASC)) + 1) OVER (ORDER BY ep1.date_time DESC ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS consec_weeks_growth FROM equity_prices_1d AS ep1 INNER JOIN equity_prices_1d AS ep2 ON ep1.date_time = (ep2.date_time + toIntervalDay(7)) INNER JOIN master_prime_1d AS mp ON ep1.security_code = mp.security_code WHERE mp.index_name = 'Nifty50'. (UNKNOWN_AGGREGATE_FUNCTION) (version 24.11.1.2557 (official build))
+",
+"Give me 10-day, 20-day performance whenever weekly volumes have increased for two consecutive weeks as of 16th July 2024.","**Query Preprocessing:**
+
+**Intent:**  
+Retrieve the 10-day and 20-day performance data for securities whenever the weekly volumes have increased for two cocutive weeks as of 16th July 2024.
+
+**Required Tables:**  
+- `master_prime_1d`
+- `equity_prices_1d`
+
+**Columns:**
+- **From `master_prime_1d`:**
+  - `security_code`
+- **From `equity_prices_1d`:**
+  - `date_time`
+  - `security_code`
+  - `close`
+  - `volume`
+
+**Conditions:**
+- Weekly volumes have increased for two cocutive weeks as of 16th July 2024.
+
+**Joins:**  
+- Joining `master_prime_1d` with `equity_prices_1d` on `security_code`.
+
+**Aggregations:**  
+- Calculate the performance over 10 days and 20 days.
+
+**Sorting/Grouping:**  
+- No specific sorting or grouping mentioned in the query.
+
+This preprocessing helps to define the query structure and necessary components to retrieve the required data from the database.","```sql
+SELECT 
+    equity_prices_1d.security_code,
+    date_time,
+    close,
+    volume,
+    SUM(close) OVER(PARTITION BY equity_prices_1d.security_code ORDER BY date_time ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) AS performance_10_days,
+    SUM(close) OVER(PARTITION BY equity_prices_1d.security_code ORDER BY date_time ROWS BETWEEN 19 PRECEDING AND CURRENT ROW) AS performance_20_days
+FROM equity_prices_1d
+JOIN master_prime_1d ON equity_prices_1d.security_code = master_prime_1d.security_code
+WHERE date_time <= '2024-07-16' AND date_time >= '2024-06-25' -- 10 days before 16th July 2024
+AND volume > LAG(volume) OVER(PARTITION BY equity_prices_1d.security_code ORDER BY date_time) 
+AND LAG(volume, 2) OVER(PARTITION BY equity_prices_1d.security_code ORDER BY date_time) > LAG(volume) OVER(PARTITION BY equity_prices_1d.security_code ORDER BY date_time)
+```  ","SELECT 
+    equity_prices_1d.security_code,
+    date_time,
+    close,
+    volume,
+    SUM(close) OVER(PARTITION BY equity_prices_1d.security_code ORDER BY date_time ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) AS performance_10_days,
+    SUM(close) OVER(PARTITION BY equity_prices_1d.security_code ORDER BY date_time ROWS BETWEEN 19 PRECEDING AND CURRENT ROW) AS performance_20_days
+FROM equity_prices_1d
+JOIN master_prime_1d ON equity_prices_1d.security_code = master_prime_1d.security_code
+WHERE date_time <= '2024-07-16' AND date_time >= '2024-06-25'
+AND volume > LAG(volume) OVER(PARTITION BY equity_prices_1d.security_code ORDER BY date_time)
+AND LAG(volume, 2) OVER(PARTITION BY equity_prices_1d.security_code ORDER BY date_time) > LAG(volume) OVER(PARTITION BY equity_prices_1d.security_code ORDER BY date_time)","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 63
+ Code: 63. DB::Exception: Aggregate function with name 'LAG' does not exist. In scope SELECT equity_prices_1d.security_code, date_time, close, volume, SUM(close) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY date_time ASC ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) AS performance_10_days, SUM(close) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY date_time ASC ROWS BETWEEN 19 PRECEDING AND CURRENT ROW) AS performance_20_days FROM equity_prices_1d INNER JOIN master_prime_1d ON equity_prices_1d.security_code = master_prime_1d.security_code WHERE (date_time <= '2024-07-16') AND (date_time >= '2024-06-25') AND (volume > LAG(volume) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY date_time ASC)) AND (LAG(volume, 2) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY date_time ASC) > LAG(volume) OVER (PARTITION BY equity_prices_1d.security_code ORDER BY date_time ASC)). (UNKNOWN_AGGREGATE_FUNCTION) (version 24.11.1.2557 (official build))
+",
+List stocks that have closed higher for 3 consecutive days as of 16th September 2024.,"**Intent:** Extract stocks that have closed higher for 3 cocutive days as of 16th September 2024.
+
+**Required Tables:** `equity_prices_1d`
+
+**Columns:**
+- `security_code`
+- `close`
+- `date_time`
+
+**Conditions:**
+- Closing price higher for 3 cocutive days
+- Date is on or before 16th September 2024
+
+**Joins:** No joins required
+
+**Aggregations:** No aggregations needed
+
+**Sorting/Grouping:** No sorting/grouping specified
+
+Here is the preprocessed SQL query:
+```sql
+SELECT security_code, date_time, close
+FROM equity_prices_1d
+WHERE date_time <= '2024-09-16'
+AND security_code IN (
+    SELECT security_code
+    FROM (
+        SELECT security_code,
+               date_time,
+               close,
+               LAG(close, 1) OVER(PARTITION BY security_code ORDER BY date_time) AS prev_close,
+               LAG(close, 2) OVER(PARTITION BY security_code ORDER BY date_time) AS prev_prev_close
+        FROM equity_prices_1d
+        WHERE date_time <= '2024-09-16'
+    ) sub
+    WHERE close > prev_close
+      AND prev_close > prev_prev_close
+)
+```
+
+This query will list the stocks that have closed higher for 3 cocutive days as of 16th September 2024 based on the available schema.","```sql
+SELECT ep.security_code, ep.date_time, ep.close
+FROM equity_prices_1d AS ep
+INNER JOIN (
+    SELECT security_code, date_time
+    FROM (
+        SELECT security_code, date_time,
+               LAG(close, 1) OVER(PARTITION BY security_code ORDER BY date_time) AS prev_close1,
+               LAG(close, 2) OVER(PARTITION BY security_code ORDER BY date_time) AS prev_close2,
+               LAG(close, 3) OVER(PARTITION BY security_code ORDER BY date_time) AS prev_close3
+        FROM equity_prices_1d
+        WHERE date_time <= '2024-09-16'
+    ) sub
+    WHERE close > prev_close1 AND prev_close1 > prev_close2 AND prev_close2 > prev_close3
+) AS filt
+ON ep.security_code = filt.security_code AND ep.date_time = filt.date_time
+WHERE ep.date_time <= '2024-09-16'
+```","SELECT ep.security_code, ep.date_time, ep.close
+FROM equity_prices_1d AS ep
+INNER JOIN (
+    SELECT security_code, date_time
+    FROM (
+        SELECT security_code, date_time,
+               LAG(close, 1) OVER(PARTITION BY security_code ORDER BY date_time) AS prev_close1,
+               LAG(close, 2) OVER(PARTITION BY security_code ORDER BY date_time) AS prev_close2,
+               LAG(close, 3) OVER(PARTITION BY security_code ORDER BY date_time) AS prev_close3
+        FROM equity_prices_1d
+        WHERE date_time <= '2024-09-16'
+    ) sub
+    WHERE close > prev_close1 AND prev_close1 > prev_close2 AND prev_close2 > prev_close3
+) AS filt
+ON ep.security_code = filt.security_code AND ep.date_time = filt.date_time
+WHERE ep.date_time <= '2024-09-16'","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 63
+ Code: 63. DB::Exception: Aggregate function with name 'LAG' does not exist. In scope SELECT security_code, date_time, LAG(close, 1) OVER (PARTITION BY security_code ORDER BY date_time ASC) AS prev_close1, LAG(close, 2) OVER (PARTITION BY security_code ORDER BY date_time ASC) AS prev_close2, LAG(close, 3) OVER (PARTITION BY security_code ORDER BY date_time ASC) AS prev_close3 FROM equity_prices_1d WHERE date_time <= '2024-09-16'. (UNKNOWN_AGGREGATE_FUNCTION) (version 24.11.1.2557 (official build))
+",
+Find stocks where the price dropped by more than 5% with unusually high volume.,"Structured Format of Preprocessed Query:
+- Intent: Find stocks
+- Required Tables: equity_prices_1d
+- Columns: security_code, close, volume
+- Conditions:
+  - Price dropped by more than 5%: close price change percentage calculation required
+  - Unusually high volume: volume comparison required
+- Sorting/Grouping: N/A
+
+Preprocessed SQL Query:
+```sql
+SELECT security_code, close, volume
+FROM equity_prices_1d
+WHERE (close - LAG(close, 1) OVER (PARTITION BY security_code ORDER BY date_time)) / LAG(close, 1) OVER (PARTITION BY security_code ORDER BY date_time) < -0.05
+AND volume > (SELECT AVG(volume) * 2.5 FROM equity_prices_1d)
+```
+
+Note: The actual implementation may depend on the specific database system being used.","```sql
+SELECT ep.security_code, ep.close, ep.volume
+FROM equity_prices_1d AS ep
+WHERE (ep.close - LAG(ep.close, 1) OVER (PARTITION BY ep.security_code ORDER BY ep.date_time)) / LAG(ep.close, 1) OVER (PARTITION BY ep.security_code ORDER BY ep.date_time) < -0.05
+AND ep.volume > (SELECT AVG(ep2.volume) * 2.5 FROM equity_prices_1d AS ep2)
+```","SELECT ep.security_code, ep.close, ep.volume
+FROM equity_prices_1d AS ep
+JOIN (
+    SELECT 
+        security_code,
+        LAG(close, 1) OVER (PARTITION BY security_code ORDER BY date_time) AS lag_close,
+        AVG(volume) OVER () AS avg_volume
+    FROM equity_prices_1d
+) AS ep_temp ON ep.security_code = ep_temp.security_code
+WHERE (ep.close - ep_temp.lag_close) / ep_temp.lag_close < -0.05
+AND ep.volume > ep_temp.avg_volume * 2.5","HTTPDriver for http://202.131.150.31:8123 received ClickHouse error code 63
+ Code: 63. DB::Exception: Aggregate function with name 'LAG' does not exist. In scope SELECT security_code, LAG(close, 1) OVER (PARTITION BY security_code ORDER BY date_time ASC) AS lag_close, AVG(volume) OVER () AS avg_volume FROM equity_prices_1d. (UNKNOWN_AGGREGATE_FUNCTION) (version 24.11.1.2557 (official build))
+",
